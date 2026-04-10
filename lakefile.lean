@@ -4,8 +4,6 @@ import Lake
 open Lake DSL
 
 package "litlib4" where
-  -- Settings for litlib4
-  -- Strict compilation to ensure signatures are mathematically sound
   moreLeanArgs := #["-DwarningAsError=true"]
 
 require mathlib from git
@@ -13,7 +11,9 @@ require mathlib from git
 
 @[default_target]
 lean_lib «Litlib» where
-  -- Core library containing all literature axioms and proofs
+  -- This tells Lake to recursively search the Litlib/ directory and 
+  -- compile every .lean file it finds. No root index file required!
+  globs := #[.andSubmodules `Litlib]
 
 lean_exe "litlib_report" where
   root := `litlib_report
