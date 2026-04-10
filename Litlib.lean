@@ -1,4 +1,5 @@
 -- FILENAME: Litlib.lean
 
--- This is the root library file for the litlib4 package.
--- It will eventually import all the individual YYYYY/BibTeX folders.
+import Litlib.Core
+import Litlib.Y1989.capovilla1989general.Signature
+import Litlib.Y1989.capovilla1989general.Proofs.Sorry
