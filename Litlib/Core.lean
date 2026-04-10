@@ -15,7 +15,6 @@ custom attributes, and syntax macros used by `litlib4` to track scientific liter
 -- 1. Metadata Record & Environment Extension
 -- ==========================================
 
-/-- The core data structure storing literature metadata for axioms. -/
 structure LitlibData where
   bibtex_key : String
   doi : String
@@ -24,11 +23,6 @@ structure LitlibData where
   granularity : String
   deriving Inhabited, Repr
 
-/-- 
-Environment extension to persist `LitlibData` across modules. 
-We use `MapDeclarationExtension` because it is perfectly suited for 
-mapping Lean declaration names (like `Eq11`) to arbitrary data.
--/
 initialize litlibExt : MapDeclarationExtension LitlibData ←
   mkMapDeclarationExtension
 
@@ -36,18 +30,9 @@ initialize litlibExt : MapDeclarationExtension LitlibData ←
 -- 2. Custom Attributes
 -- ==========================================
 
-/- 
-Note: The prompt specified using `Lean.registerTagAttribute` for tags like 
-`@[litlib_difficulty intractable]`. However, in Lean 4, Tag Attributes 
-cannot accept parameters (they are purely binary flags like `@[inline]`). 
-To satisfy the requirement of passing an argument (e.g., `intractable` or `Retracted`),
-we define custom syntaxes and use `registerParametricAttribute` instead.
--/
-
 syntax (name := litlibDifficultyAttrStx) "litlib_difficulty " ident : attr
 syntax (name := litlibStatusAttrStx) "litlib_status " ident : attr
 
-/-- Attribute indicating the difficulty of a proof instance. -/
 initialize litlibDifficultyAttr : ParametricAttribute Name ←
   registerParametricAttribute {
     name := `litlib_difficulty
@@ -58,7 +43,6 @@ initialize litlibDifficultyAttr : ParametricAttribute Name ←
       | _ => throwError "Invalid litlib_difficulty attribute syntax. Expected an identifier."
   }
 
-/-- Attribute indicating the status of a litlib theorem. -/
 initialize litlibStatusAttr : ParametricAttribute Name ←
   registerParametricAttribute {
     name := `litlib_status
@@ -69,16 +53,20 @@ initialize litlibStatusAttr : ParametricAttribute Name ←
       | _ => throwError "Invalid litlib_status attribute syntax. Expected an identifier."
   }
 
-
 -- ==========================================
--- 3. The `literature_axiom` Macro
+-- 3. Syntax Definitions (Bypassing Internal Parsers)
 -- ==========================================
 
-/-- 
-Parser definition for the `literature_axiom` command.
-Requires standard literature metadata and a `where` block 
-containing the Lean signatures.
--/
+-- We explicitly define binders to avoid "unknown parser declaration" errors
+declare_syntax_cat litlibBinder
+syntax "(" ident+ " : " term ")" : litlibBinder
+syntax "{" ident+ " : " term "}" : litlibBinder
+syntax "[" term "]"              : litlibBinder
+syntax "[" ident " : " term "]"  : litlibBinder
+
+declare_syntax_cat litlibField
+syntax ident (litlibBinder)* " : " term : litlibField
+
 syntax (name := literatureAxiom) "literature_axiom " ident " : " term
   "bibtex_key " str
   "doi " str
@@ -86,50 +74,54 @@ syntax (name := literatureAxiom) "literature_axiom " ident " : " term
   "status " ident
   ("granularity " str)?
   "where"
-  (colGt ident (Parser.Term.bracketedBinder)* " : " term)* : command
+  (colGt litlibField)* : command
+
+-- ==========================================
+-- 4. The Elaborator
+-- ==========================================
 
 /-- 
 Elaborator for the `literature_axiom` command.
-1. Generates the equivalent `class` declaration.
-2. Extracts the metadata and stores it in the `litlibExt` environment extension.
+We use direct AST array indexing to avoid Lean's macro compiler 
+hijacking the `where` keyword.
 -/
 @[command_elab literatureAxiom]
 def elabLiteratureAxiom : CommandElab := fun stx => do
-  match stx with
-  | `(command| literature_axiom $name:ident : $ty:term
-       bibtex_key $bib:str
-       doi $doi:str
-       authors [ $authors,* ]
-       status $status:ident
-       $[granularity $gran:str]?
-       where
-       $[$meths:ident $binders* : $mty:term]*) => do
-       
-     -- Step 1: Generate and execute the underlying `class` definition
-     let classCmd ← `(command| 
-       class $name:ident : $ty:term where
-         $[$meths:ident $binders* : $mty:term]*
-     )
-     elabCommand classCmd
+  let args := stx.getArgs
+  
+  -- Extract basic definitions
+  let nameId := args[1]!.getId
+  let tyStr := args[3]!.reprint.getD "Prop"
+  
+  -- Extract string metadata
+  let bibStr := args[5]!.isStrLit?.getD ""
+  let doiStr := args[7]!.isStrLit?.getD ""
+  
+  -- Extract alternating strings from the `str,*` syntax
+  let authorsStrs := args[10]!.getArgs.filterMap (·.isStrLit?)
+  let statusStr := args[13]!.getId.toString
+  
+  -- Handle optional granularity (args[14] is a nullNode of size 0 or 2)
+  let granArgs := args[14]!.getArgs
+  let granStr := if granArgs.size == 2 then
+                   granArgs[1]!.isStrLit?.getD "default"
+                 else
+                   "default"
 
-     -- Step 2: Extract string representations of the metadata
-     let bibStr := bib.getString
-     let doiStr := doi.getString
-     let authorStrs := authors.getElems.toList.map (·.getString)
-     let statusStr := status.getId.toString
-     let granStr := match gran with
-                    | some g => g.getString
-                    | none => "default" -- Fallback if granularity is omitted
-     
-     let data : LitlibData := {
-       bibtex_key := bibStr
-       doi := doiStr
-       authors := authorStrs
-       status := statusStr
-       granularity := granStr
-     }
+  -- Extract and format fields (args[16] is the nullNode holding the fields)
+  let fieldsStr := args[16]!.reprint.getD ""
+  
+  -- Reconstruct and execute the class
+  let classCode := s!"class {nameId} : {tyStr} where\n{fieldsStr}"
+  
+  let env ← getEnv
+  match Parser.runParserCategory env `command classCode "<litlib_macro>" with
+  | Except.ok classStx => 
+      elabCommand classStx
+  | Except.error e => 
+      throwError s!"Failed to generate underlying class. Parser error: {e}\nGenerated Code:\n{classCode}"
 
-     -- Step 3: Insert the parsed data into the environment extension keyed by the axiom name
-     modifyEnv fun env => litlibExt.insert env name.getId data
-     
-  | _ => throwUnsupportedSyntax
+  -- Persist the metadata using the direct constructor to avoid keyword collisions
+  let data := LitlibData.mk bibStr doiStr authorsStrs.toList statusStr granStr
+
+  modifyEnv fun env => litlibExt.insert env nameId data
