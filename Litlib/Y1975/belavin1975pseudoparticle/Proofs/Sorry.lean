@@ -6,10 +6,14 @@ namespace Litlib.Y1975.belavin1975pseudoparticle.Proofs
 
 @[litlib_difficulty intractable, litlib_status Conjecture]
 instance : Eq11_SelfDuality where
-  is_self_dual _ := True
-  is_anti_self_dual _ := True
+  is_self_dual := sorry
+  is_anti_self_dual := sorry
 
 @[litlib_difficulty intractable, litlib_status Conjecture]
 instance : Eq10_ActionBound where
-  bogomolnyi_bound _ := sorry
-  saturation_condition _ _ := sorry
+  is_self_dual := sorry
+  is_anti_self_dual := sorry
+  bogomolnyi_bound := sorry
+  saturation_condition := sorry
+
+end Litlib.Y1975.belavin1975pseudoparticle.Proofs

@@ -18,3 +18,5 @@ instance : Eq1_33_ElectromagneticTensor where
   G := sorry
   F := sorry
   physical_tensor_def := sorry
+
+end Litlib.Y1979.duan1979su2.Proofs
