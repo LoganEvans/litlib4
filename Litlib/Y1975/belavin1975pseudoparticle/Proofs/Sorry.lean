@@ -5,6 +5,10 @@ import Litlib.Y1975.belavin1975pseudoparticle.Signature
 namespace Litlib.Y1975.belavin1975pseudoparticle.Proofs
 
 @[litlib_difficulty easy, litlib_status Conjecture]
+instance : Eq10_and_11 where
+  topological_energy_bound := sorry
+
+@[litlib_difficulty easy, litlib_status Conjecture]
 instance : Eq16 where
   bpst_profile_ode := sorry
 

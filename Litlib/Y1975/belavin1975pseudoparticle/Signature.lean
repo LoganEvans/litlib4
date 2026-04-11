@@ -3,8 +3,30 @@
 import Litlib.Core
 import Mathlib.Data.Real.Basic
 import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 namespace Litlib.Y1975.belavin1975pseudoparticle
+
+literature_citation Eq10_and_11
+  bibtex_key "belavin1975pseudoparticle"
+  doi "10.1016/0370-2693(75)90163-X"
+  authors["Belavin, A.A.", "Polyakov, A.M.", "Schwartz, A.S.", "Tyupkin, Yu.S."]
+  status Standard
+class Eq10_and_11 where
+  /--
+  Equations (10) and (11) (page 86): The Topological Action Bound.
+  The energy E (defined as 1/4 Sp ∫ F^2 d^4x) is bounded below by 2π²|q|.
+  Furthermore, this bound is saturated (equality holds) if the field 
+  is self-dual or anti-self-dual (Equation 11).
+  -/
+  topological_energy_bound
+    (State : Type*)
+    (Energy : State → ℝ)
+    (windingNumber : State → ℤ)
+    (isSelfDual : State → Prop)
+    (isAntiSelfDual : State → Prop) :
+    (∀ (s : State), 2 * (Real.pi ^ 2) * |(windingNumber s : ℝ)| ≤ Energy s) ∧
+    (∀ (s : State), (isSelfDual s ∨ isAntiSelfDual s) → Energy s = 2 * (Real.pi ^ 2) * |(windingNumber s : ℝ)|)
 
 literature_citation Eq16
   bibtex_key "belavin1975pseudoparticle"
