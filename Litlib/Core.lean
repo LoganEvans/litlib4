@@ -30,8 +30,8 @@ initialize litlibExt : MapDeclarationExtension LitlibData ←
 -- 2. Custom Attributes
 -- ==========================================
 
-syntax (name := litlibDifficultyAttrStx) "litlib_difficulty " ident : attr
-syntax (name := litlibStatusAttrStx) "litlib_status " ident : attr
+syntax (name := litlib_difficulty) "litlib_difficulty " ident : attr
+syntax (name := litlib_status) "litlib_status " ident : attr
 
 initialize litlibDifficultyAttr : ParametricAttribute Name ←
   registerParametricAttribute {
@@ -40,7 +40,7 @@ initialize litlibDifficultyAttr : ParametricAttribute Name ←
     getParam := fun _ stx => do
       match stx with
       | `(attr| litlib_difficulty $id:ident) => return id.getId
-      | _ => throwError "Invalid litlib_difficulty attribute syntax. Expected an identifier."
+      | _ => throwError "Invalid litlib_difficulty attribute syntax."
   }
 
 initialize litlibStatusAttr : ParametricAttribute Name ←
@@ -50,78 +50,73 @@ initialize litlibStatusAttr : ParametricAttribute Name ←
     getParam := fun _ stx => do
       match stx with
       | `(attr| litlib_status $id:ident) => return id.getId
-      | _ => throwError "Invalid litlib_status attribute syntax. Expected an identifier."
+      | _ => throwError "Invalid litlib_status attribute syntax."
   }
 
--- ==========================================
--- 3. Syntax Definitions (Bypassing Internal Parsers)
--- ==========================================
-
--- We explicitly define binders to avoid "unknown parser declaration" errors
-declare_syntax_cat litlibBinder
-syntax "(" ident+ " : " term ")" : litlibBinder
-syntax "{" ident+ " : " term "}" : litlibBinder
-syntax "[" term "]"              : litlibBinder
-syntax "[" ident " : " term "]"  : litlibBinder
-
-declare_syntax_cat litlibField
-syntax ident (litlibBinder)* " : " term : litlibField
-
-syntax (name := literatureAxiom) "literature_axiom " ident " : " term
-  "bibtex_key " str
-  "doi " str
-  "authors " "[" str,* "]"
-  "status " ident
-  ("granularity " str)?
-  "where"
-  (colGt litlibField)* : command
+declare_syntax_cat litlibStatus
+syntax ident : litlibStatus
+syntax str : litlibStatus
 
 -- ==========================================
--- 4. The Elaborator
+-- 3. Syntax Definition
 -- ==========================================
 
-/-- 
-Elaborator for the `literature_axiom` command.
-We use direct AST array indexing to avoid Lean's macro compiler 
-hijacking the `where` keyword.
--/
+syntax (name := literatureAxiom) 
+  "literature_axiom" ident
+  "bibtex_key" str
+  ("doi" str)?
+  "authors" "[" str,* "]"
+  "status" litlibStatus
+  ("granularity" str)?
+  command : command
+
+-- ==========================================
+-- 4. The Elaborator (AST Keyword Extraction)
+-- ==========================================
+
 @[command_elab literatureAxiom]
 def elabLiteratureAxiom : CommandElab := fun stx => do
   let args := stx.getArgs
   
-  -- Extract basic definitions
+  -- The Identifier is always the second element
   let nameId := args[1]!.getId
-  let tyStr := args[3]!.reprint.getD "Prop"
   
-  -- Extract string metadata
-  let bibStr := args[5]!.isStrLit?.getD ""
-  let doiStr := args[7]!.isStrLit?.getD ""
-  
-  -- Extract alternating strings from the `str,*` syntax
-  let authorsStrs := args[10]!.getArgs.filterMap (·.isStrLit?)
-  let statusStr := args[13]!.getId.toString
-  
-  -- Handle optional granularity (args[14] is a nullNode of size 0 or 2)
-  let granArgs := args[14]!.getArgs
-  let granStr := if granArgs.size == 2 then
-                   granArgs[1]!.isStrLit?.getD "default"
-                 else
-                   "default"
+  -- The underlying class command is always the very last element of the syntax tree
+  let classCmd := args[args.size - 1]!
 
-  -- Extract and format fields (args[16] is the nullNode holding the fields)
-  let fieldsStr := args[16]!.reprint.getD ""
-  
-  -- Reconstruct and execute the class
-  let classCode := s!"class {nameId} : {tyStr} where\n{fieldsStr}"
-  
-  let env ← getEnv
-  match Parser.runParserCategory env `command classCode "<litlib_macro>" with
-  | Except.ok classStx => 
-      elabCommand classStx
-  | Except.error e => 
-      throwError s!"Failed to generate underlying class. Parser error: {e}\nGenerated Code:\n{classCode}"
+  -- Initialize default values
+  let mut bibStr := ""
+  let mut doiStr := ""
+  let mut authStrs : List String := []
+  let mut statusStr := "Standard"
+  let mut granStr := "default"
 
-  -- Persist the metadata using the direct constructor to avoid keyword collisions
-  let data := LitlibData.mk bibStr doiStr authorsStrs.toList statusStr granStr
+  -- Iterate through the syntax tree to find the keywords
+  for i in [0:args.size] do
+    let node := args[i]!
+    let nodeStr := node.reprint.getD ""
+    
+    -- Lean's reprint might append spaces (e.g. "bibtex_key "), so we check the start of the string
+    if nodeStr.startsWith "bibtex_key" then
+      bibStr := args[i+1]!.isStrLit?.getD ""
+    else if nodeStr.startsWith "doi" then
+      let doiNode := args[i+1]!.getArgs
+      if doiNode.size == 2 then doiStr := doiNode[1]!.isStrLit?.getD ""
+    else if nodeStr.startsWith "authors" then
+      authStrs := args[i+2]!.getArgs.filterMap (·.isStrLit?) |>.toList
+    else if nodeStr.startsWith "status" then
+      let rawStatus := args[i+1]!.reprint.getD "Standard"
+      -- We manually strip potential trailing spaces from the status identifier without using .trim
+      let chars := rawStatus.toList
+      let cleanChars := chars.takeWhile (fun c => c != ' ' && c != '\n' && c != '\r')
+      statusStr := String.ofList cleanChars
+    else if nodeStr.startsWith "granularity" then
+      let granNode := args[i+1]!.getArgs
+      if granNode.size == 2 then granStr := granNode[1]!.isStrLit?.getD ""
 
+  -- 1. Natively execute the underlying `class ... where` command
+  elabCommand classCmd
+
+  -- 2. Persist the metadata using the extracted identifier
+  let data := LitlibData.mk bibStr doiStr authStrs statusStr granStr
   modifyEnv fun env => litlibExt.insert env nameId data

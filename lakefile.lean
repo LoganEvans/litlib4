@@ -4,16 +4,17 @@ import Lake
 open Lake DSL
 
 package "litlib4" where
-  moreLeanArgs := #["-DwarningAsError=true"]
+  -- We rely on standard Lean 4 compiler diagnostics here.
+  -- The litlib_run bash script handles filtering the `sorry` traces.
 
 require mathlib from git
-  "https://github.com/leanprover-community/mathlib4.git"
+  "https://github.com/leanprover-community/mathlib4.git" @ "v4.27.0"
 
 @[default_target]
 lean_lib «Litlib» where
-  -- This tells Lake to recursively search the Litlib/ directory and 
-  -- compile every .lean file it finds. No root index file required!
-  globs := #[.andSubmodules `Litlib]
+  roots := #[]
+  globs := #[.submodules `Litlib]
 
+@[default_target]
 lean_exe "litlib_report" where
   root := `litlib_report

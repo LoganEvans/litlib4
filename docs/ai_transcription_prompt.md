@@ -17,32 +17,38 @@ For the provided text, generate exactly two files:
 2. `Litlib/Y[Year]/[bibtex_key]/Proofs/Sorry.lean`
 
 #### Format Requirements for `Signature.lean`
-Use the custom `literature_axiom` macro. It requires metadata and a `where` block defining the mathematical signature.
-```lean
--- FILENAME: Litlib/Y1975/belavin1975pseudoparticle/Signature.lean
-import Litlib.Core
-import Mathlib.Topology.Basic
+Use the custom `literature_axiom` macro. It requires the metadata block, followed IMMEDIATELY by a native `class [Name] where` declaration. Do not use quotes around the status field.
 
-namespace Litlib.Y1975.belavin1975pseudoparticle
-
-```lean
-literature_axiom Eq11 : Prop
-  bibtex_key "belavin1975pseudoparticle"
-  doi "10.1016/0370-2693(75)90163-X"
-  authors ["Belavin, A.A.", "Polyakov, A.M."]
-  status "Standard"
-where
-  bpst_is_self_dual (A : GaugeField) : isFully4DSymmetric A
-```
+    ```lean
+    -- FILENAME: Litlib/Y1975/belavin1975pseudoparticle/Signature.lean
+    import Litlib.Core
+    import Mathlib.Topology.Basic
+    
+    namespace Litlib.Y1975.belavin1975pseudoparticle
+    
+    literature_axiom Eq11
+      bibtex_key "belavin1975pseudoparticle"
+      doi "10.1016/0370-2693(75)90163-X"
+      authors ["Belavin, A.A.", "Polyakov, A.M."]
+      status Standard
+    class Eq11 where
+      bpst_is_self_dual (A : GaugeField) : isFully4DSymmetric A
+    ```
 
 #### Format Requirements for `Proofs/Sorry.lean`
-You must provide a fallback instance using `sorry`. You must evaluate how difficult this would be to formally prove in Lean 4 and attach a difficulty attribute (`easy`, `medium`, `hard`, or `intractable`).
-```lean
--- FILENAME: Litlib/Y1975/belavin1975pseudoparticle/Proofs/Sorry.lean
-import Litlib.Y1975.belavin1975pseudoparticle.Signature
+You must provide a fallback instance using `sorry`. You must evaluate how difficult this would be to formally prove in Lean 4 and attach a difficulty attribute (`easy`, `medium`, `hard`, or `intractable`). Use explicit field assignments for the sorry values, do NOT use `⟨sorry⟩` brackets.
 
-@[litlib_difficulty intractable]
-instance : Litlib.Y1975.belavin1975pseudoparticle.Eq11 := ⟨sorry⟩
-```
+    ```lean
+    -- FILENAME: Litlib/Y1975/belavin1975pseudoparticle/Proofs/Sorry.lean
+    import Litlib.Y1975.belavin1975pseudoparticle.Signature
+    
+    namespace Litlib.Y1975.belavin1975pseudoparticle.Proofs
+    
+    @[litlib_difficulty intractable, litlib_status Conjecture]
+    instance : Eq11 where
+      bpst_is_self_dual := sorry
+    
+    end Litlib.Y1975.belavin1975pseudoparticle.Proofs
+    ```
 
 Please await the literature snippet to transcribe.
