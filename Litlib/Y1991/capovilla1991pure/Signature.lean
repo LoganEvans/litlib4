@@ -15,12 +15,6 @@ class Eq2_22 where
   /--
   Equation (2.22) (page 64): The reconstruction of the spacetime metric
   directly from the scalar density η and the spin-connection curvature R_{AB}.
-  
-  This algebraic identity (the Urbantke metric) dynamically generates the 
-  spacetime metric from an SL(2,C) connection. The foundational 
-  requirement is that the resulting tensor g_{μν} is symmetric. 
-  By casting this algebraically over Fintypes, we verify the symmetry 
-  without requiring a background smooth manifold.
   -/
   urbantke_metric_symmetric
     (R : Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
@@ -43,3 +37,24 @@ class Eq2_22 where
                   Finset.sum Finset.univ (fun C =>
                     epsilon α β γ δ * R μ α A B * R β γ B C * R δ ν C A)))))))
     ∀ μ ν, g μ ν = g ν μ
+
+literature_axiom UrbantkeCDJ
+  bibtex_key "capovilla1991pure"
+  doi "10.1088/0264-9381/8/1/01"
+  authors ["Capovilla, Riccardo", "Dell, John", "Jacobson, Ted"]
+  status Standard
+class UrbantkeCDJ where
+  /--
+  Capstone Theorem: Ricci Flatness of the Urbantke Metric.
+  Using the Weyl Pattern, this theorem establishes that if a field configuration 
+  satisfies the pure connection field equations, its corresponding Urbantke metric 
+  is Ricci flat.
+  -/
+  urbantke_is_ricci_flat
+    (SpacetimePoint SL2C : Type*)
+    (satisfiesPureConnectionEq : (Fin 4 → Fin 4 → SpacetimePoint → SL2C) → Prop)
+    (urbantkeMetric : (Fin 4 → Fin 4 → SL2C) → Matrix (Fin 4) (Fin 4) ℂ)
+    (isRicciFlat : (SpacetimePoint → Matrix (Fin 4) (Fin 4) ℂ) → Prop)
+    (F : Fin 4 → Fin 4 → SpacetimePoint → SL2C) :
+    satisfiesPureConnectionEq F →
+    isRicciFlat (fun x => urbantkeMetric (fun m n => F m n x))

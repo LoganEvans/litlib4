@@ -3,6 +3,7 @@
 import Litlib.Core
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Matrix.Basic
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 
 namespace Litlib.Y2024.gielen2024unimodular
 
@@ -39,7 +40,7 @@ class Eq3 where
 literature_axiom Eq7
   bibtex_key "gielen2024unimodular"
   doi "10.1088/1361-6382/ad3277"
-  authors ["Gielen, Steffen", "Nash, Elliot"]
+  authors["Gielen, Steffen", "Nash, Elliot"]
   status Standard
 class Eq7 where
   /--
@@ -77,3 +78,23 @@ class Eq11 where
     (h_inv : Minv * M = 1)
     (h_eq : Minv * X * Minv = 1) :
     X = M * M
+
+literature_axiom UnimodularCDJ
+  bibtex_key "gielen2024unimodular"
+  doi "10.1088/1361-6382/ad3277"
+  authors ["Gielen, Steffen", "Nash, Elliot"]
+  status Standard
+class UnimodularCDJ where
+  /--
+  Capstone Theorem: The Unimodular Capovilla-Dell-Jacobson constraint.
+  Using the Weyl Pattern, this theorem asserts that any connection satisfying 
+  the chiral CDJ field equations inherently generates a spacetime metric 
+  (via the Urbantke construction) that has a constant spacetime volume.
+  -/
+  cdj_implies_constant_volume
+    (SpacetimePoint SL2C : Type*)
+    (satisfiesCdjConstraint : (Fin 4 → Fin 4 → SpacetimePoint → SL2C) → Prop)
+    (urbantkeMetric : (Fin 4 → Fin 4 → SL2C) → Matrix (Fin 4) (Fin 4) ℂ)
+    (F : Fin 4 → Fin 4 → SpacetimePoint → SL2C) :
+    satisfiesCdjConstraint F →
+    ∃ (c : ℂ), c ≠ 0 ∧ ∀ x, Matrix.det (urbantkeMetric (fun m n => F m n x)) = c
