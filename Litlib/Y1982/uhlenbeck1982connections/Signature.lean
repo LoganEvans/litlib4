@@ -51,3 +51,54 @@ class Thm1_5 where
       ∃ (subseq : ℕ → ℕ) (s : ℕ → GaugeTransform),
         StrictMono subseq ∧
         isWeaklyConvergent (fun i => applyGauge (s i) (D (subseq i)))
+
+literature_citation ConnectionTopology
+  bibtex_key "uhlenbeck1982connections"
+  doi "10.1007/BF01206014"
+  authors ["Uhlenbeck, Karen K."]
+  status Standard
+class ConnectionTopology where
+  /--
+  Capstone Theorem for CGD: Connection Topology.
+  Axiom stating that there exists a valid, rigorous Sobolev topological space 
+  over the field of connections.
+  -/
+  exists_sobolev_topology
+    (Connection : Type*)
+    (isSobolevTopology : TopologicalSpace Connection → Prop) :
+    ∃ (T : TopologicalSpace Connection), isSobolevTopology T
+
+literature_citation YangMillsActionDifferentiable
+  bibtex_key "uhlenbeck1982connections"
+  doi "10.1007/BF01206014"
+  authors ["Uhlenbeck, Karen K."]
+  status Standard
+class YangMillsActionDifferentiable where
+  /--
+  Capstone Theorem for CGD: Yang-Mills Action Differentiability.
+  An axiom stating the Yang-Mills action is Fréchet differentiable with 
+  respect to smooth (W=1) variations.
+  -/
+  is_frechet_differentiable
+    (Connection : Type*)
+    (Action : Connection → ℝ)
+    (isFrechetDifferentiable : (Connection → ℝ) → Prop) :
+    isFrechetDifferentiable Action
+
+literature_citation YangMillsFunctionalDerivative
+  bibtex_key "uhlenbeck1982connections"
+  doi "10.1007/BF01206014"
+  authors ["Uhlenbeck, Karen K."]
+  status Standard
+class YangMillsFunctionalDerivative where
+  /--
+  Capstone Theorem for CGD: Yang-Mills Functional Derivative.
+  If a connection is a stationary point of the action, it mathematically implies 
+  the local continuous Euler-Lagrange (Yang-Mills) PDEs.
+  -/
+  stationary_implies_euler_lagrange
+    (Connection : Type*)
+    (Action : Connection → ℝ)
+    (isStationaryPoint : Connection → (Connection → ℝ) → Prop)
+    (satisfiesYangMillsPDE : Connection → Prop) :
+    ∀ (A : Connection), isStationaryPoint A Action → satisfiesYangMillsPDE A

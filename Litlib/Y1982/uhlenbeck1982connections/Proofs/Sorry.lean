@@ -4,10 +4,6 @@ import Litlib.Y1982.uhlenbeck1982connections.Signature
 
 namespace Litlib.Y1982.uhlenbeck1982connections.Proofs
 
--- These theorems represent foundational, highly non-trivial results in 
--- global analysis and non-linear partial differential equations. 
--- Formalizing the requisite Sobolev spaces over non-linear manifolds 
--- would be a massive undertaking.
 @[litlib_difficulty intractable, litlib_status Conjecture]
 instance : Thm1_3 where
   exists_coulomb_gauge := sorry
@@ -15,5 +11,17 @@ instance : Thm1_3 where
 @[litlib_difficulty intractable, litlib_status Conjecture]
 instance : Thm1_5 where
   uhlenbeck_compactness := sorry
+
+@[litlib_difficulty hard, litlib_status Conjecture]
+instance : ConnectionTopology where
+  exists_sobolev_topology := sorry
+
+@[litlib_difficulty hard, litlib_status Conjecture]
+instance : YangMillsActionDifferentiable where
+  is_frechet_differentiable := sorry
+
+@[litlib_difficulty hard, litlib_status Conjecture]
+instance : YangMillsFunctionalDerivative where
+  stationary_implies_euler_lagrange := sorry
 
 end Litlib.Y1982.uhlenbeck1982connections.Proofs
