@@ -2,7 +2,8 @@
 
 import Litlib.Core
 import Mathlib.Data.Real.Basic
-import Mathlib.Algebra.Module.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Basic
+import Mathlib.Analysis.Calculus.Deriv.Basic
 
 namespace Litlib.Y1976.rudin1976principles
 
@@ -16,13 +17,11 @@ class Eq9_39 where
   and its equivalence to the Fréchet derivative evaluated on a vector.
   -/
   directional_derivative
-    (V W : Type*) [AddCommGroup V] [Module ℝ V] [AddCommGroup W] [Module ℝ W]
-    (f : V → W)
-    (frechetDeriv : V → V → W)
-    (isFrechetDerivative : (V → W) → (V → V → W) → Prop)
+    (V W : Type*) [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup W][NormedSpace ℝ W]
+    (f : V → W) (x u : V)
+    (hf : DifferentiableAt ℝ f x)
     (limitToZero : (ℝ → W) → W → Prop) :
-    isFrechetDerivative f frechetDeriv →
-    ∀ x u : V, limitToZero (fun t => (t⁻¹) • (f (x + t • u) - f x)) (frechetDeriv x u)
+    limitToZero (fun t => (t⁻¹) • (f (x + t • u) - f x)) ((fderiv ℝ f x) u)
 
 literature_citation Thm9_19
   bibtex_key "rudin1976principles"
@@ -31,36 +30,29 @@ literature_citation Thm9_19
 class Thm9_19 where
   /--
   Theorem 9.19 (page 218): The Mean Value Theorem for functions of several variables.
-  Projects the multidimensional bounds down to a 1D scalar function along a line segment.
   -/
   multidimensional_mvt
-    (V W : Type*) [AddCommGroup V] [Module ℝ V] [AddCommGroup W] [Module ℝ W]
+    (V W : Type*) [NormedAddCommGroup V] [NormedSpace ℝ V][NormedAddCommGroup W] [NormedSpace ℝ W]
     (f : V → W)
-    (normV : V → ℝ)
-    (normW : W → ℝ)
-    (frechetDeriv : V → V → W)
-    (isFrechetDerivative : (V → W) → (V → V → W) → Prop)
     (a b : V)
     (M : ℝ) :
-    isFrechetDerivative f frechetDeriv →
-    (∀ x, normW (frechetDeriv x (b - a)) ≤ M * normV (b - a)) →
-    normW (f b - f a) ≤ M * normV (b - a)
+    Differentiable ℝ f →
+    (∀ x, ‖fderiv ℝ f x (b - a)‖ ≤ M * ‖b - a‖) →
+    ‖f b - f a‖ ≤ M * ‖b - a‖
 
 literature_citation FrechetToScalarProjection
   bibtex_key "rudin1976principles"
-  authors ["Rudin, Walter"]
+  authors["Rudin, Walter"]
   status Standard
 class FrechetToScalarProjection where
   /--
   Capstone Theorem for CGD: Fréchet to Scalar Projection.
   Mathematical theorem projecting multi-dimensional continuous Fréchet 
-  derivatives down to 1D scalar limits (so that CGD can evaluate them algebraically).
-  If g(t) = f(x + t u), then the scalar derivative g'(0) = Df(x)[u].
+  derivatives down to 1D scalar limits using Mathlib's native topologies.
   -/
   project_frechet_to_1d
-    (V W : Type*)[AddCommGroup V] [Module ℝ V]
+    (V W : Type*) [NormedAddCommGroup V][NormedSpace ℝ V] [NormedAddCommGroup W] [NormedSpace ℝ W]
     (f : V → W)
-    (frechetDeriv : (V → W) → V → V → W)
-    (scalarDeriv : (ℝ → W) → ℝ → W) :
-    ∀ (x u : V),
-      frechetDeriv f x u = scalarDeriv (fun t => f (x + t • u)) 0
+    (x u : V)
+    (hf : DifferentiableAt ℝ f x) :
+    (fderiv ℝ f x) u = deriv (fun t : ℝ => f (x + t • u)) 0
