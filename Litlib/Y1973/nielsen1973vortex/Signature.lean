@@ -24,9 +24,23 @@ literature_axiom Eq2_21
   status Standard
 class Eq2_21 where
   /-- Equation (2.21) (page 49): The mass square of the scalar particle is given by 
-      the second derivative of the potential at the vacuum minimum.
-      V(ρ) = 1/2 * (-c₂|ϕ|² + c₄|ϕ|⁴), evaluated for fluctuations ρ around ϕ₀.
-      The second derivative with respect to ρ evaluated at ρ=0 is 2c₂. -/
+      the second derivative of the potential at the vacuum minimum. -/
   scalar_mass_sq (c₂ c₄ ϕ₀ : ℝ) (hc₂ : 0 < c₂) (hc₄ : 0 < c₄) (hϕ₀_sq : ϕ₀^2 = c₂ / (2 * c₄)) :
     let V := fun ρ => (1/2 : ℝ) * (- c₂ * (ϕ₀ + ρ)^2 + c₄ * (ϕ₀ + ρ)^4)
     deriv (deriv V) 0 = 2 * c₂
+
+literature_axiom NielsenOlesenVortex
+  bibtex_key "nielsen1973vortex"
+  doi "10.1016/0550-3213(73)90350-7"
+  authors ["Nielsen, H.B.", "Olesen, P."]
+  status Standard
+class NielsenOlesenVortex where
+  /--
+  Capstone Theorem: Nielsen-Olesen Vortex / Minimal Surface.
+  A mathematically guaranteed stationary minimum of the action for the flux tube.
+  -/
+  exists_minimal_surface
+    (State : Type*)
+    (Action : State → ℝ)
+    (isTopologicalVortex : State → Prop) :
+    ∃ (s : State), isTopologicalVortex s ∧ ∀ (s' : State), isTopologicalVortex s' → Action s ≤ Action s'

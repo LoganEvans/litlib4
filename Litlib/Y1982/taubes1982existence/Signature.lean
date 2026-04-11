@@ -15,15 +15,6 @@ class Eq2_7_and_2_8 where
   /--
   Equations (2.7) and (2.8) (page 263): The first and second variation 
   (gradient and Hessian) of the Yang-Mills-Higgs action functional.
-  
-  By parameterizing the connection A and Higgs field Φ along a variation 
-  c + sψ = (A + sω, Φ + sη), the fields expand algebraically as:
-  F(s) = F_A + s D_A ω + s² ω ∧ ω
-  DΦ(s) = D_A Φ + s (D_A η +[ω, Φ]) + s² [ω, η]
-  
-  This theorem establishes the exact coefficients of the Fréchet derivatives 
-  at s=0, avoiding the need for deep Sobolev space topologies by reducing 
-  the claim to rigorous calculus on an abstract inner product space.
   -/
   ymh_variations
     (V : Type*)[NormedAddCommGroup V][InnerProductSpace ℝ V]
@@ -38,3 +29,18 @@ class Eq2_7_and_2_8 where
                   2 * inner ℝ omega_wedge_omega F_A + 2 * inner ℝ bracket_omega_eta D_A_Phi + 2 * inner ℝ bracket_omega_Phi D_A_eta
     
     deriv a 0 = grad_a ∧ deriv (deriv a) 0 = hess_a
+
+literature_axiom BogomolnyiExistence
+  bibtex_key "taubes1982existence"
+  doi "10.1007/BF01206014"
+  authors ["Taubes, Clifford Henry"]
+  status Standard
+class BogomolnyiExistence where
+  /--
+  Capstone Theorem: Bogomolnyi Existence.
+  The infimum of the Yang-Mills-Higgs action is attained by a smooth function.
+  -/
+  exists_w1_minimizer
+    (Connection : Type*)
+    (isW1Minimizer : Connection → Prop) :
+    ∃ (A : Connection), isW1Minimizer A

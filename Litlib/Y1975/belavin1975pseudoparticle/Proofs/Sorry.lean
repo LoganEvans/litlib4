@@ -8,4 +8,8 @@ namespace Litlib.Y1975.belavin1975pseudoparticle.Proofs
 instance : Eq16 where
   bpst_profile_ode := sorry
 
+@[litlib_difficulty hard, litlib_status Conjecture]
+instance : BpstModuliUniqueness where
+  bpst_uniqueness := sorry
+
 end Litlib.Y1975.belavin1975pseudoparticle.Proofs

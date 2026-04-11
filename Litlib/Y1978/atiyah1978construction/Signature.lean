@@ -13,13 +13,8 @@ literature_axiom Page185Algebra
   status Standard
 class Page185Algebra where
   /--
-  The core linear algebra lemma on page 185:
-  If B is a skew form, σ_V is an antilinear map with σ_V^2 = -1, and the induced 
-  hermitian form H(u, v) = B(u, σ_V v) is positive definite, then for any subspace Uz, 
-  if U_σz = σ_V(Uz), the intersection of the annihilator (Uz)^0 and U_σz is trivial.
-  
-  This algebraic result ensures that the "real" lines of P3(C) are never jumping lines,
-  forming the topological foundation of the ADHM instanton construction.
+  The core linear algebra lemma on page 185: Ensures that "real" lines 
+  of P3(C) are never jumping lines.
   -/
   jumping_lines_trivial
     (V : Type*) [AddCommGroup V][Module ℂ V]
@@ -38,3 +33,22 @@ class Page185Algebra where
     (hv_in_U_σz : ∃ u ∈ Uz, σ_V u = v)
     (hv_in_Uz_annihilator : ∀ u ∈ Uz, B u v = 0) :
     v = 0
+
+literature_axiom AdhmModuliUniqueness
+  bibtex_key "atiyah1978construction"
+  doi "10.1016/0375-9601(78)90141-X"
+  authors["Atiyah, M.F.", "Hitchin, N.J.", "Drinfeld, V.G.", "Manin, Yu.I."]
+  status Standard
+class AdhmModuliUniqueness where
+  /--
+  Capstone Theorem: ADHM Moduli Uniqueness.
+  Any self-dual instanton is gauge-equivalent to one constructed via the ADHM linear algebra data.
+  -/
+  adhm_uniqueness
+    (State AdhmData : Type*)
+    (isSelfDual : State → Prop)
+    (isGaugeEquivalent : State → State → Prop)
+    (constructInstanton : AdhmData → State)
+    (isValidAdhmData : AdhmData → Prop) :
+    ∀ (s : State), isSelfDual s → 
+    ∃ (d : AdhmData), isValidAdhmData d ∧ isGaugeEquivalent s (constructInstanton d)

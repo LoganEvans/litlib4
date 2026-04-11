@@ -12,4 +12,8 @@ instance : Thm5_5 where
 instance : Thm7_1 where
   pontryagin_defect_bound := sorry
 
+@[litlib_difficulty hard, litlib_status Conjecture]
+instance : YangMillsCoercivity where
+  is_coercive := sorry
+
 end Litlib.Y1982.sedlacek1982direct.Proofs
