@@ -7,7 +7,7 @@ import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 
 namespace Litlib.Y2024.gielen2024unimodular
 
-literature_axiom Eq3
+literature_citation Eq3
   bibtex_key "gielen2024unimodular"
   doi "10.1088/1361-6382/ad3277"
   authors["Gielen, Steffen", "Nash, Elliot"]
@@ -37,7 +37,7 @@ class Eq3 where
     let ω := -2 * Complex.I * detE
     ∀ i j : Fin 3, wedge_sigma i j = if i = j then ω else 0
 
-literature_axiom Eq7
+literature_citation Eq7
   bibtex_key "gielen2024unimodular"
   doi "10.1088/1361-6382/ad3277"
   authors["Gielen, Steffen", "Nash, Elliot"]
@@ -61,7 +61,7 @@ class Eq7 where
     ∀ i ρ, ∑ j : Fin 3, ∑ μ : Fin 4, ∑ ν : Fin 4, Sigma i μ ν * (Sigma j μ ν * V i j ρ + Sigma j ν ρ * V i j μ + Sigma j ρ μ * V i j ν) 
       = 2 * ∑ j : Fin 3, (if i = j then (1:ℂ) else 0) * V i j ρ
 
-literature_axiom Eq11
+literature_citation Eq11
   bibtex_key "gielen2024unimodular"
   doi "10.1088/1361-6382/ad3277"
   authors ["Gielen, Steffen", "Nash, Elliot"]
@@ -79,7 +79,7 @@ class Eq11 where
     (h_eq : Minv * X * Minv = 1) :
     X = M * M
 
-literature_axiom UnimodularCDJ
+literature_citation UnimodularCDJ
   bibtex_key "gielen2024unimodular"
   doi "10.1088/1361-6382/ad3277"
   authors ["Gielen, Steffen", "Nash, Elliot"]

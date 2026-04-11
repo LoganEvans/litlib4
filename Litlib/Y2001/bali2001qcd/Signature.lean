@@ -6,7 +6,7 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 namespace Litlib.Y2001.bali2001qcd
 
-literature_axiom Eq2_3_and_2_4
+literature_citation Eq2_3_and_2_4
   bibtex_key "bali2001qcd"
   doi "10.1016/S0370-1573(00)00079-X"
   authors ["Bali, Gunnar S."]
@@ -22,7 +22,7 @@ class Eq2_3_and_2_4 where
     (hJ : J = (Real.pi * d^2 * σ) / 2) :
     J = (1 / (2 * Real.pi * σ)) * m^2
 
-literature_axiom Eq4_40
+literature_citation Eq4_40
   bibtex_key "bali2001qcd"
   doi "10.1016/S0370-1573(00)00079-X"
   authors ["Bali, Gunnar S."]
@@ -37,7 +37,7 @@ class Eq4_40 where
     let V_o := (g^2 / (2 * N)) * (1 / q^2)
     V_o = - (1 / N_A) * V_s
 
-literature_axiom Eq5_11
+literature_citation Eq5_11
   bibtex_key "bali2001qcd"
   doi "10.1016/S0370-1573(00)00079-X"
   authors["Bali, Gunnar S."]
@@ -51,7 +51,7 @@ class Eq5_11 where
     (hC_F : C_F = (N^2 - 1) / (2 * N)) :
     (C_A / C_F) * (V_self / 2) = (N^2 / (N^2 - 1)) * V_self
 
-literature_axiom Eq6_48_to_6_50
+literature_citation Eq6_48_to_6_50
   bibtex_key "bali2001qcd"
   doi "10.1016/S0370-1573(00)00079-X"
   authors["Bali, Gunnar S."]
@@ -75,7 +75,7 @@ class Eq6_48_to_6_50 where
       ∀ r, V_b r + 2 * V_d r = (r / 6) * V_0_prime r - (1 / 2) * V_0 r) ∧
     (∀ r, V_c r + 2 * V_e r = - (r / 2) * V_0_prime r)
 
-literature_axiom FluxTubeEnergyBounds
+literature_citation FluxTubeEnergyBounds
   bibtex_key "bali2001qcd"
   doi "10.1016/S0370-1573(00)00079-X"
   authors["Bali, Gunnar S."]

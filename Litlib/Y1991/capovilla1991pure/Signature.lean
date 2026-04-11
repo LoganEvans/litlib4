@@ -6,7 +6,7 @@ import Mathlib.Data.Matrix.Basic
 
 namespace Litlib.Y1991.capovilla1991pure
 
-literature_axiom Eq2_22
+literature_citation Eq2_22
   bibtex_key "capovilla1991pure"
   doi "10.1088/0264-9381/8/1/01"
   authors["Capovilla, Riccardo", "Dell, John", "Jacobson, Ted"]
@@ -38,7 +38,7 @@ class Eq2_22 where
                     epsilon α β γ δ * R μ α A B * R β γ B C * R δ ν C A)))))))
     ∀ μ ν, g μ ν = g ν μ
 
-literature_axiom UrbantkeCDJ
+literature_citation UrbantkeCDJ
   bibtex_key "capovilla1991pure"
   doi "10.1088/0264-9381/8/1/01"
   authors ["Capovilla, Riccardo", "Dell, John", "Jacobson, Ted"]
