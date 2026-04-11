@@ -6,7 +6,7 @@ import Mathlib.Analysis.Calculus.Deriv.Basic
 
 namespace Litlib.Y1982.taubes1982existence
 
-literature_axiom Eq2_7_and_2_8
+literature_citation Eq2_7_and_2_8
   bibtex_key "taubes1982existence"
   doi "10.1007/BF01206014"
   authors ["Taubes, Clifford Henry"]
@@ -30,7 +30,7 @@ class Eq2_7_and_2_8 where
     
     deriv a 0 = grad_a ∧ deriv (deriv a) 0 = hess_a
 
-literature_axiom BogomolnyiExistence
+literature_citation BogomolnyiExistence
   bibtex_key "taubes1982existence"
   doi "10.1007/BF01206014"
   authors ["Taubes, Clifford Henry"]

@@ -7,7 +7,7 @@ import Mathlib.Data.Real.Basic
 
 namespace Litlib.Y1982.uhlenbeck1982connections
 
-literature_axiom Thm1_3
+literature_citation Thm1_3
   bibtex_key "uhlenbeck1982connections"
   doi "10.1007/BF01206014"
   authors ["Uhlenbeck, Karen K."]
@@ -29,7 +29,7 @@ class Thm1_3 where
       curvature_Ln2_norm A ≤ κ →
       ∃ (g : GaugeTransform), isCoulombGauge (applyGauge g A)
 
-literature_axiom Thm1_5
+literature_citation Thm1_5
   bibtex_key "uhlenbeck1982connections"
   doi "10.1007/BF01206014"
   authors ["Uhlenbeck, Karen K."]

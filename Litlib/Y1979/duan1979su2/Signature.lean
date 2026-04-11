@@ -16,7 +16,7 @@ opaque isospin_cross (a b : IsospinVector) : IsospinVector
 opaque partial_deriv (n : UnitIsospinField) (μ : Fin 4) : SpacetimePoint → IsospinVector
 opaque covar_deriv (n : UnitIsospinField) (μ : Fin 4) : SpacetimePoint → IsospinVector
 
-literature_axiom Eq1_13_Decomposition
+literature_citation Eq1_13_Decomposition
   bibtex_key "duan1979su2"
   doi "10.1142/9789813237278_0001"
   authors ["Duan, Yi-Shi", "Ge, Mo-Lin"]
@@ -28,7 +28,7 @@ class Eq1_13_Decomposition where
   b (n : UnitIsospinField) : GaugePotential
   decomposition (W : GaugePotential) (n : UnitIsospinField) : Prop
 
-literature_axiom Eq1_33_ElectromagneticTensor
+literature_citation Eq1_33_ElectromagneticTensor
   bibtex_key "duan1979su2"
   doi "10.1142/9789813237278_0001"
   authors ["Duan, Yi-Shi", "Ge, Mo-Lin"]

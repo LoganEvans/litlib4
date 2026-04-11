@@ -7,7 +7,7 @@ import Mathlib.Data.Matrix.Basic
 
 namespace Litlib.Y1956.utiyama1956invariant
 
-literature_axiom Eq1_20
+literature_citation Eq1_20
   bibtex_key "utiyama1956invariant"
   doi "10.1103/PhysRev.101.1597"
   authors ["Utiyama, Ryoyu"]
@@ -32,7 +32,7 @@ class Eq1_20 where
     (def_δF : ∀ μ ν x, δF μ ν x = deriv μ (δA ν) x - deriv ν (δA μ) x + ⁅δA μ x, A ν x⁆ + ⁅A μ x, δA ν x⁆) :
     ∀ μ ν x, δF μ ν x = ⁅F μ ν x, ε x⁆
 
-literature_axiom UtiyamaExpansion
+literature_citation UtiyamaExpansion
   bibtex_key "utiyama1956invariant"
   doi "10.1103/PhysRev.101.1597"
   authors ["Utiyama, Ryoyu"]

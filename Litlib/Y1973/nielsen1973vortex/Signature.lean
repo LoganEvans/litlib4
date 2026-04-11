@@ -6,7 +6,7 @@ import Mathlib.Analysis.Calculus.Deriv.Basic
 
 namespace Litlib.Y1973.nielsen1973vortex
 
-literature_axiom Eq2_19
+literature_citation Eq2_19
   bibtex_key "nielsen1973vortex"
   doi "10.1016/0550-3213(73)90350-7"
   authors["Nielsen, H.B.", "Olesen, P."]
@@ -17,7 +17,7 @@ class Eq2_19 where
   vacuum_value (c₂ c₄ : ℝ) (hc₂ : 0 < c₂) (hc₄ : 0 < c₄) (ϕ₀ : ℝ) (hϕ₀_pos : 0 < ϕ₀) (hϕ₀_sq : ϕ₀^2 = c₂ / (2 * c₄)) :
     ∀ x : ℝ, (- c₂ * ϕ₀^2 + c₄ * ϕ₀^4) ≤ (- c₂ * x^2 + c₄ * x^4)
 
-literature_axiom Eq2_21
+literature_citation Eq2_21
   bibtex_key "nielsen1973vortex"
   doi "10.1016/0550-3213(73)90350-7"
   authors ["Nielsen, H.B.", "Olesen, P."]
@@ -29,7 +29,7 @@ class Eq2_21 where
     let V := fun ρ => (1/2 : ℝ) * (- c₂ * (ϕ₀ + ρ)^2 + c₄ * (ϕ₀ + ρ)^4)
     deriv (deriv V) 0 = 2 * c₂
 
-literature_axiom NielsenOlesenVortex
+literature_citation NielsenOlesenVortex
   bibtex_key "nielsen1973vortex"
   doi "10.1016/0550-3213(73)90350-7"
   authors ["Nielsen, H.B.", "Olesen, P."]

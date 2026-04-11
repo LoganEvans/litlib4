@@ -62,7 +62,7 @@ syntax str : litlibStatus
 -- ==========================================
 
 syntax (name := literatureAxiom) 
-  "literature_axiom" ident
+  "literature_citation" ident
   "bibtex_key" str
   ("doi" str)?
   "authors" "[" str,* "]"

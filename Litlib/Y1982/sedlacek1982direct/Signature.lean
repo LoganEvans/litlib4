@@ -6,7 +6,7 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 namespace Litlib.Y1982.sedlacek1982direct
 
-literature_axiom Thm5_5
+literature_citation Thm5_5
   bibtex_key "sedlacek1982direct"
   doi "10.1007/BF01214887"
   authors ["Sedlacek, Steven"]
@@ -24,7 +24,7 @@ class Thm5_5 where
     (h_limit : isMinimizingLimit P P_infty) :
     eta P_infty = eta P
 
-literature_axiom Thm7_1
+literature_citation Thm7_1
   bibtex_key "sedlacek1982direct"
   doi "10.1007/BF01214887"
   authors ["Sedlacek, Steven"]
@@ -43,7 +43,7 @@ class Thm7_1 where
     (h_limit : isMinimizingLimit P P_infty) :
     |p1 P - p1 P_infty| ≤ (m P - m P_infty) / (4 * Real.pi ^ 2)
 
-literature_axiom YangMillsCoercivity
+literature_citation YangMillsCoercivity
   bibtex_key "sedlacek1982direct"
   doi "10.1007/BF01214887"
   authors["Sedlacek, Steven"]

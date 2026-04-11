@@ -6,7 +6,7 @@ import Mathlib.Algebra.Module.Basic
 
 namespace Litlib.Y1978.atiyah1978construction
 
-literature_axiom Page185Algebra
+literature_citation Page185Algebra
   bibtex_key "atiyah1978construction"
   doi "10.1016/0375-9601(78)90141-X"
   authors["Atiyah, M.F.", "Hitchin, N.J.", "Drinfeld, V.G.", "Manin, Yu.I."]
@@ -34,7 +34,7 @@ class Page185Algebra where
     (hv_in_Uz_annihilator : ∀ u ∈ Uz, B u v = 0) :
     v = 0
 
-literature_axiom AdhmModuliUniqueness
+literature_citation AdhmModuliUniqueness
   bibtex_key "atiyah1978construction"
   doi "10.1016/0375-9601(78)90141-X"
   authors["Atiyah, M.F.", "Hitchin, N.J.", "Drinfeld, V.G.", "Manin, Yu.I."]

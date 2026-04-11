@@ -6,7 +6,7 @@ import Mathlib.Analysis.Calculus.Deriv.Basic
 
 namespace Litlib.Y1975.belavin1975pseudoparticle
 
-literature_axiom Eq16
+literature_citation Eq16
   bibtex_key "belavin1975pseudoparticle"
   doi "10.1016/0370-2693(75)90163-X"
   authors["Belavin, A.A.", "Polyakov, A.M.", "Schwartz, A.S.", "Tyupkin, Yu.S."]
@@ -19,7 +19,7 @@ class Eq16 where
     let f := fun (r : ℝ) => 2 / (r^2 + lam^2)
     ∀ r : ℝ, r ≠ 0 → deriv f r / r + (f r)^2 = 0
 
-literature_axiom BpstModuliUniqueness
+literature_citation BpstModuliUniqueness
   bibtex_key "belavin1975pseudoparticle"
   doi "10.1016/0370-2693(75)90163-X"
   authors["Belavin, A.A.", "Polyakov, A.M.", "Schwartz, A.S.", "Tyupkin, Yu.S."]

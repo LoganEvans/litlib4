@@ -13,7 +13,7 @@ abbrev Connection := SpacetimePoint → Fin 4 → SO3C_Algebra
 abbrev Curvature := SpacetimePoint → Fin 4 → Fin 4 → SO3C_Algebra
 abbrev ScalarDensity := SpacetimePoint → ℂ
 
-literature_axiom Eq1
+literature_citation Eq1
   bibtex_key "capovilla1989general"
   doi "10.1103/PhysRevLett.63.2325"
   authors ["Capovilla, Riccardo", "Jacobson, Ted", "Dell, John"]
@@ -22,7 +22,7 @@ class Eq1 where
   h_tensor (a b c d : Fin 3) : ℂ
   Action (η : ScalarDensity) (A : Connection) : ℂ
 
-literature_axiom Eq6_RicciFlat
+literature_citation Eq6_RicciFlat
   bibtex_key "capovilla1989general"
   doi "10.1103/PhysRevLett.63.2325"
   authors ["Capovilla, Riccardo", "Jacobson, Ted", "Dell, John"]

@@ -12,7 +12,7 @@ import Mathlib.Algebra.Algebra.IsSimpleRing  -- FIXED: Exact import for IsSimple
 
 namespace Litlib.Y1946.weyl1946classical
 
-literature_axiom SchursLemma
+literature_citation SchursLemma
   bibtex_key "weyl1946classical"
   authors ["Weyl, Hermann"]
   status Standard
@@ -21,7 +21,7 @@ class SchursLemma where
   end_of_simple_module_is_division_ring (R V : Type*) [Ring R] [AddCommGroup V] [Module R V] [IsSimpleModule R V] : 
     Nonempty (DivisionRing (Module.End R V))
 
-literature_axiom DivRingIsSimple
+literature_citation DivRingIsSimple
   bibtex_key "weyl1946classical"
   authors ["Weyl, Hermann"]
   status Standard
@@ -29,7 +29,7 @@ class DivRingIsSimple where
   /-- Chapter III, Theorem 3.3.A -/
   division_ring_is_simple_ring (D : Type*) [DivisionRing D] : IsSimpleRing D
 
-literature_axiom MaschkesTheorem
+literature_citation MaschkesTheorem
   bibtex_key "weyl1946classical"
   authors ["Weyl, Hermann"]
   status Standard
@@ -38,7 +38,7 @@ class MaschkesTheorem where
   group_ring_is_semisimple (k G : Type*) [Field k] [Group G] [Fintype G] [Invertible (Fintype.card G : k)] :
     IsSemisimpleRing (MonoidAlgebra k G)
 
-literature_axiom HilbertBasisTheorem
+literature_citation HilbertBasisTheorem
   bibtex_key "weyl1946classical"
   authors ["Weyl, Hermann"]
   status Standard
@@ -47,7 +47,7 @@ class HilbertBasisTheorem where
   polynomial_is_noetherian (R : Type*) [CommRing R] [IsNoetherianRing R] : 
     IsNoetherianRing (Polynomial R)
 
-literature_axiom FirstMainTheoremOrthogonalRank4
+literature_citation FirstMainTheoremOrthogonalRank4
   bibtex_key "weyl1946classical"
   authors ["Weyl, Hermann"]
   status Standard
