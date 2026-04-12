@@ -58,8 +58,8 @@ class Eq7 where
       -(if i = j then (1:ℂ) else 0) * (if μ = ρ then (1:ℂ) else 0) + ∑ k : Fin 3, eps3 i j k * Sigma k μ ρ)
     (h_V_symm : ∀ i j ρ, V i j ρ = V j i ρ)
     (h_eps3_antisymm : ∀ i j k, eps3 i j k = -eps3 j i k ∧ eps3 i j k = -eps3 i k j) :
-    ∀ i ρ, ∑ j : Fin 3, ∑ μ : Fin 4, ∑ ν : Fin 4, Sigma i μ ν * (Sigma j μ ν * V i j ρ + Sigma j ν ρ * V i j μ + Sigma j ρ μ * V i j ν) 
-      = 2 * ∑ j : Fin 3, (if i = j then (1:ℂ) else 0) * V i j ρ
+    ∀ ρ, ∑ i : Fin 3, ∑ j : Fin 3, ∑ μ : Fin 4, ∑ ν : Fin 4, Sigma i μ ν * (Sigma j μ ν * V i j ρ + Sigma j ν ρ * V i j μ + Sigma j ρ μ * V i j ν) 
+      = 2 * ∑ i : Fin 3, ∑ j : Fin 3, (if i = j then (1:ℂ) else 0) * V i j ρ
 
 literature_citation Eq11
   bibtex_key "gielen2024unimodular"
