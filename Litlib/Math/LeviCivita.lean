@@ -40,11 +40,6 @@ lemma sum_fin_3 {α} [AddCommMonoid α] (f : Fin 3 → α) :
   (∑ i : Fin 3, f i) = f 0 + f 1 + f 2 := by
   simp[Fin.sum_univ_succ, Fin.sum_univ_zero, add_assoc]
 
--- ==============================================================================
--- UNIVERSAL CONTRACTION THEOREMS
--- (Uses the explicit Litlib O(1) Matrix4 determinant expansion to bypass timeouts)
--- ==============================================================================
-
 theorem epsilon4_contract_all : (∑ i : Fin 4, ∑ j : Fin 4, ∑ k : Fin 4, ∑ l : Fin 4, epsilon4 i j k l * epsilon4 i j k l) = 24 := by
   simp[sum_fin_4, epsilon4, Litlib.Math.Matrix4.expand_det_4]
   try norm_num
