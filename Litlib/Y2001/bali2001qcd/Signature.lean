@@ -31,7 +31,7 @@ class Eq4_40 where
   /--
   Equation (4.40) (page 36): The momentum space static potentials.
   -/
-  singlet_octet_potentials (N N_A : ℝ) (g q : ℝ) (hN : N > 0) (hN_A : N_A = N^2 - 1) (hq : q ≠ 0) :
+  singlet_octet_potentials (N N_A : ℝ) (g q : ℝ) (hN : N > 1) (hN_A : N_A = N^2 - 1) (hq : q ≠ 0) :
     let C_F := N_A / (2 * N)
     let V_s := - C_F * g^2 * (1 / q^2)
     let V_o := (g^2 / (2 * N)) * (1 / q^2)
@@ -47,6 +47,7 @@ class Eq5_11 where
   Equation (5.11) (page 65): The self-energy of the adjoint static source.
   -/
   adjoint_self_energy (N C_A C_F V_self : ℝ) 
+    (hN : N > 1)
     (hC_A : C_A = N) 
     (hC_F : C_F = (N^2 - 1) / (2 * N)) :
     (C_A / C_F) * (V_self / 2) = (N^2 / (N^2 - 1)) * V_self
@@ -70,10 +71,10 @@ class Eq6_48_to_6_50 where
     let V_e := fun (r : ℝ) => - (σ / 6) * r
     let V_0_prime := fun (r : ℝ) => e / r^2 + σ
     
-    (∀ r, V_2_prime r - V_1_prime r = V_0_prime r) ∧
+    (∀ r, r ≠ 0 → V_2_prime r - V_1_prime r = V_0_prime r) ∧
     (V_self = - 2 * C_b - 4 * C_d → 
-      ∀ r, V_b r + 2 * V_d r = (r / 6) * V_0_prime r - (1 / 2) * V_0 r) ∧
-    (∀ r, V_c r + 2 * V_e r = - (r / 2) * V_0_prime r)
+      ∀ r, r ≠ 0 → V_b r + 2 * V_d r = (r / 6) * V_0_prime r - (1 / 2) * V_0 r) ∧
+    (∀ r, r ≠ 0 → V_c r + 2 * V_e r = - (r / 2) * V_0_prime r)
 
 literature_citation FluxTubeEnergyBounds
   bibtex_key "bali2001qcd"
@@ -99,3 +100,5 @@ class FluxTubeEnergyBounds where
     (snappedFluxTube : ℝ → FluxTubeState)
     (M L : ℝ) :
     spatialEnergy (snappedFluxTube L) = 2 * M
+
+end Litlib.Y2001.bali2001qcd
