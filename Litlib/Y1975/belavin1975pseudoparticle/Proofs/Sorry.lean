@@ -16,12 +16,4 @@ instance (priority := 10) fallback_Eq16 : Eq16 where
 instance (priority := 10) fallback_BpstModuliUniqueness : BpstModuliUniqueness where
   bpst_uniqueness := sorry
 
-@[litlib_difficulty easy, litlib_status Conjecture]
-instance (priority := 10) fallback_BpstIsSelfDual : BpstIsSelfDual where
-  bpst_satisfies_self_duality := sorry
-
-@[litlib_difficulty easy, litlib_status Conjecture]
-instance (priority := 10) fallback_BpstCoreExpansion : BpstCoreExpansion where
-  bpst_core_trace_eq_hedgehog_core_trace := sorry
-
 end Litlib.Y1975.belavin1975pseudoparticle.Proofs
