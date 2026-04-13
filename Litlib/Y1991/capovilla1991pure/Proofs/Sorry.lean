@@ -5,11 +5,11 @@ import Litlib.Y1991.capovilla1991pure.Signature
 namespace Litlib.Y1991.capovilla1991pure.Proofs
 
 @[litlib_difficulty hard, litlib_status Conjecture]
-instance : Eq2_22 where
+instance (priority := 10) fallback_Eq2_22 : Eq2_22 where
   urbantke_metric_symmetric := sorry
 
 @[litlib_difficulty hard, litlib_status Conjecture]
-instance : UrbantkeCDJ where
+instance (priority := 10) fallback_UrbantkeCDJ : UrbantkeCDJ where
   urbantke_is_ricci_flat := sorry
 
 end Litlib.Y1991.capovilla1991pure.Proofs
