@@ -12,8 +12,8 @@ instance (priority := 10) fallback_Eq10_and_11 : Eq10_and_11 where
 instance (priority := 10) fallback_Eq16 : Eq16 where
   bpst_profile_ode := sorry
 
-@[litlib_difficulty hard, litlib_status Conjecture]
+@[litlib_difficulty medium, litlib_status Conjecture]
 instance (priority := 10) fallback_BpstModuliUniqueness : BpstModuliUniqueness where
-  bpst_uniqueness := sorry
+  bpst_profile_uniqueness := sorry
 
 end Litlib.Y1975.belavin1975pseudoparticle.Proofs
