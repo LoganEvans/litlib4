@@ -3,6 +3,10 @@
 import Litlib.Core
 import Mathlib.Data.Real.Basic
 import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Topology.Basic
+import Mathlib.Order.Filter.Basic
+
+open Filter Topology
 
 namespace Litlib.Y1973.nielsen1973vortex
 
@@ -36,11 +40,21 @@ literature_citation NielsenOlesenVortex
   status Standard
 class NielsenOlesenVortex where
   /--
-  Capstone Theorem: Nielsen-Olesen Vortex / Minimal Surface.
-  A mathematically guaranteed stationary minimum of the action for the flux tube.
+  Capstone Theorem: Nielsen-Olesen Vortex.
+  The classical Euler-Lagrange equations for the Abelian Higgs model 
+  admit a regular vortex solution satisfying the topological boundary conditions.
   -/
-  exists_minimal_surface
-    (State : Type*)
-    (Action : State → ℝ)
-    (isTopologicalVortex : State → Prop) :
-    ∃ (s : State), isTopologicalVortex s ∧ ∀ (s' : State), isTopologicalVortex s' → Action s ≤ Action s'
+  exists_vortex_solution
+    (c₂ c₄ ϕ₀ : ℝ)
+    (h_c₂ : 0 < c₂) (h_c₄ : 0 < c₄)
+    (h_ϕ₀ : 0 < ϕ₀ ∧ ϕ₀^2 = c₂ / (2 * c₄)) :
+    ∃ (f a : ℝ → ℝ),
+      (Tendsto f atTop (nhds ϕ₀)) ∧ 
+      (Tendsto a atTop (nhds 1)) ∧ 
+      (f 0 = 0) ∧ (a 0 = 0) ∧
+      (∀ r > 0, 
+        deriv (deriv f) r + (1 / r) * deriv f r - ((1 - a r)^2 / r^2) * f r + c₂ * f r - 2 * c₄ * (f r)^3 = 0) ∧
+      (∀ r > 0, 
+        deriv (deriv a) r - (1 / r) * deriv a r + (f r)^2 * (1 - a r) = 0)
+
+end Litlib.Y1973.nielsen1973vortex
