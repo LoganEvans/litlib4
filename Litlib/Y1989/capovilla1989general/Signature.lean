@@ -3,15 +3,12 @@
 import Litlib.Core
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Real.Basic
+import Mathlib.Data.Matrix.Basic
+import Mathlib.LinearAlgebra.Matrix.Trace
+
+open BigOperators
 
 namespace Litlib.Y1989.capovilla1989general
-
-abbrev SpacetimePoint := Fin 4 → ℝ
-abbrev SO3C_Algebra := Fin 3 → ℂ
-abbrev SpacetimeMetric := SpacetimePoint → Fin 4 → Fin 4 → ℝ
-abbrev Connection := SpacetimePoint → Fin 4 → SO3C_Algebra
-abbrev Curvature := SpacetimePoint → Fin 4 → Fin 4 → SO3C_Algebra
-abbrev ScalarDensity := SpacetimePoint → ℂ
 
 literature_citation Eq1
   bibtex_key "capovilla1989general"
@@ -19,18 +16,39 @@ literature_citation Eq1
   authors ["Capovilla, Riccardo", "Jacobson, Ted", "Dell, John"]
   status Standard
 class Eq1 where
-  h_tensor (a b c d : Fin 3) : ℂ
-  Action (η : ScalarDensity) (A : Connection) : ℂ
+  /--
+  Equation (1): The pure connection action of General Relativity.
+  The integral of η Tr(F ∧ F). Secured by defining the integrand explicitly.
+  -/
+  cdj_integrand
+    (SpacetimePoint : Type*)
+    (F : SpacetimePoint → Fin 4 → Fin 4 → Matrix (Fin 3) (Fin 3) ℂ)
+    (η : SpacetimePoint → ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
+    (Integrand : SpacetimePoint → ℂ) :
+    ∀ x, Integrand x = η x * ∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4,
+      epsilon4 μ ν ρ σ * Matrix.trace (F x μ ν * F x ρ σ)
 
 literature_citation Eq6_RicciFlat
   bibtex_key "capovilla1989general"
   doi "10.1103/PhysRevLett.63.2325"
   authors ["Capovilla, Riccardo", "Jacobson, Ted", "Dell, John"]
   status Standard
-class Eq6_RicciFlat where
-  satisfies_cdj_constraint (F : Curvature) : Prop
-  urbantke_metric (F : Curvature) : SpacetimeMetric
-  ricci_tensor (g : SpacetimeMetric) : SpacetimePoint → Fin 4 → Fin 4 → ℝ
-  cdj_implies_ricci_flat (F : Curvature) :
-    satisfies_cdj_constraint F → 
+class Eq6_RicciFlat
+    (SpacetimePoint : Type*)
+    (urbantke_metric : (SpacetimePoint → Fin 4 → Fin 4 → Matrix (Fin 3) (Fin 3) ℂ) → (SpacetimePoint → Fin 4 → Fin 4 → ℝ))
+    (ricci_tensor : (SpacetimePoint → Fin 4 → Fin 4 → ℝ) → SpacetimePoint → Fin 4 → Fin 4 → ℝ) where
+  /--
+  Equation (6): Ricci Flatness of the Urbantke metric.
+  If the curvature matrix field satisfies the algebraic CDJ constraint Tr(F ∧ F) = 0, 
+  the corresponding metric evaluates to a Ricci-flat tensor.
+  -/
+  cdj_implies_ricci_flat 
+    (F : SpacetimePoint → Fin 4 → Fin 4 → Matrix (Fin 3) (Fin 3) ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
+    (h_cdj_constraint : ∀ x, 
+      (∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4,
+        epsilon4 μ ν ρ σ * Matrix.trace (F x μ ν * F x ρ σ)) = 0) :
     ∀ (x : SpacetimePoint) (μ ν : Fin 4), ricci_tensor (urbantke_metric F) x μ ν = 0
+
+end Litlib.Y1989.capovilla1989general
