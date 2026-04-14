@@ -5,6 +5,8 @@ import Mathlib.Algebra.Lie.Basic
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 
+open BigOperators
+
 namespace Litlib.Y1956.utiyama1956invariant
 
 literature_citation Eq1_20
@@ -41,13 +43,22 @@ class UtiyamaExpansion where
   /--
   Capstone Theorem: Utiyama Expansion Theorem.
   Any gauge-invariant, renormalizable Lagrangian natively expands into the trace 
-  of the field strength squared. Passed abstractly via the Weyl Pattern.
+  of the field strength squared.
   -/
   utiyama_expansion 
-    (ChiralM : Type*)[Ring ChiralM] [Algebra ℂ ChiralM]
-    (isGaugeInvariant : ((Fin 4 → Fin 4 → ChiralM) → ℂ) → Prop)
-    (isMassDimension4 : ((Fin 4 → Fin 4 → ChiralM) → ℂ) → Prop)
+    (ChiralM : Type*) [Ring ChiralM] [Algebra ℂ ChiralM]
     (Trace : ChiralM → ℂ)
-    (L : (Fin 4 → Fin 4 → ChiralM) → ℂ) :
-    isGaugeInvariant L → isMassDimension4 L →
-    ∃ (T : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ), ∀ F, L F = ∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4, T μ ν ρ σ * Trace (F μ ν * F ρ σ)
+    (L : (Fin 4 → Fin 4 → ChiralM) → ℂ)
+    (h_trace_spans : ∀ (B : ChiralM → ChiralM → ℂ),
+      (∀ c x y, B (c • x) y = c * B x y) →
+      (∀ x1 x2 y, B (x1 + x2) y = B x1 y + B x2 y) →
+      (∀ x y1 y2, B x (y1 + y2) = B x y1 + B x y2) →
+      (∀ x y (U : ChiralMˣ), B ((U : ChiralM) * x * (↑U⁻¹ : ChiralM)) ((U : ChiralM) * y * (↑U⁻¹ : ChiralM)) = B x y) →
+      ∃ (k : ℂ), ∀ x y, B x y = k * Trace (x * y))
+    (h_L_quad_scale : ∀ (c : ℂ) (F : Fin 4 → Fin 4 → ChiralM), L (fun μ ν => c • F μ ν) = c^2 * L F)
+    (h_L_quad_add : ∀ (F G : Fin 4 → Fin 4 → ChiralM), L (fun μ ν => F μ ν + G μ ν) + L (fun μ ν => F μ ν - G μ ν) = 2 * L F + 2 * L G)
+    (h_L_gauge : ∀ (F : Fin 4 → Fin 4 → ChiralM) (U : ChiralMˣ), L (fun μ ν => (U : ChiralM) * F μ ν * (↑U⁻¹ : ChiralM)) = L F) :
+    ∃ (T : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ), 
+      ∀ F, L F = ∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4, T μ ν ρ σ * Trace (F μ ν * F ρ σ)
+
+end Litlib.Y1956.utiyama1956invariant
