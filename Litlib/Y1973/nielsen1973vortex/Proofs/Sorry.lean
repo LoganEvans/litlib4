@@ -18,6 +18,6 @@ attribute [deprecated "Formalized proof available. Add `import Litlib.Y1973.niel
 
 @[litlib_difficulty hard, litlib_status Conjecture]
 instance (priority := 10) fallback_NielsenOlesenVortex : NielsenOlesenVortex where
-  exists_minimal_surface := sorry
+  exists_vortex_solution := sorry
 
 end Litlib.Y1973.nielsen1973vortex.Proofs
