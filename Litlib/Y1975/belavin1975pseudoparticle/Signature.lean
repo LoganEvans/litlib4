@@ -3,7 +3,11 @@
 import Litlib.Core
 import Mathlib.Data.Real.Basic
 import Mathlib.Analysis.Calculus.Deriv.Basic
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Topology.Basic
+import Mathlib.Order.Filter.Basic
+import Mathlib.Analysis.InnerProductSpace.Basic
+
+open Filter Topology
 
 namespace Litlib.Y1975.belavin1975pseudoparticle
 
@@ -15,18 +19,19 @@ literature_citation Eq10_and_11
 class Eq10_and_11 where
   /--
   Equations (10) and (11) (page 86): The Topological Action Bound.
-  The energy E (defined as 1/4 Sp ∫ F^2 d^4x) is bounded below by 2π²|q|.
-  Furthermore, this bound is saturated (equality holds) if the field 
-  is self-dual or anti-self-dual (Equation 11).
+  Abstracted to a real Hilbert space equipped with an isometric involution (the Hodge star).
+  The energy is bounded below by the topological charge, and the bound is saturated 
+  iff the field is self-dual or anti-self-dual.
   -/
   topological_energy_bound
-    (State : Type*)
-    (Energy : State → ℝ)
-    (windingNumber : State → ℤ)
-    (isSelfDual : State → Prop)
-    (isAntiSelfDual : State → Prop) :
-    (∀ (s : State), 2 * (Real.pi ^ 2) * |(windingNumber s : ℝ)| ≤ Energy s) ∧
-    (∀ (s : State), (isSelfDual s ∨ isAntiSelfDual s) → Energy s = 2 * (Real.pi ^ 2) * |(windingNumber s : ℝ)|)
+    (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℝ V]
+    (star : V → V)
+    (h_star_isometry : ∀ v, ‖star v‖ = ‖v‖) :
+    ∀ (v : V),
+      let E := (1 / 2 : ℝ) * ‖v‖^2
+      let Q := (1 / 2 : ℝ) * inner ℝ v (star v)
+      |Q| ≤ E ∧
+      (star v = v ∨ star v = -v → E = |Q|)
 
 literature_citation Eq16
   bibtex_key "belavin1975pseudoparticle"
@@ -48,17 +53,18 @@ literature_citation BpstModuliUniqueness
   status Standard
 class BpstModuliUniqueness where
   /--
-  Capstone Theorem: Moduli Uniqueness.
-  If a topological state minimizes the action (e.g. self-dual, W=1), 
-  then it is gauge-equivalent to the BPST instanton.
+  Capstone Theorem: BPST Profile Uniqueness.
+  The only regular solutions to the BPST self-dual radial ODE 
+  that vanish at infinity are the 1-parameter family of instanton profiles 
+  f(r) = 2 / (r^2 + λ^2). This mathematically rigidifies the Moduli Uniqueness 
+  for the spherically symmetric ansatz without using unconstrained predicates.
   -/
-  bpst_uniqueness
-    (State : Type*)
-    (isSelfDual : State → Prop)
-    (hasWindingNumber1 : State → Prop)
-    (isGaugeEquivalent : State → State → Prop)
-    (bpstInstanton : State) :
-    isSelfDual bpstInstanton ∧ hasWindingNumber1 bpstInstanton ∧
-    ∀ (s : State), isSelfDual s → hasWindingNumber1 s → isGaugeEquivalent s bpstInstanton
+  bpst_profile_uniqueness
+    (f : ℝ → ℝ)
+    (hf_diff : DifferentiableOn ℝ f (Set.Ioi 0))
+    (hf_ode : ∀ r > 0, deriv f r / r + (f r)^2 = 0)
+    (hf_limit : Tendsto f atTop (nhds 0))
+    (hf_pos : ∃ r > 0, f r > 0) :
+    ∃ (lam : ℝ), lam > 0 ∧ ∀ r > 0, f r = 2 / (r^2 + lam^2)
 
 end Litlib.Y1975.belavin1975pseudoparticle
