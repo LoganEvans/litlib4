@@ -8,7 +8,11 @@ import Mathlib.RingTheory.SimpleModule.Basic
 import Mathlib.Algebra.MonoidAlgebra.Basic
 import Mathlib.RepresentationTheory.Maschke
 import Mathlib.Data.Complex.Basic
-import Mathlib.Algebra.Algebra.IsSimpleRing  -- FIXED: Exact import for IsSimpleRing
+import Mathlib.Algebra.Algebra.IsSimpleRing
+import Mathlib.Data.Matrix.Basic
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+
+open Matrix BigOperators
 
 namespace Litlib.Y1946.weyl1946classical
 
@@ -54,10 +58,21 @@ literature_citation FirstMainTheoremOrthogonalRank4
 class FirstMainTheoremOrthogonalRank4 where
   /-- Chapter II, Theorem 2.9.A -/
   unique_lorentz_invariant_rank4 
-    (IsLorentzInvariant : (Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) → Prop)
-    (eta : Fin 4 → Fin 4 → ℂ)
+    (eta : Matrix (Fin 4) (Fin 4) ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    (T : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) :
-    IsLorentzInvariant T →
+    (T : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
+    (h_eta_symm : ∀ i j, eta i j = eta j i)
+    (h_eta_nondeg : Matrix.det eta ≠ 0)
+    (h_epsilon_alt : ∀ α β γ δ, 
+      epsilon4 α β γ δ = -epsilon4 β α γ δ ∧ 
+      epsilon4 α β γ δ = -epsilon4 α γ β δ ∧ 
+      epsilon4 α β γ δ = -epsilon4 α β δ γ)
+    (h_epsilon_nondeg : epsilon4 0 1 2 3 ≠ 0)
+    (h_inv : ∀ (Λ : Matrix (Fin 4) (Fin 4) ℂ),
+      Λ * eta * Matrix.transpose Λ = eta → Matrix.det Λ = 1 →
+      ∀ μ ν ρ σ, ∑ α : Fin 4, ∑ β : Fin 4, ∑ γ : Fin 4, ∑ δ : Fin 4,
+        Λ μ α * Λ ν β * Λ ρ γ * Λ σ δ * T α β γ δ = T μ ν ρ σ) :
     ∃ (c1 c2 c3 c4 : ℂ), ∀ μ ν ρ σ,
       T μ ν ρ σ = c1 * (eta μ ν * eta ρ σ) + c2 * (eta μ ρ * eta ν σ) + c3 * (eta μ σ * eta ν ρ) + c4 * epsilon4 μ ν ρ σ
+
+end Litlib.Y1946.weyl1946classical
