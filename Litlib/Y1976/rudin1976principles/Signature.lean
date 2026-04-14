@@ -4,6 +4,10 @@ import Litlib.Core
 import Mathlib.Data.Real.Basic
 import Mathlib.Analysis.Calculus.FDeriv.Basic
 import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Topology.Basic
+import Mathlib.Order.Filter.Basic
+
+open Filter Topology
 
 namespace Litlib.Y1976.rudin1976principles
 
@@ -19,9 +23,8 @@ class Eq9_39 where
   directional_derivative
     (V W : Type*) [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup W][NormedSpace ℝ W]
     (f : V → W) (x u : V)
-    (hf : DifferentiableAt ℝ f x)
-    (limitToZero : (ℝ → W) → W → Prop) :
-    limitToZero (fun t => (t⁻¹) • (f (x + t • u) - f x)) ((fderiv ℝ f x) u)
+    (hf : DifferentiableAt ℝ f x) :
+    Tendsto (fun t : ℝ => t⁻¹ • (f (x + t • u) - f x)) (𝓝[≠] 0) (𝓝 ((fderiv ℝ f x) u))
 
 literature_citation Thm9_19
   bibtex_key "rudin1976principles"
@@ -56,3 +59,5 @@ class FrechetToScalarProjection where
     (x u : V)
     (hf : DifferentiableAt ℝ f x) :
     (fderiv ℝ f x) u = deriv (fun t : ℝ => f (x + t • u)) 0
+
+end Litlib.Y1976.rudin1976principles
