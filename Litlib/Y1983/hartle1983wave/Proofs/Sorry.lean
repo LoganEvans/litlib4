@@ -16,9 +16,7 @@ instance : NoBoundaryProposal where
 instance : SemiclassicalGroundState where
   semiclassical_approximation := sorry
 
--- This is a highly abstracted topological assertion. While the physics is profound, 
--- synthesizing the instance given the Weyl Pattern abstraction is mathematically straightforward.
-@[litlib_difficulty easy, litlib_status Conjecture]
+@[litlib_difficulty hard, litlib_status Conjecture]
 instance : BigBangInstantonBoundary where
   big_bang_is_instanton := sorry
 
