@@ -4,6 +4,12 @@ import Litlib.Core
 import Mathlib.Topology.Basic
 import Mathlib.Order.Monotone.Basic
 import Mathlib.Data.Real.Basic
+import Mathlib.Order.Filter.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Add
+import Mathlib.Analysis.Calculus.FDeriv.Linear
+
+open Filter Topology
 
 namespace Litlib.Y1982.uhlenbeck1982connections
 
@@ -20,14 +26,14 @@ class Thm1_3 where
   gauge condition (d*A = 0).
   -/
   exists_coulomb_gauge
-    (Connection GaugeTransform : Type*)
+    (Connection GaugeTransform Form : Type*) [Zero Form]
     (curvature_Ln2_norm : Connection → ℝ)
     (applyGauge : GaugeTransform → Connection → Connection)
-    (isCoulombGauge : Connection → Prop) :
+    (d_star : Connection → Form) :
     ∃ (κ : ℝ), κ > 0 ∧
     ∀ (A : Connection),
       curvature_Ln2_norm A ≤ κ →
-      ∃ (g : GaugeTransform), isCoulombGauge (applyGauge g A)
+      ∃ (g : GaugeTransform), d_star (applyGauge g A) = 0
 
 literature_citation Thm1_5
   bibtex_key "uhlenbeck1982connections"
@@ -42,15 +48,14 @@ class Thm1_5 where
   the gauge-transformed subsequence converges weakly.
   -/
   uhlenbeck_compactness 
-    (Connection GaugeTransform : Type*)
+    (Connection GaugeTransform : Type*) [TopologicalSpace Connection]
     (curvature_Lp_norm : Connection → ℝ)
-    (applyGauge : GaugeTransform → Connection → Connection)
-    (isWeaklyConvergent : (ℕ → Connection) → Prop) :
+    (applyGauge : GaugeTransform → Connection → Connection) :
     ∀ (D : ℕ → Connection) (B : ℝ),
       (∀ i, curvature_Lp_norm (D i) ≤ B) →
-      ∃ (subseq : ℕ → ℕ) (s : ℕ → GaugeTransform),
+      ∃ (A_infty : Connection) (subseq : ℕ → ℕ) (s : ℕ → GaugeTransform),
         StrictMono subseq ∧
-        isWeaklyConvergent (fun i => applyGauge (s i) (D (subseq i)))
+        Tendsto (fun i => applyGauge (s i) (D (subseq i))) atTop (𝓝 A_infty)
 
 literature_citation ConnectionTopology
   bibtex_key "uhlenbeck1982connections"
@@ -60,13 +65,18 @@ literature_citation ConnectionTopology
 class ConnectionTopology where
   /--
   Capstone Theorem for CGD: Connection Topology.
-  Axiom stating that there exists a valid, rigorous Sobolev topological space 
-  over the field of connections.
+  Uhlenbeck establishes that the space of W^{1,p} connections modulo gauge 
+  transformations forms a metric space. We enforce the existence of a metric 
+  that separates points iff they are not gauge-equivalent.
   -/
-  exists_sobolev_topology
-    (Connection : Type*)
-    (isSobolevTopology : TopologicalSpace Connection → Prop) :
-    ∃ (T : TopologicalSpace Connection), isSobolevTopology T
+  exists_gauge_metric
+    (Connection GaugeTransform : Type*)
+    (applyGauge : GaugeTransform → Connection → Connection) :
+    ∃ (dist : Connection → Connection → ℝ),
+      (∀ a b, dist a b ≥ 0) ∧
+      (∀ a b, dist a b = 0 ↔ ∃ g, applyGauge g a = b) ∧
+      (∀ a b, dist a b = dist b a) ∧
+      (∀ a b c, dist a c ≤ dist a b + dist b c)
 
 literature_citation YangMillsActionDifferentiable
   bibtex_key "uhlenbeck1982connections"
@@ -76,14 +86,12 @@ literature_citation YangMillsActionDifferentiable
 class YangMillsActionDifferentiable where
   /--
   Capstone Theorem for CGD: Yang-Mills Action Differentiability.
-  An axiom stating the Yang-Mills action is Fréchet differentiable with 
-  respect to smooth (W=1) variations.
+  The Yang-Mills action is Fréchet differentiable with respect to W^{1,p} variations.
   -/
   is_frechet_differentiable
-    (Connection : Type*)
-    (Action : Connection → ℝ)
-    (isFrechetDifferentiable : (Connection → ℝ) → Prop) :
-    isFrechetDifferentiable Action
+    (Connection : Type*) [NormedAddCommGroup Connection] [NormedSpace ℝ Connection]
+    (Action : Connection → ℝ) :
+    Differentiable ℝ Action
 
 literature_citation YangMillsFunctionalDerivative
   bibtex_key "uhlenbeck1982connections"
@@ -93,12 +101,14 @@ literature_citation YangMillsFunctionalDerivative
 class YangMillsFunctionalDerivative where
   /--
   Capstone Theorem for CGD: Yang-Mills Functional Derivative.
-  If a connection is a stationary point of the action, it mathematically implies 
-  the local continuous Euler-Lagrange (Yang-Mills) PDEs.
+  If a connection is a stationary point of the action (Fréchet derivative is 0), 
+  it mathematically implies the local continuous Euler-Lagrange (Yang-Mills) PDEs.
   -/
   stationary_implies_euler_lagrange
-    (Connection : Type*)
+    (Connection Form : Type*) [NormedAddCommGroup Connection] [NormedSpace ℝ Connection] [Zero Form]
     (Action : Connection → ℝ)
-    (isStationaryPoint : Connection → (Connection → ℝ) → Prop)
-    (satisfiesYangMillsPDE : Connection → Prop) :
-    ∀ (A : Connection), isStationaryPoint A Action → satisfiesYangMillsPDE A
+    (F : Connection → Form) (d_star : Form → Form) :
+    ∀ (A : Connection),
+      HasFDerivAt Action (0 : Connection →L[ℝ] ℝ) A → d_star (F A) = 0
+
+end Litlib.Y1982.uhlenbeck1982connections
