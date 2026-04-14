@@ -8,8 +8,8 @@ namespace Litlib.Y1978.atiyah1978construction.Proofs
 instance : Page185Algebra where
   jumping_lines_trivial := sorry
 
-@[litlib_difficulty hard, litlib_status Conjecture]
+@[litlib_difficulty easy, litlib_status Conjecture]
 instance : AdhmModuliUniqueness where
-  adhm_uniqueness := sorry
+  adhm_charge_1 := sorry
 
 end Litlib.Y1978.atiyah1978construction.Proofs
