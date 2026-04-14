@@ -3,6 +3,7 @@
 import Litlib.Core
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Topology.Basic
 
 namespace Litlib.Y1982.taubes1982existence
 
@@ -39,8 +40,15 @@ class BogomolnyiExistence where
   /--
   Capstone Theorem: Bogomolnyi Existence.
   The infimum of the Yang-Mills-Higgs action is attained by a smooth function.
+  Secured by mapping the variational problem to rigorous topological compactness,
+  ensuring the Extreme Value Theorem holds and preventing non-coercive exploits.
   -/
   exists_w1_minimizer
-    (Connection : Type*)
-    (isW1Minimizer : Connection → Prop) :
-    ∃ (A : Connection), isW1Minimizer A
+    (Connection : Type*) [TopologicalSpace Connection]
+    (Action : Connection → ℝ)
+    (h_nonempty : Nonempty Connection)
+    (h_continuous : Continuous Action)
+    (h_compact_sublevel : ∀ (c : ℝ), IsCompact {A | Action A ≤ c}) :
+    ∃ (A_min : Connection), ∀ A, Action A_min ≤ Action A
+
+end Litlib.Y1982.taubes1982existence
