@@ -104,7 +104,7 @@ class YangMillsFunctionalDerivative where
   If a connection is a stationary point of the action (Fréchet derivative is 0), 
   it mathematically implies the local continuous Euler-Lagrange (Yang-Mills) PDEs.
   -/
-  stationaryImpliesEulerLagrange
+  stationaryImpliesEOM
     (Connection Form : Type*) [NormedAddCommGroup Connection] [NormedSpace ℝ Connection] [Zero Form]
     (Action : Connection → ℝ)
     (F : Connection → Form) (dStar : Form → Form) :

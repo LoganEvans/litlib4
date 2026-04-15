@@ -45,7 +45,7 @@ class UtiyamaExpansion where
   Any gauge-invariant, renormalizable Lagrangian natively expands into the trace 
   of the field strength squared.
   -/
-  utiyamaExpansion 
+  yieldsTraceExpansion 
     (ChiralM : Type*) [Ring ChiralM] [Algebra ℂ ChiralM]
     (Trace : ChiralM → ℂ)
     (L : (Fin 4 → Fin 4 → ChiralM) → ℂ)
