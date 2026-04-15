@@ -81,23 +81,22 @@ literature_citation FluxTubeEnergyBounds
   doi "10.1016/S0370-1573(00)00079-X"
   authors["Bali, Gunnar S."]
   status Standard
-class FluxTubeEnergyBounds where
+class FluxTubeEnergyBounds 
+    (FluxTubeState : Type*)
+    (spatialEnergy : FluxTubeState → ℝ)
+    (intactFluxTube : ℝ → FluxTubeState)
+    (snappedFluxTube : ℝ → FluxTubeState) where
   /--
   Capstone Theorem: Macroscopic String Energy Bounds.
   The energy of an intact topological flux tube scales linearly with its length 
   (the string tension σ), while a snapped flux tube resolves into two isolated masses (2M).
+  Secured by moving structural states out of universally quantified variables.
   -/
   intact_energy
-    (FluxTubeState : Type*)
-    (spatialEnergy : FluxTubeState → ℝ)
-    (intactFluxTube : ℝ → FluxTubeState)
     (sigma L : ℝ) :
     spatialEnergy (intactFluxTube L) = sigma * L
   
   snapped_energy
-    (FluxTubeState : Type*)
-    (spatialEnergy : FluxTubeState → ℝ)
-    (snappedFluxTube : ℝ → FluxTubeState)
     (M L : ℝ) :
     spatialEnergy (snappedFluxTube L) = 2 * M
 
