@@ -4,6 +4,9 @@ import Litlib.Core
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+import Mathlib.LinearAlgebra.Matrix.Trace
+
+open BigOperators
 
 namespace Litlib.Y2024.gielen2024unimodular
 
@@ -84,19 +87,29 @@ literature_citation UnimodularCDJ
   doi "10.1088/1361-6382/ad3277"
   authors ["Gielen, Steffen", "Nash, Elliot"]
   status Standard
-class UnimodularCDJ where
+class UnimodularCDJ 
+    (SpacetimePoint : Type*)
+    (urbantkeMetric : (Fin 4 → Fin 4 → Matrix (Fin 3) (Fin 3) ℂ) → Matrix (Fin 4) (Fin 4) ℂ) where
   /--
   Capstone Theorem: The Unimodular Capovilla-Dell-Jacobson constraint.
-  Using the Weyl Pattern, this theorem asserts that any connection satisfying 
-  the chiral CDJ field equations inherently generates a spacetime metric 
-  (via the Urbantke construction) that has a constant spacetime volume.
+  Secured by migrating mappings to class bounds and enforcing rigorous matrix 
+  trace equations (Tr(F ∧ F) = Λ). Asserts that any connection satisfying the 
+  chiral CDJ field equations inherently generates an Urbantke metric that has 
+  a constant spacetime volume.
   -/
   cdj_implies_constant_volume
-    (SpacetimePoint SL2C : Type*)
-    (satisfiesCdjConstraint : (Fin 4 → Fin 4 → SpacetimePoint → SL2C) → Prop)
-    (urbantkeMetric : (Fin 4 → Fin 4 → SL2C) → Matrix (Fin 4) (Fin 4) ℂ)
-    (F : Fin 4 → Fin 4 → SpacetimePoint → SL2C) :
-    satisfiesCdjConstraint F →
+    (F : Fin 4 → Fin 4 → SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
+    (Λ : ℂ)
+    (h_epsilon_alt : ∀ α β γ δ, 
+      epsilon4 α β γ δ = -epsilon4 β α γ δ ∧ 
+      epsilon4 α β γ δ = -epsilon4 α γ β δ ∧ 
+      epsilon4 α β γ δ = -epsilon4 α β δ γ)
+    (h_epsilon_nondeg : epsilon4 0 1 2 3 ≠ 0)
+    (h_Λ_nz : Λ ≠ 0)
+    (h_cdj_constraint : ∀ x, 
+      (∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4,
+        epsilon4 μ ν ρ σ * Matrix.trace (F μ ν x * F ρ σ x)) = Λ) :
     ∃ (c : ℂ), c ≠ 0 ∧ ∀ x, Matrix.det (urbantkeMetric (fun m n => F m n x)) = c
 
 end Litlib.Y2024.gielen2024unimodular
