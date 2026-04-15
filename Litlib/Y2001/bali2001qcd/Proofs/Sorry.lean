@@ -29,7 +29,11 @@ instance (priority := 10) fallback_Eq6_48_to_6_50 : Eq6_48_to_6_50 where
 attribute [deprecated "Formalized proof available. Import the verified proof file from the Proofs directory to override this fallback." (since := "2024-10-24")] fallback_Eq6_48_to_6_50
 
 @[litlib_difficulty medium, litlib_status Conjecture]
-instance (priority := 10) fallback_FluxTubeEnergyBounds : FluxTubeEnergyBounds where
+instance (priority := 10) fallback_FluxTubeEnergyBounds 
+    {FluxTubeState : Type*}
+    {spatialEnergy : FluxTubeState → ℝ}
+    {intactFluxTube : ℝ → FluxTubeState}
+    {snappedFluxTube : ℝ → FluxTubeState} : FluxTubeEnergyBounds FluxTubeState spatialEnergy intactFluxTube snappedFluxTube where
   intact_energy := sorry
   snapped_energy := sorry
 
