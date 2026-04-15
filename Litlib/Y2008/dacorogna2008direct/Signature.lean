@@ -6,8 +6,8 @@ import Mathlib.Topology.Basic
 
 namespace Litlib.Y2008.dacorogna2008direct
 
-literature_citation ConvexityHierarchy
-  bibtex_key "dacorogna2008direct"
+Litlib.reference ConvexityHierarchy
+  bibtex "dacorogna2008direct"
   doi "10.1007/978-0-387-55249-1"
   authors["Dacorogna, Bernard"]
   status Standard
@@ -24,8 +24,8 @@ class ConvexityHierarchy
       (isPolyconvex f → isQuasiconvex f) ∧
       (isQuasiconvex f → isRankOneConvex f)
 
-literature_citation DirectMethod
-  bibtex_key "dacorogna2008direct"
+Litlib.reference DirectMethod
+  bibtex "dacorogna2008direct"
   doi "10.1007/978-0-387-55249-1"
   authors ["Dacorogna, Bernard"]
   status Standard
@@ -37,13 +37,13 @@ class DirectMethod
   If a functional has compact sublevel sets (encoding coercivity and lower 
   semicontinuity natively in Mathlib's topology), a global minimum absolutely exists.
   -/
-  exists_global_minimum
-    (h_nonempty : Nonempty State)
-    (h_compact_sublevel : ∀ (c : ℝ), IsCompact {u | Action u ≤ c}) :
+  existsGlobalMinimum
+    (hNonempty : Nonempty State)
+    (hCompactSublevel : ∀ (c : ℝ), IsCompact {u | Action u ≤ c}) :
     ∃ (u : State), ∀ (v : State), Action u ≤ Action v
 
-literature_citation RelaxationTheorem
-  bibtex_key "dacorogna2008direct"
+Litlib.reference RelaxationTheorem
+  bibtex "dacorogna2008direct"
   doi "10.1007/978-0-387-55249-1"
   authors ["Dacorogna, Bernard"]
   status Standard
@@ -56,11 +56,11 @@ class RelaxationTheorem
   is equal to the infimum of the relaxed problem formed by taking the 
   quasiconvex envelope. Secured using native Mathlib Greatest Lower Bounds (IsGLB).
   -/
-  inf_P_eq_inf_QP
+  infPEqInfQp
     (infP infQP : ℝ)
-    (h_envelope : isQuasiconvexEnvelope Action RelaxedAction)
-    (h_inf_P : IsGLB (Set.range Action) infP)
-    (h_inf_QP : IsGLB (Set.range RelaxedAction) infQP) :
+    (hEnvelope : isQuasiconvexEnvelope Action RelaxedAction)
+    (hInfP : IsGLB (Set.range Action) infP)
+    (hInfQp : IsGLB (Set.range RelaxedAction) infQP) :
     infP = infQP
 
 end Litlib.Y2008.dacorogna2008direct

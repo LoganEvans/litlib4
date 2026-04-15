@@ -13,8 +13,8 @@ open Filter Topology
 
 namespace Litlib.Y1982.uhlenbeck1982connections
 
-literature_citation Thm1_3
-  bibtex_key "uhlenbeck1982connections"
+Litlib.reference Thm1_3
+  bibtex "uhlenbeck1982connections"
   doi "10.1007/BF01206014"
   authors ["Uhlenbeck, Karen K."]
   status Standard
@@ -25,18 +25,18 @@ class Thm1_3 where
   gauge transformation mapping the connection to one satisfying the Coulomb 
   gauge condition (d*A = 0).
   -/
-  exists_coulomb_gauge
+  existsCoulombGauge
     (Connection GaugeTransform Form : Type*) [Zero Form]
-    (curvature_Ln2_norm : Connection → ℝ)
+    (curvatureLn2Norm : Connection → ℝ)
     (applyGauge : GaugeTransform → Connection → Connection)
-    (d_star : Connection → Form) :
+    (dStar : Connection → Form) :
     ∃ (κ : ℝ), κ > 0 ∧
     ∀ (A : Connection),
-      curvature_Ln2_norm A ≤ κ →
-      ∃ (g : GaugeTransform), d_star (applyGauge g A) = 0
+      curvatureLn2Norm A ≤ κ →
+      ∃ (g : GaugeTransform), dStar (applyGauge g A) = 0
 
-literature_citation Thm1_5
-  bibtex_key "uhlenbeck1982connections"
+Litlib.reference Thm1_5
+  bibtex "uhlenbeck1982connections"
   doi "10.1007/BF01206014"
   authors ["Uhlenbeck, Karen K."]
   status Standard
@@ -47,18 +47,18 @@ class Thm1_5 where
   Then there exists a subsequence and a sequence of gauge transformations such that
   the gauge-transformed subsequence converges weakly.
   -/
-  uhlenbeck_compactness 
+  uhlenbeckCompactness 
     (Connection GaugeTransform : Type*) [TopologicalSpace Connection]
-    (curvature_Lp_norm : Connection → ℝ)
+    (curvatureLpNorm : Connection → ℝ)
     (applyGauge : GaugeTransform → Connection → Connection) :
     ∀ (D : ℕ → Connection) (B : ℝ),
-      (∀ i, curvature_Lp_norm (D i) ≤ B) →
-      ∃ (A_infty : Connection) (subseq : ℕ → ℕ) (s : ℕ → GaugeTransform),
+      (∀ i, curvatureLpNorm (D i) ≤ B) →
+      ∃ (aInfty : Connection) (subseq : ℕ → ℕ) (s : ℕ → GaugeTransform),
         StrictMono subseq ∧
-        Tendsto (fun i => applyGauge (s i) (D (subseq i))) atTop (𝓝 A_infty)
+        Tendsto (fun i => applyGauge (s i) (D (subseq i))) atTop (𝓝 aInfty)
 
-literature_citation ConnectionTopology
-  bibtex_key "uhlenbeck1982connections"
+Litlib.reference ConnectionTopology
+  bibtex "uhlenbeck1982connections"
   doi "10.1007/BF01206014"
   authors ["Uhlenbeck, Karen K."]
   status Standard
@@ -69,7 +69,7 @@ class ConnectionTopology where
   transformations forms a metric space. We enforce the existence of a metric 
   that separates points iff they are not gauge-equivalent.
   -/
-  exists_gauge_metric
+  existsGaugeMetric
     (Connection GaugeTransform : Type*)
     (applyGauge : GaugeTransform → Connection → Connection) :
     ∃ (dist : Connection → Connection → ℝ),
@@ -78,8 +78,8 @@ class ConnectionTopology where
       (∀ a b, dist a b = dist b a) ∧
       (∀ a b c, dist a c ≤ dist a b + dist b c)
 
-literature_citation YangMillsActionDifferentiable
-  bibtex_key "uhlenbeck1982connections"
+Litlib.reference YangMillsActionDifferentiable
+  bibtex "uhlenbeck1982connections"
   doi "10.1007/BF01206014"
   authors ["Uhlenbeck, Karen K."]
   status Standard
@@ -88,13 +88,13 @@ class YangMillsActionDifferentiable where
   Capstone Theorem for CGD: Yang-Mills Action Differentiability.
   The Yang-Mills action is Fréchet differentiable with respect to W^{1,p} variations.
   -/
-  is_frechet_differentiable
+  isFrechetDifferentiable
     (Connection : Type*) [NormedAddCommGroup Connection] [NormedSpace ℝ Connection]
     (Action : Connection → ℝ) :
     Differentiable ℝ Action
 
-literature_citation YangMillsFunctionalDerivative
-  bibtex_key "uhlenbeck1982connections"
+Litlib.reference YangMillsFunctionalDerivative
+  bibtex "uhlenbeck1982connections"
   doi "10.1007/BF01206014"
   authors ["Uhlenbeck, Karen K."]
   status Standard
@@ -104,11 +104,11 @@ class YangMillsFunctionalDerivative where
   If a connection is a stationary point of the action (Fréchet derivative is 0), 
   it mathematically implies the local continuous Euler-Lagrange (Yang-Mills) PDEs.
   -/
-  stationary_implies_euler_lagrange
+  stationaryImpliesEulerLagrange
     (Connection Form : Type*) [NormedAddCommGroup Connection] [NormedSpace ℝ Connection] [Zero Form]
     (Action : Connection → ℝ)
-    (F : Connection → Form) (d_star : Form → Form) :
+    (F : Connection → Form) (dStar : Form → Form) :
     ∀ (A : Connection),
-      HasFDerivAt Action (0 : Connection →L[ℝ] ℝ) A → d_star (F A) = 0
+      HasFDerivAt Action (0 : Connection →L[ℝ] ℝ) A → dStar (F A) = 0
 
 end Litlib.Y1982.uhlenbeck1982connections

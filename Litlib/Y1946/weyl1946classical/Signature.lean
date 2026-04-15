@@ -16,59 +16,59 @@ open Matrix BigOperators
 
 namespace Litlib.Y1946.weyl1946classical
 
-literature_citation SchursLemma
-  bibtex_key "weyl1946classical"
+Litlib.reference SchursLemma
+  bibtex "weyl1946classical"
   authors ["Weyl, Hermann"]
   status Standard
 class SchursLemma where
   /-- Chapter III, Lemma 3.1.A -/
-  end_of_simple_module_is_division_ring (R V : Type*) [Ring R] [AddCommGroup V] [Module R V] [IsSimpleModule R V] : 
+  endOfSimpleModuleIsDivisionRing (R V : Type*) [Ring R] [AddCommGroup V] [Module R V] [IsSimpleModule R V] : 
     Nonempty (DivisionRing (Module.End R V))
 
-literature_citation DivRingIsSimple
-  bibtex_key "weyl1946classical"
+Litlib.reference DivRingIsSimple
+  bibtex "weyl1946classical"
   authors ["Weyl, Hermann"]
   status Standard
 class DivRingIsSimple where
   /-- Chapter III, Theorem 3.3.A -/
-  division_ring_is_simple_ring (D : Type*) [DivisionRing D] : IsSimpleRing D
+  divisionRingIsSimpleRing (D : Type*) [DivisionRing D] : IsSimpleRing D
 
-literature_citation MaschkesTheorem
-  bibtex_key "weyl1946classical"
+Litlib.reference MaschkesTheorem
+  bibtex "weyl1946classical"
   authors ["Weyl, Hermann"]
   status Standard
 class MaschkesTheorem where
   /-- Chapter III, Section 7 -/
-  group_ring_is_semisimple (k G : Type*) [Field k] [Group G] [Fintype G] [Invertible (Fintype.card G : k)] :
+  groupRingIsSemisimple (k G : Type*) [Field k] [Group G] [Fintype G] [Invertible (Fintype.card G : k)] :
     IsSemisimpleRing (MonoidAlgebra k G)
 
-literature_citation HilbertBasisTheorem
-  bibtex_key "weyl1946classical"
+Litlib.reference HilbertBasisTheorem
+  bibtex "weyl1946classical"
   authors ["Weyl, Hermann"]
   status Standard
 class HilbertBasisTheorem where
   /-- Chapter VIII, Theorem 8.6.A -/
-  polynomial_is_noetherian (R : Type*) [CommRing R] [IsNoetherianRing R] : 
+  polynomialIsNoetherian (R : Type*) [CommRing R] [IsNoetherianRing R] : 
     IsNoetherianRing (Polynomial R)
 
-literature_citation FirstMainTheoremOrthogonalRank4
-  bibtex_key "weyl1946classical"
+Litlib.reference FirstMainTheoremOrthogonalRank4
+  bibtex "weyl1946classical"
   authors ["Weyl, Hermann"]
   status Standard
 class FirstMainTheoremOrthogonalRank4 where
   /-- Chapter II, Theorem 2.9.A -/
-  unique_lorentz_invariant_rank4 
+  uniqueLorentzInvariantRank4 
     (eta : Matrix (Fin 4) (Fin 4) ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
     (T : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    (h_eta_symm : ∀ i j, eta i j = eta j i)
-    (h_eta_nondeg : Matrix.det eta ≠ 0)
-    (h_epsilon_alt : ∀ α β γ δ, 
+    (hEtaSymm : ∀ i j, eta i j = eta j i)
+    (hEtaNondeg : Matrix.det eta ≠ 0)
+    (hEpsilonAlt : ∀ α β γ δ, 
       epsilon4 α β γ δ = -epsilon4 β α γ δ ∧ 
       epsilon4 α β γ δ = -epsilon4 α γ β δ ∧ 
       epsilon4 α β γ δ = -epsilon4 α β δ γ)
-    (h_epsilon_nondeg : epsilon4 0 1 2 3 ≠ 0)
-    (h_inv : ∀ (Λ : Matrix (Fin 4) (Fin 4) ℂ),
+    (hEpsilonNondeg : epsilon4 0 1 2 3 ≠ 0)
+    (hInv : ∀ (Λ : Matrix (Fin 4) (Fin 4) ℂ),
       Λ * eta * Matrix.transpose Λ = eta → Matrix.det Λ = 1 →
       ∀ μ ν ρ σ, ∑ α : Fin 4, ∑ β : Fin 4, ∑ γ : Fin 4, ∑ δ : Fin 4,
         Λ μ α * Λ ν β * Λ ρ γ * Λ σ δ * T α β γ δ = T μ ν ρ σ) :

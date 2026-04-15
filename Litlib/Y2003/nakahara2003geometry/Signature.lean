@@ -9,73 +9,73 @@ import Mathlib.Topology.ContinuousOn
 
 namespace Litlib.Y2003.nakahara2003geometry
 
-literature_citation Eq6_8
-  bibtex_key "nakahara2003geometry"
+Litlib.reference Eq6_8
+  bibtex "nakahara2003geometry"
   authors ["Nakahara, Mikio"]
   status Standard
 class Eq6_8 
     (Chain Form : Type*)
     (integral : Chain → Form → ℝ)
-    (exterior_deriv : Form → Form)
+    (exteriorDeriv : Form → Form)
     (boundary : Chain → Chain) where
   /-- 
   Equation 6.8 (page 247): Stokes' Theorem.
   The integral of the exterior derivative of a form over a chain c is equal 
   to the integral of the form over the boundary of c. 
   -/
-  stokes_theorem :
+  stokesTheorem :
     ∀ (c : Chain) (omega : Form), 
-      integral c (exterior_deriv omega) = integral (boundary c) omega
+      integral c (exteriorDeriv omega) = integral (boundary c) omega
 
-literature_citation Eq10_32b
-  bibtex_key "nakahara2003geometry"
+Litlib.reference Eq10_32b
+  bibtex "nakahara2003geometry"
   authors ["Nakahara, Mikio"]
   status Standard
 class Eq10_32b 
     (Form : Type*) [AddCommGroup Form]
-    (exterior_deriv : Form → Form)
+    (exteriorDeriv : Form → Form)
     (wedge : Form → Form → Form) where
   /-- 
   Equation 10.32b (page 406): Cartan's structure equation.
   The curvature two-form Ω is defined from the connection one-form ω.
   -/
-  cartan_structure_eq
+  cartanStructureEq
     (omega Omega : Form) :
-    Omega = exterior_deriv omega + wedge omega omega
+    Omega = exteriorDeriv omega + wedge omega omega
 
-literature_citation Eq10_45
-  bibtex_key "nakahara2003geometry"
+Litlib.reference Eq10_45
+  bibtex "nakahara2003geometry"
   authors ["Nakahara, Mikio"]
   status Standard
 class Eq10_45 
     (Form : Type*) [Zero Form]
-    (covariant_deriv : Form → Form) where
+    (covariantDeriv : Form → Form) where
   /-- 
   Equation 10.45 (page 409): The Bianchi identity.
   The covariant exterior derivative of the curvature two-form identically vanishes.
   -/
-  bianchi_identity
+  bianchiIdentity
     (Omega : Form) :
-    covariant_deriv Omega = 0
+    covariantDeriv Omega = 0
 
-literature_citation Eq10_128
-  bibtex_key "nakahara2003geometry"
+Litlib.reference Eq10_128
+  bibtex "nakahara2003geometry"
   authors["Nakahara, Mikio"]
   status Standard
 class Eq10_128 
     (Map : Type*)
     (degree : Map → ℤ)
-    (cartan_maurer_integral : Map → ℝ) where
+    (cartanMaurerIntegral : Map → ℝ) where
   /--
   Equation 10.128 (page 428): Winding number of a map to SU(2).
   The degree of the mapping g : S^3 -> SU(2) is given by the normalized 
   integral of the Cartan-Maurer 3-form.
   -/
-  winding_number_integral :
-    ∀ (g : Map), (degree g : ℝ) = (1 / (24 * Real.pi^2)) * cartan_maurer_integral g
+  windingNumberIntegral :
+    ∀ (g : Map), (degree g : ℝ) = (1 / (24 * Real.pi^2)) * cartanMaurerIntegral g
 
-literature_citation TopologicalCalculus
-  bibtex_key "nakahara2003geometry"
+Litlib.reference TopologicalCalculus
+  bibtex "nakahara2003geometry"
   authors["Nakahara, Mikio"]
   status Standard
 class TopologicalCalculus 
@@ -90,19 +90,19 @@ class TopologicalCalculus
   Secured by mapping abstract homotopy to mathematically rigorous continuous
   functions from the connected real interval [0,1], leveraging the discrete topology of ℤ.
   -/
-  homotopy_invariance
+  homotopyInvariance
     (H : ℝ → Map)
-    (h_cont : Continuous H) :
+    (hCont : Continuous H) :
     ∀ t1 t2 : ℝ, windingNumber (H t1) = windingNumber (H t2)
 
-  degree_theorem :
+  degreeTheorem :
     ∀ g, cartanMaurerIntegral g = (windingNumber g : ℝ)
 
-  gauge_and_translation_invariance :
+  gaugeAndTranslationInvariance :
     ∀ g, cartanMaurerIntegral (applyTranslation g) = cartanMaurerIntegral g ∧
          cartanMaurerIntegral (applyGauge g) = cartanMaurerIntegral g
 
-  bpst_boundary_degree :
+  bpstBoundaryDegree :
     cartanMaurerIntegral bpstEnvelope = 1
 
 end Litlib.Y2003.nakahara2003geometry

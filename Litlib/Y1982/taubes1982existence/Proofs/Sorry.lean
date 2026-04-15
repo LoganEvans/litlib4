@@ -4,12 +4,12 @@ import Litlib.Y1982.taubes1982existence.Signature
 
 namespace Litlib.Y1982.taubes1982existence.Proofs
 
-@[litlib_difficulty easy, litlib_status Conjecture]
+@[Litlib.difficulty easy, Litlib.status Conjecture]
 instance : Eq2_7_and_2_8 where
-  ymh_variations := sorry
+  ymhVariations := sorry
 
-@[litlib_difficulty hard, litlib_status Conjecture]
+@[Litlib.difficulty hard, Litlib.status Conjecture]
 instance : BogomolnyiExistence where
-  exists_w1_minimizer := sorry
+  existsW1Minimizer := sorry
 
 end Litlib.Y1982.taubes1982existence.Proofs

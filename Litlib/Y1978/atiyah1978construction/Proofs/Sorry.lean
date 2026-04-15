@@ -4,12 +4,12 @@ import Litlib.Y1978.atiyah1978construction.Signature
 
 namespace Litlib.Y1978.atiyah1978construction.Proofs
 
-@[litlib_difficulty easy, litlib_status Conjecture]
+@[Litlib.difficulty easy, Litlib.status Conjecture]
 instance : Page185Algebra where
-  jumping_lines_trivial := sorry
+  jumpingLinesTrivial := sorry
 
-@[litlib_difficulty easy, litlib_status Conjecture]
+@[Litlib.difficulty easy, Litlib.status Conjecture]
 instance : AdhmModuliUniqueness where
-  adhm_charge_1 := sorry
+  adhmCharge1 := sorry
 
 end Litlib.Y1978.atiyah1978construction.Proofs

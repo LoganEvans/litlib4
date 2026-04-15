@@ -11,8 +11,8 @@ open Filter Topology
 
 namespace Litlib.Y1976.rudin1976principles
 
-literature_citation Eq9_39
-  bibtex_key "rudin1976principles"
+Litlib.reference Eq9_39
+  bibtex "rudin1976principles"
   authors ["Rudin, Walter"]
   status Standard
 class Eq9_39 where
@@ -20,21 +20,21 @@ class Eq9_39 where
   Equation (39) (page 217): The definition of the directional derivative 
   and its equivalence to the Fréchet derivative evaluated on a vector.
   -/
-  directional_derivative
+  directionalDerivative
     (V W : Type*) [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup W][NormedSpace ℝ W]
     (f : V → W) (x u : V)
     (hf : DifferentiableAt ℝ f x) :
     Tendsto (fun t : ℝ => t⁻¹ • (f (x + t • u) - f x)) (𝓝[≠] 0) (𝓝 ((fderiv ℝ f x) u))
 
-literature_citation Thm9_19
-  bibtex_key "rudin1976principles"
+Litlib.reference Thm9_19
+  bibtex "rudin1976principles"
   authors ["Rudin, Walter"]
   status Standard
 class Thm9_19 where
   /--
   Theorem 9.19 (page 218): The Mean Value Theorem for functions of several variables.
   -/
-  multidimensional_mvt
+  multidimensionalMvt
     (V W : Type*) [NormedAddCommGroup V] [NormedSpace ℝ V][NormedAddCommGroup W] [NormedSpace ℝ W]
     (f : V → W)
     (a b : V)
@@ -43,8 +43,8 @@ class Thm9_19 where
     (∀ x, ‖fderiv ℝ f x (b - a)‖ ≤ M * ‖b - a‖) →
     ‖f b - f a‖ ≤ M * ‖b - a‖
 
-literature_citation FrechetToScalarProjection
-  bibtex_key "rudin1976principles"
+Litlib.reference FrechetToScalarProjection
+  bibtex "rudin1976principles"
   authors["Rudin, Walter"]
   status Standard
 class FrechetToScalarProjection where
@@ -53,7 +53,7 @@ class FrechetToScalarProjection where
   Mathematical theorem projecting multi-dimensional continuous Fréchet 
   derivatives down to 1D scalar limits using Mathlib's native topologies.
   -/
-  project_frechet_to_1d
+  projectFrechetTo1d
     (V W : Type*) [NormedAddCommGroup V][NormedSpace ℝ V] [NormedAddCommGroup W] [NormedSpace ℝ W]
     (f : V → W)
     (x u : V)

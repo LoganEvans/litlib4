@@ -4,24 +4,24 @@ import Litlib.Y1982.uhlenbeck1982connections.Signature
 
 namespace Litlib.Y1982.uhlenbeck1982connections.Proofs
 
-@[litlib_difficulty intractable, litlib_status Conjecture]
+@[Litlib.difficulty intractable, Litlib.status Conjecture]
 instance : Thm1_3 where
-  exists_coulomb_gauge := sorry
+  existsCoulombGauge := sorry
 
-@[litlib_difficulty intractable, litlib_status Conjecture]
+@[Litlib.difficulty intractable, Litlib.status Conjecture]
 instance : Thm1_5 where
-  uhlenbeck_compactness := sorry
+  uhlenbeckCompactness := sorry
 
-@[litlib_difficulty hard, litlib_status Conjecture]
+@[Litlib.difficulty hard, Litlib.status Conjecture]
 instance : ConnectionTopology where
-  exists_sobolev_topology := sorry
+  existsGaugeMetric := sorry
 
-@[litlib_difficulty hard, litlib_status Conjecture]
+@[Litlib.difficulty hard, Litlib.status Conjecture]
 instance : YangMillsActionDifferentiable where
-  is_frechet_differentiable := sorry
+  isFrechetDifferentiable := sorry
 
-@[litlib_difficulty hard, litlib_status Conjecture]
+@[Litlib.difficulty hard, Litlib.status Conjecture]
 instance : YangMillsFunctionalDerivative where
-  stationary_implies_euler_lagrange := sorry
+  stationaryImpliesEulerLagrange := sorry
 
 end Litlib.Y1982.uhlenbeck1982connections.Proofs

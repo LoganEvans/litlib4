@@ -12,8 +12,8 @@ open Filter Topology
 
 namespace Litlib.Y1983.hartle1983wave
 
-literature_citation Eq2_13
-  bibtex_key "hartle1983wave"
+Litlib.reference Eq2_13
+  bibtex "hartle1983wave"
   doi "10.1103/PhysRevD.28.2960"
   authors["Hartle, J. B.", "Hawking, S. W."]
   status Standard
@@ -23,13 +23,13 @@ class Eq2_13 where
   The state of a closed universe is an eigenstate of the Hamiltonian 
   with eigenvalue zero.
   -/
-  wheeler_dewitt
+  wheelerDewitt
     (State : Type*) [AddCommGroup State] [Module ℝ State]
     (Hamiltonian : State → State) :
-    ∃ (Psi : State), Psi ≠ 0 ∧ Hamiltonian Psi = 0
+    ∃ (psi : State), psi ≠ 0 ∧ Hamiltonian psi = 0
 
-literature_citation NoBoundaryProposal
-  bibtex_key "hartle1983wave"
+Litlib.reference NoBoundaryProposal
+  bibtex "hartle1983wave"
   doi "10.1103/PhysRevD.28.2960"
   authors ["Hartle, J. B.", "Hawking, S. W."]
   status Standard
@@ -40,7 +40,7 @@ class NoBoundaryProposal where
   by a Euclidean path integral over the set of 4-geometries that have the 
   3-geometry as their only boundary.
   -/
-  ground_state_amplitude
+  groundStateAmplitude
     (ThreeGeometry FourGeometry : Type*)
     (boundaryOf : FourGeometry → ThreeGeometry)
     (EuclideanAction : FourGeometry → ℝ)
@@ -49,8 +49,8 @@ class NoBoundaryProposal where
     ∀ (h : ThreeGeometry), 
       amplitude h = pathIntegral (fun g => Real.exp (-EuclideanAction g)) {g | boundaryOf g = h}
 
-literature_citation SemiclassicalGroundState
-  bibtex_key "hartle1983wave"
+Litlib.reference SemiclassicalGroundState
+  bibtex "hartle1983wave"
   doi "10.1103/PhysRevD.28.2960"
   authors["Hartle, J. B.", "Hawking, S. W."]
   status Standard
@@ -60,7 +60,7 @@ class SemiclassicalGroundState where
   The ground-state wave function can be evaluated in the steepest-descents 
   approximation as ħ → 0.
   -/
-  semiclassical_approximation
+  semiclassicalApproximation
     (ThreeGeometry : Type*)
     (Action : ThreeGeometry → ℝ)
     (WaveFunction : ℝ → ThreeGeometry → ℝ)
@@ -68,8 +68,8 @@ class SemiclassicalGroundState where
     ∀ (h : ThreeGeometry), 
       Tendsto (fun ħ => WaveFunction ħ h) (𝓝[>] 0) (𝓝 (PreFactor h * Real.exp (-Action h)))
 
-literature_citation BigBangInstantonBoundary
-  bibtex_key "hartle1983wave"
+Litlib.reference BigBangInstantonBoundary
+  bibtex "hartle1983wave"
   doi "10.1103/PhysRevD.28.2960"
   authors["Hartle, J. B.", "Hawking, S. W."]
   status Standard
@@ -80,7 +80,7 @@ class BigBangInstantonBoundary where
   is a pure Euclidean SO(4) instanton. We secure this by mapping the condition 
   to mathematical self-duality over a rigorously defined Hilbert space.
   -/
-  big_bang_is_instanton
+  bigBangIsInstanton
     (State : Type*) [NormedAddCommGroup State] [InnerProductSpace ℝ State]
     (star : State → State)
     (Connection : ℝ → State) :

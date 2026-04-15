@@ -4,16 +4,16 @@ import Litlib.Y1975.belavin1975pseudoparticle.Signature
 
 namespace Litlib.Y1975.belavin1975pseudoparticle.Proofs
 
-@[litlib_difficulty easy, litlib_status Conjecture]
+@[Litlib.difficulty easy, Litlib.status Conjecture]
 instance (priority := 10) fallback_Eq10_and_11 : Eq10_and_11 where
-  topological_energy_bound := sorry
+  topologicalEnergyBound := sorry
 
-@[litlib_difficulty easy, litlib_status Conjecture]
+@[Litlib.difficulty easy, Litlib.status Conjecture]
 instance (priority := 10) fallback_Eq16 : Eq16 where
-  bpst_profile_ode := sorry
+  bpstProfileOde := sorry
 
-@[litlib_difficulty medium, litlib_status Conjecture]
+@[Litlib.difficulty medium, Litlib.status Conjecture]
 instance (priority := 10) fallback_BpstModuliUniqueness : BpstModuliUniqueness where
-  bpst_profile_uniqueness := sorry
+  bpstProfileUniqueness := sorry
 
 end Litlib.Y1975.belavin1975pseudoparticle.Proofs

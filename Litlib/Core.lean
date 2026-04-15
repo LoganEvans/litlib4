@@ -16,7 +16,7 @@ custom attributes, and syntax macros used by `litlib4` to track scientific liter
 -- ==========================================
 
 structure LitlibData where
-  bibtex_key : String
+  bibtex : String
   doi : String
   authors : List String
   status : String
@@ -30,27 +30,27 @@ initialize litlibExt : MapDeclarationExtension LitlibData ←
 -- 2. Custom Attributes
 -- ==========================================
 
-syntax (name := litlib_difficulty) "litlib_difficulty " ident : attr
-syntax (name := litlib_status) "litlib_status " ident : attr
+syntax (name := Litlib.difficulty) "Litlib.difficulty " ident : attr
+syntax (name := Litlib.status) "Litlib.status " ident : attr
 
 initialize litlibDifficultyAttr : ParametricAttribute Name ←
   registerParametricAttribute {
-    name := `litlib_difficulty
+    name := `Litlib.difficulty
     descr := "Difficulty level of a litlib proof instance (e.g., intractable)"
     getParam := fun _ stx => do
       match stx with
-      | `(attr| litlib_difficulty $id:ident) => return id.getId
-      | _ => throwError "Invalid litlib_difficulty attribute syntax."
+      | `(attr| Litlib.difficulty $id:ident) => return id.getId
+      | _ => throwError "Invalid Litlib.difficulty attribute syntax."
   }
 
 initialize litlibStatusAttr : ParametricAttribute Name ←
   registerParametricAttribute {
-    name := `litlib_status
+    name := `Litlib.status
     descr := "Status of a litlib theorem (e.g., Retracted, Verified)"
     getParam := fun _ stx => do
       match stx with
-      | `(attr| litlib_status $id:ident) => return id.getId
-      | _ => throwError "Invalid litlib_status attribute syntax."
+      | `(attr| Litlib.status $id:ident) => return id.getId
+      | _ => throwError "Invalid Litlib.status attribute syntax."
   }
 
 declare_syntax_cat litlibStatus
@@ -62,8 +62,8 @@ syntax str : litlibStatus
 -- ==========================================
 
 syntax (name := literatureAxiom) 
-  "literature_citation" ident
-  "bibtex_key" str
+  "Litlib.reference" ident
+  "bibtex" str
   ("doi" str)?
   "authors" "[" str,* "]"
   "status" litlibStatus
@@ -96,8 +96,8 @@ def elabLiteratureAxiom : CommandElab := fun stx => do
     let node := args[i]!
     let nodeStr := node.reprint.getD ""
     
-    -- Lean's reprint might append spaces (e.g. "bibtex_key "), so we check the start of the string
-    if nodeStr.startsWith "bibtex_key" then
+    -- Lean's reprint might append spaces (e.g. "bibtex "), so we check the start of the string
+    if nodeStr.startsWith "bibtex" then
       bibStr := args[i+1]!.isStrLit?.getD ""
     else if nodeStr.startsWith "doi" then
       let doiNode := args[i+1]!.getArgs

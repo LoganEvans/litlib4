@@ -4,16 +4,16 @@ import Litlib.Y1982.sedlacek1982direct.Signature
 
 namespace Litlib.Y1982.sedlacek1982direct.Proofs
 
-@[litlib_difficulty intractable, litlib_status Conjecture]
+@[Litlib.difficulty intractable, Litlib.status Conjecture]
 instance : Thm5_5 where
-  obstruction_preserved := sorry
+  obstructionPreserved := sorry
 
-@[litlib_difficulty intractable, litlib_status Conjecture]
+@[Litlib.difficulty intractable, Litlib.status Conjecture]
 instance : Thm7_1 where
-  pontryagin_defect_bound := sorry
+  pontryaginDefectBound := sorry
 
-@[litlib_difficulty hard, litlib_status Conjecture]
+@[Litlib.difficulty hard, Litlib.status Conjecture]
 instance : YangMillsCoercivity where
-  is_coercive := sorry
+  isCoercive := sorry
 
 end Litlib.Y1982.sedlacek1982direct.Proofs

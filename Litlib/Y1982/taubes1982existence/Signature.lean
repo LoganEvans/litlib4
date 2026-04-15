@@ -7,8 +7,8 @@ import Mathlib.Topology.Basic
 
 namespace Litlib.Y1982.taubes1982existence
 
-literature_citation Eq2_7_and_2_8
-  bibtex_key "taubes1982existence"
+Litlib.reference Eq2_7_and_2_8
+  bibtex "taubes1982existence"
   doi "10.1007/BF01206014"
   authors ["Taubes, Clifford Henry"]
   status Standard
@@ -17,22 +17,22 @@ class Eq2_7_and_2_8 where
   Equations (2.7) and (2.8) (page 263): The first and second variation 
   (gradient and Hessian) of the Yang-Mills-Higgs action functional.
   -/
-  ymh_variations
+  ymhVariations
     (V : Type*)[NormedAddCommGroup V][InnerProductSpace ℝ V]
-    (F_A D_A_Phi D_A_omega D_A_eta bracket_omega_Phi omega_wedge_omega bracket_omega_eta : V) :
-    let F := fun (s : ℝ) => F_A + s • D_A_omega + (s^2) • omega_wedge_omega
-    let DPhi := fun (s : ℝ) => D_A_Phi + s • (D_A_eta + bracket_omega_Phi) + (s^2) • bracket_omega_eta
-    let a := fun (s : ℝ) => (1/2 : ℝ) * (inner ℝ (F s) (F s) + inner ℝ (DPhi s) (DPhi s))
+    (fA dAPhi dAOmega dAEta bracketOmegaPhi omegaWedgeOmega bracketOmegaEta : V) :
+    let F := fun (s : ℝ) => fA + s • dAOmega + (s^2) • omegaWedgeOmega
+    let dPhi := fun (s : ℝ) => dAPhi + s • (dAEta + bracketOmegaPhi) + (s^2) • bracketOmegaEta
+    let a := fun (s : ℝ) => (1/2 : ℝ) * (inner ℝ (F s) (F s) + inner ℝ (dPhi s) (dPhi s))
     
-    let grad_a := inner ℝ D_A_omega F_A + inner ℝ bracket_omega_Phi D_A_Phi + inner ℝ D_A_eta D_A_Phi
+    let gradA := inner ℝ dAOmega fA + inner ℝ bracketOmegaPhi dAPhi + inner ℝ dAEta dAPhi
     
-    let hess_a := inner ℝ D_A_omega D_A_omega + inner ℝ D_A_eta D_A_eta + inner ℝ bracket_omega_Phi bracket_omega_Phi +
-                  2 * inner ℝ omega_wedge_omega F_A + 2 * inner ℝ bracket_omega_eta D_A_Phi + 2 * inner ℝ bracket_omega_Phi D_A_eta
+    let hessA := inner ℝ dAOmega dAOmega + inner ℝ dAEta dAEta + inner ℝ bracketOmegaPhi bracketOmegaPhi +
+                  2 * inner ℝ omegaWedgeOmega fA + 2 * inner ℝ bracketOmegaEta dAPhi + 2 * inner ℝ bracketOmegaPhi dAEta
     
-    deriv a 0 = grad_a ∧ deriv (deriv a) 0 = hess_a
+    deriv a 0 = gradA ∧ deriv (deriv a) 0 = hessA
 
-literature_citation BogomolnyiExistence
-  bibtex_key "taubes1982existence"
+Litlib.reference BogomolnyiExistence
+  bibtex "taubes1982existence"
   doi "10.1007/BF01206014"
   authors ["Taubes, Clifford Henry"]
   status Standard
@@ -43,12 +43,12 @@ class BogomolnyiExistence where
   Secured by mapping the variational problem to rigorous topological compactness,
   ensuring the Extreme Value Theorem holds and preventing non-coercive exploits.
   -/
-  exists_w1_minimizer
+  existsW1Minimizer
     (Connection : Type*) [TopologicalSpace Connection]
     (Action : Connection → ℝ)
-    (h_nonempty : Nonempty Connection)
-    (h_continuous : Continuous Action)
-    (h_compact_sublevel : ∀ (c : ℝ), IsCompact {A | Action A ≤ c}) :
-    ∃ (A_min : Connection), ∀ A, Action A_min ≤ Action A
+    (hNonempty : Nonempty Connection)
+    (hContinuous : Continuous Action)
+    (hCompactSublevel : ∀ (c : ℝ), IsCompact {A | Action A ≤ c}) :
+    ∃ (aMin : Connection), ∀ A, Action aMin ≤ Action A
 
 end Litlib.Y1982.taubes1982existence

@@ -13,50 +13,50 @@ namespace Litlib.Y1979.duan1979su2.Proofs.Original
 
 variable {m : Type*} [Fintype m]
 
-lemma smul_mul_smul_c (c : Complex) (A B : Matrix m m Complex) :
+lemma smulMulSmulC (c : Complex) (A B : Matrix m m Complex) :
   (c • A) * (c • B) = (c * c) • (A * B) := by
   calc (c • A) * (c • B)
     _ = c • (A * (c • B)) := by rw[Matrix.smul_mul]
     _ = c • (c • (A * B)) := by rw[Matrix.mul_smul]
     _ = (c * c) • (A * B) := by rw[smul_smul]
 
-lemma cho_duan_curvature [DecidableEq m]
+lemma choDuanCurvature [DecidableEq m]
   (n u v : Matrix m m Complex)
   (c g : Complex)
-  (h_n_sq : n * n = 1)
-  (h_nu : n * u = - (u * n))
-  (h_nv : n * v = - (v * n)) :
-  let B_u := c • (n * u)
-  let B_v := c • (n * v)
+  (hNSq : n * n = 1)
+  (hNu : n * u = - (u * n))
+  (hNv : n * v = - (v * n)) :
+  let bU := c • (n * u)
+  let bV := c • (n * v)
   let curl := c • (u * v - v * u)
-  let comm := B_u * B_v - B_v * B_u
+  let comm := bU * bV - bV * bU
   curl + g • comm = (c - g * c^2) • (u * v - v * u) := by
 
-  intros B_u B_v curl comm
+  intros bU bV curl comm
 
-  have h_nunv : (n * u) * (n * v) = - (u * v) := by
+  have hNuNv : (n * u) * (n * v) = - (u * v) := by
     calc (n * u) * (n * v)
-      _ = -(u * n) * (n * v) := by rw[h_nu]
+      _ = -(u * n) * (n * v) := by rw[hNu]
       _ = - ((u * n) * (n * v)) := by exact neg_mul _ _
       _ = - (u * (n * (n * v))) := by rw[Matrix.mul_assoc]
       _ = - (u * ((n * n) * v)) := by rw[← Matrix.mul_assoc n n v]
-      _ = - (u * (1 * v)) := by rw[h_n_sq]
+      _ = - (u * (1 * v)) := by rw[hNSq]
       _ = - (u * v) := by rw[Matrix.one_mul]
 
-  have h_nvnu : (n * v) * (n * u) = - (v * u) := by
+  have hNvNu : (n * v) * (n * u) = - (v * u) := by
     calc (n * v) * (n * u)
-      _ = -(v * n) * (n * u) := by rw[h_nv]
+      _ = -(v * n) * (n * u) := by rw[hNv]
       _ = - ((v * n) * (n * u)) := by exact neg_mul _ _
       _ = - (v * (n * (n * u))) := by rw[Matrix.mul_assoc]
       _ = - (v * ((n * n) * u)) := by rw[← Matrix.mul_assoc n n u]
-      _ = - (v * (1 * u)) := by rw[h_n_sq]
+      _ = - (v * (1 * u)) := by rw[hNSq]
       _ = - (v * u) := by rw[Matrix.one_mul]
 
-  have h_comm : comm = (- (c * c)) • (u * v - v * u) := by
-    dsimp[comm, B_u, B_v]
-    rw[smul_mul_smul_c c (n * u) (n * v)]
-    rw[smul_mul_smul_c c (n * v) (n * u)]
-    rw[h_nunv, h_nvnu]
+  have hComm : comm = (- (c * c)) • (u * v - v * u) := by
+    dsimp[comm, bU, bV]
+    rw[smulMulSmulC c (n * u) (n * v)]
+    rw[smulMulSmulC c (n * v) (n * u)]
+    rw[hNuNv, hNvNu]
 
     have step1 : (c * c) • -(u * v) - (c * c) • -(v * u) = -((c * c) • (u * v)) + (c * c) • (v * u) := by
       rw[smul_neg, smul_neg, sub_neg_eq_add]
@@ -74,7 +74,7 @@ lemma cho_duan_curvature [DecidableEq m]
     rw[step1, step2, step3, step4, step5, step6]
 
   calc curl + g • comm
-    _ = c • (u * v - v * u) + g • ((- (c * c)) • (u * v - v * u)) := by rw[h_comm]
+    _ = c • (u * v - v * u) + g • ((- (c * c)) • (u * v - v * u)) := by rw[hComm]
     _ = c • (u * v - v * u) + (g * - (c * c)) • (u * v - v * u) := by rw[smul_smul]
     _ = (c + g * - (c * c)) • (u * v - v * u) := by rw[add_smul]
     _ = (c - g * c^2) • (u * v - v * u) := by
@@ -101,14 +101,14 @@ def s3 : Matrix (Fin 2) (Fin 2) Complex :=
     else 0
 
 /-- Explicitly unroll a sum over Fin 2 -/
-lemma sum_fin_2 (f : Fin 2 → Complex) : ∑ i : Fin 2, f i = f 0 + f 1 := by
+lemma sumFin2 (f : Fin 2 → Complex) : ∑ i : Fin 2, f i = f 0 + f 1 := by
   rw[Fin.sum_univ_castSucc, Fin.sum_univ_castSucc]
   simp
 
 /-- Explicitly unroll 2x2 matrix multiplication using canonical sum expansion -/
-lemma eval_mul_2x2 (A B : Matrix (Fin 2) (Fin 2) Complex) (i j : Fin 2) :
+lemma evalMul2x2 (A B : Matrix (Fin 2) (Fin 2) Complex) (i j : Fin 2) :
   (A * B) i j = A i 0 * B 0 j + A i 1 * B 1 j := by
-  rw[Matrix.mul_apply, sum_fin_2]
+  rw[Matrix.mul_apply, sumFin2]
 
 theorem choDuanCurvatureNonzero :
   ∃ (n u v : Matrix (Fin 2) (Fin 2) Complex) (c g : Complex),
@@ -118,47 +118,47 @@ theorem choDuanCurvatureNonzero :
     (c - g * c^2) • (u * v - v * u) ≠ 0 := by
   use s3, s1, s2, 2, 0
 
-  have h_n_sq : s3 * s3 = 1 := by
+  have hNSq : s3 * s3 = 1 := by
     ext i j
     fin_cases i <;> fin_cases j <;>
-    simp[s3, eval_mul_2x2]
+    simp[s3, evalMul2x2]
 
-  have h_nu : s3 * s1 = - (s1 * s3) := by
+  have hNu : s3 * s1 = - (s1 * s3) := by
     ext i j
     fin_cases i <;> fin_cases j <;>
-    simp[s3, s1, eval_mul_2x2]
+    simp[s3, s1, evalMul2x2]
 
-  have h_nv : s3 * s2 = - (s2 * s3) := by
+  have hNv : s3 * s2 = - (s2 * s3) := by
     ext i j
     fin_cases i <;> fin_cases j <;>
-    simp[s3, s2, eval_mul_2x2]
+    simp[s3, s2, evalMul2x2]
 
-  refine ⟨h_n_sq, h_nu, h_nv, ?_⟩
+  refine ⟨hNSq, hNu, hNv, ?_⟩
 
-  intro h_eq
-  have h_contra : ((2 - 0 * 2^2 : Complex) • (s1 * s2 - s2 * s1)) 0 0 = 0 := by
-    rw[h_eq]
+  intro hEq
+  have hContra : ((2 - 0 * 2^2 : Complex) • (s1 * s2 - s2 * s1)) 0 0 = 0 := by
+    rw[hEq]
     rfl
 
-  have h_s1_s2 : (s1 * s2) 0 0 = Complex.I := by
-    simp[s1, s2, eval_mul_2x2]
+  have hS1S2 : (s1 * s2) 0 0 = Complex.I := by
+    simp[s1, s2, evalMul2x2]
 
-  have h_s2_s1 : (s2 * s1) 0 0 = -Complex.I := by
-    simp[s1, s2, eval_mul_2x2]
+  have hS2S1 : (s2 * s1) 0 0 = -Complex.I := by
+    simp[s1, s2, evalMul2x2]
 
-  have h_eval : ((2 - 0 * 2^2 : Complex) • (s1 * s2 - s2 * s1)) 0 0 = 4 * I := by
+  have hEval : ((2 - 0 * 2^2 : Complex) • (s1 * s2 - s2 * s1)) 0 0 = 4 * I := by
     have hc : (2 - 0 * (2:Complex)^2) = 2 := by ring
     have hsub : (s1 * s2 - s2 * s1) 0 0 = (s1 * s2) 0 0 - (s2 * s1) 0 0 := rfl
-    rw[Matrix.smul_apply, hc, hsub, h_s1_s2, h_s2_s1]
+    rw[Matrix.smul_apply, hc, hsub, hS1S2, hS2S1]
     change (2 : Complex) * (I - -I) = 4 * I
     ring
 
-  rw[h_eval] at h_contra
+  rw[hEval] at hContra
 
-  have h_4I : (4 : Complex) * I ≠ 0 := by
+  have h4I : (4 : Complex) * I ≠ 0 := by
     intro h
-    have h_im : ((4 : Complex) * I).im = 0 := by rw [h]; rfl
-    have h_im_eval : ((4 : Complex) * I).im = 4 := by
+    have hIm : ((4 : Complex) * I).im = 0 := by rw [h]; rfl
+    have hImEval : ((4 : Complex) * I).im = 4 := by
       have h1 : ((4:Complex) * I).im = (4:Complex).re * I.im + (4:Complex).im * I.re := rfl
       have h2 : (4:Complex).re = 4 := rfl
       have h3 : (4:Complex).im = 0 := rfl
@@ -166,9 +166,9 @@ theorem choDuanCurvatureNonzero :
       have h5 : I.re = 0 := rfl
       rw[h1, h2, h3, h4, h5]
       ring
-    rw[h_im_eval] at h_im
-    norm_num at h_im
+    rw[hImEval] at hIm
+    norm_num at hIm
 
-  exact h_4I h_contra
+  exact h4I hContra
 
 end Litlib.Y1979.duan1979su2.Proofs.Original

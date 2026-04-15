@@ -4,20 +4,20 @@ import Litlib.Y1983.hartle1983wave.Signature
 
 namespace Litlib.Y1983.hartle1983wave.Proofs
 
-@[litlib_difficulty easy, litlib_status Conjecture]
+@[Litlib.difficulty easy, Litlib.status Conjecture]
 instance : Eq2_13 where
-  wheeler_dewitt := sorry
+  wheelerDewitt := sorry
 
-@[litlib_difficulty intractable, litlib_status Conjecture]
+@[Litlib.difficulty intractable, Litlib.status Conjecture]
 instance : NoBoundaryProposal where
-  ground_state_amplitude := sorry
+  groundStateAmplitude := sorry
 
-@[litlib_difficulty hard, litlib_status Conjecture]
+@[Litlib.difficulty hard, Litlib.status Conjecture]
 instance : SemiclassicalGroundState where
-  semiclassical_approximation := sorry
+  semiclassicalApproximation := sorry
 
-@[litlib_difficulty hard, litlib_status Conjecture]
+@[Litlib.difficulty hard, Litlib.status Conjecture]
 instance : BigBangInstantonBoundary where
-  big_bang_is_instanton := sorry
+  bigBangIsInstanton := sorry
 
 end Litlib.Y1983.hartle1983wave.Proofs
