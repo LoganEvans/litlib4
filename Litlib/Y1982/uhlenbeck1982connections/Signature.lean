@@ -18,76 +18,70 @@ Litlib.reference Thm1_3
   doi "10.1007/BF01206014"
   authors ["Uhlenbeck, Karen K."]
   status Standard
-class Thm1_3 where
+class Thm1_3 
+    (Connection GaugeTransform Form : Type*) [Zero Form]
+    (curvatureLn2Norm : Connection → ℝ)
+    (applyGauge : GaugeTransform → Connection → Connection)
+    (dStar : Connection → Form) where
   existsCoulombGauge :
-    ∀ (Connection GaugeTransform Form : Type*) [Zero Form] [Zero Connection]
-      (curvatureLn2Norm : Connection → ℝ)
-      (applyGauge : GaugeTransform → Connection → Connection)
-      (dStar : Connection → Form)
-      (_h_curvature_zero : curvatureLn2Norm 0 = 0),
-      ∃ (κ : ℝ), κ > 0 ∧
-      ∀ (A : Connection),
-        curvatureLn2Norm A ≤ κ →
-        ∃ (g : GaugeTransform), dStar (applyGauge g A) = 0
+    ∃ (κ : ℝ), κ > 0 ∧
+    ∀ (A : Connection),
+      curvatureLn2Norm A ≤ κ →
+      ∃ (g : GaugeTransform), dStar (applyGauge g A) = 0
 
 Litlib.reference Thm1_5
   bibtex "uhlenbeck1982connections"
   doi "10.1007/BF01206014"
   authors ["Uhlenbeck, Karen K."]
   status Standard
-class Thm1_5 where
+class Thm1_5 
+    (Connection GaugeTransform : Type*) [TopologicalSpace Connection]
+    (curvatureLpNorm : Connection → ℝ)
+    (applyGauge : GaugeTransform → Connection → Connection) where
   uhlenbeckCompactness :
-    ∀ (Connection GaugeTransform : Type*) [TopologicalSpace Connection]
-      (curvatureLpNorm : Connection → ℝ)
-      (applyGauge : GaugeTransform → Connection → Connection)
-      (_h_norm_nonneg : ∀ A, curvatureLpNorm A ≥ 0),
-      ∀ (D : ℕ → Connection) (B : ℝ),
-        (∀ i, curvatureLpNorm (D i) ≤ B) →
-        ∃ (aInfty : Connection) (subseq : ℕ → ℕ) (s : ℕ → GaugeTransform),
-          StrictMono subseq ∧
-          Tendsto (fun i => applyGauge (s i) (D (subseq i))) atTop (𝓝 aInfty)
+    ∀ (D : ℕ → Connection) (B : ℝ),
+      (∀ i, curvatureLpNorm (D i) ≤ B) →
+      ∃ (aInfty : Connection) (subseq : ℕ → ℕ) (s : ℕ → GaugeTransform),
+        StrictMono subseq ∧
+        Tendsto (fun i => applyGauge (s i) (D (subseq i))) atTop (𝓝 aInfty)
 
 Litlib.reference ConnectionTopology
   bibtex "uhlenbeck1982connections"
   doi "10.1007/BF01206014"
   authors ["Uhlenbeck, Karen K."]
   status Standard
-class ConnectionTopology where
+class ConnectionTopology 
+    (Connection GaugeTransform : Type*)
+    (applyGauge : GaugeTransform → Connection → Connection) where
   existsGaugeMetric :
-    ∀ (Connection GaugeTransform : Type*)
-      (applyGauge : GaugeTransform → Connection → Connection),
-      ∃ (dist : Connection → Connection → ℝ),
-        (∀ a b, dist a b ≥ 0) ∧
-        (∀ a b, dist a b = 0 ↔ ∃ g, applyGauge g a = b) ∧
-        (∀ a b, dist a b = dist b a) ∧
-        (∀ a b c, dist a c ≤ dist a b + dist b c)
+    ∃ (dist : Connection → Connection → ℝ),
+      (∀ a b, dist a b ≥ 0) ∧
+      (∀ a b, dist a b = 0 ↔ ∃ g, applyGauge g a = b) ∧
+      (∀ a b, dist a b = dist b a) ∧
+      (∀ a b c, dist a c ≤ dist a b + dist b c)
 
 Litlib.reference YangMillsActionDifferentiable
   bibtex "uhlenbeck1982connections"
   doi "10.1007/BF01206014"
   authors ["Uhlenbeck, Karen K."]
   status Standard
-class YangMillsActionDifferentiable where
+class YangMillsActionDifferentiable 
+    (Connection : Type*) [NormedAddCommGroup Connection] [NormedSpace ℝ Connection]
+    (Action : Connection → ℝ) where
   isFrechetDifferentiable :
-    ∀ (Connection : Type*) [NormedAddCommGroup Connection] [NormedSpace ℝ Connection]
-      (Action : Connection → ℝ)
-      (_h_action_zero : Action 0 = 0),
-      Differentiable ℝ Action
+    Differentiable ℝ Action
 
 Litlib.reference YangMillsFunctionalDerivative
   bibtex "uhlenbeck1982connections"
   doi "10.1007/BF01206014"
   authors ["Uhlenbeck, Karen K."]
   status Standard
-class YangMillsFunctionalDerivative where
+class YangMillsFunctionalDerivative 
+    (Connection Form : Type*) [NormedAddCommGroup Connection] [NormedSpace ℝ Connection] [Zero Form]
+    (Action : Connection → ℝ)
+    (F : Connection → Form) (dStar : Form → Form) where
   stationaryImpliesEOM :
-    ∀ (Connection Form : Type*) [NormedAddCommGroup Connection] [NormedSpace ℝ Connection] [Zero Form]
-      (Action : Connection → ℝ)
-      (F : Connection → Form) (dStar : Form → Form)
-      (_h_action_zero : Action 0 = 0)
-      (_h_F_zero : F 0 = 0)
-      (_h_dStar_zero : dStar 0 = 0),
-      ∀ (A : Connection),
-        HasFDerivAt Action (0 : Connection →L[ℝ] ℝ) A → dStar (F A) = 0
+    ∀ (A : Connection),
+      HasFDerivAt Action (0 : Connection →L[ℝ] ℝ) A → dStar (F A) = 0
 
 end Litlib.Y1982.uhlenbeck1982connections
