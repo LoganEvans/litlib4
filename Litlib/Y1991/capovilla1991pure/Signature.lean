@@ -27,6 +27,7 @@ class Eq2_22 where
       epsilon α β γ δ = -epsilon β α γ δ ∧ 
       epsilon α β γ δ = -epsilon α γ β δ ∧ 
       epsilon α β γ δ = -epsilon α β δ γ)
+    (hEpsNondeg : epsilon 0 1 2 3 ≠ 0)
     (hRSkew : ∀ μ ν A B, R μ ν A B = - R ν μ A B)
     (hRSymmSpin : ∀ μ ν A B, R μ ν A B = R μ ν B A) :
     let g := fun (μ ν : Fin 4) =>
@@ -59,6 +60,11 @@ class UrbantkeCDJ
   urbantkeIsRicciFlat
     (F : SpacetimePoint → Fin 4 → Fin 4 → Matrix (Fin 2) (Fin 2) ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
+    (hEpsilonAlt : ∀ α β γ δ, 
+      epsilon4 α β γ δ = -epsilon4 β α γ δ ∧ 
+      epsilon4 α β γ δ = -epsilon4 α γ β δ ∧ 
+      epsilon4 α β γ δ = -epsilon4 α β δ γ)
+    (hEpsilonNondeg : epsilon4 0 1 2 3 ≠ 0)
     (hPureConnection : ∀ x, 
       (∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4,
         epsilon4 μ ν ρ σ * Matrix.trace (F x μ ν * F x ρ σ)) = 0) :
