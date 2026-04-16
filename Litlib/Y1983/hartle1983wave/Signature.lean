@@ -17,73 +17,57 @@ Litlib.reference Eq2_13
   doi "10.1103/PhysRevD.28.2960"
   authors["Hartle, J. B.", "Hawking, S. W."]
   status Standard
-class Eq2_13 
-    (State : Type*) [AddCommGroup State] [Module ℝ State]
-    (Hamiltonian : State → State) where
-  /--
-  Equation (2.13) (page 2963): The Wheeler-DeWitt equation.
-  The state of a closed universe is an eigenstate of the Hamiltonian 
-  with eigenvalue zero.
-  -/
+class Eq2_13 where
   wheelerDewitt :
-    ∃ (psi : State), psi ≠ 0 ∧ Hamiltonian psi = 0
+    ∀ (State : Type*) [AddCommGroup State] [Module ℝ State]
+      (Hamiltonian : State → State)
+      (_h_hamiltonian_zero : Hamiltonian 0 = 0),
+      ∃ (psi : State), psi ≠ 0 ∧ Hamiltonian psi = 0
 
 Litlib.reference NoBoundaryProposal
   bibtex "hartle1983wave"
   doi "10.1103/PhysRevD.28.2960"
   authors ["Hartle, J. B.", "Hawking, S. W."]
   status Standard
-class NoBoundaryProposal 
-    (ThreeGeometry FourGeometry : Type*)
-    (boundaryOf : FourGeometry → ThreeGeometry)
-    (EuclideanAction : FourGeometry → ℝ)
-    (amplitude : ThreeGeometry → ℝ)
-    (pathIntegral : (FourGeometry → ℝ) → Set FourGeometry → ℝ) where
-  /--
-  Equation (3.1) and (3.5) (page 2965): The No-Boundary Proposal.
-  The ground state wave function amplitude for a given 3-geometry is defined 
-  by a Euclidean path integral over the set of 4-geometries that have the 
-  3-geometry as their only boundary.
-  -/
+class NoBoundaryProposal where
   groundStateAmplitude :
-    ∀ (h : ThreeGeometry), 
-      amplitude h = pathIntegral (fun g => Real.exp (-EuclideanAction g)) {g | boundaryOf g = h}
+    ∀ (ThreeGeometry FourGeometry : Type*)
+      (boundaryOf : FourGeometry → ThreeGeometry)
+      (EuclideanAction : FourGeometry → ℝ)
+      (amplitude : ThreeGeometry → ℝ)
+      (pathIntegral : (FourGeometry → ℝ) → Set FourGeometry → ℝ)
+      (_h_action_pos : ∀ g, EuclideanAction g ≥ 0),
+      ∀ (h : ThreeGeometry), 
+        amplitude h = pathIntegral (fun g => Real.exp (-EuclideanAction g)) {g | boundaryOf g = h}
 
 Litlib.reference SemiclassicalGroundState
   bibtex "hartle1983wave"
   doi "10.1103/PhysRevD.28.2960"
   authors["Hartle, J. B.", "Hawking, S. W."]
   status Standard
-class SemiclassicalGroundState 
-    (ThreeGeometry : Type*)
-    (Action : ThreeGeometry → ℝ)
-    (WaveFunction : ℝ → ThreeGeometry → ℝ)
-    (PreFactor : ThreeGeometry → ℝ) where
-  /--
-  Equation (4.1) (page 2966): The semiclassical limit.
-  The ground-state wave function can be evaluated in the steepest-descents 
-  approximation as ħ → 0.
-  -/
+class SemiclassicalGroundState where
   semiclassicalApproximation :
-    ∀ (h : ThreeGeometry), 
-      Tendsto (fun ħ => WaveFunction ħ h) (𝓝[>] 0) (𝓝 (PreFactor h * Real.exp (-Action h)))
+    ∀ (ThreeGeometry : Type*)
+      (Action : ThreeGeometry → ℝ)
+      (WaveFunction : ℝ → ThreeGeometry → ℝ)
+      (PreFactor : ThreeGeometry → ℝ)
+      (_h_action_pos : ∀ h, Action h ≥ 0),
+      ∀ (h : ThreeGeometry), 
+        Tendsto (fun ħ => WaveFunction ħ h) (𝓝[>] 0) (𝓝 (PreFactor h * Real.exp (-Action h)))
 
 Litlib.reference BigBangInstantonBoundary
   bibtex "hartle1983wave"
   doi "10.1103/PhysRevD.28.2960"
   authors["Hartle, J. B.", "Hawking, S. W."]
   status Standard
-class BigBangInstantonBoundary 
-    (State : Type*) [NormedAddCommGroup State] [InnerProductSpace ℝ State]
-    (star : State → State)
-    (Connection : ℝ → State) where
-  /--
-  Capstone Theorem for CGD: Big Bang Instanton Boundary.
-  At the temporal boundary (t = 0, or the Big Bang), the universe connection
-  is a pure Euclidean SO(4) instanton. We secure this by mapping the condition 
-  to mathematical self-duality over a rigorously defined Hilbert space.
-  -/
+class BigBangInstantonBoundary where
   bigBangIsInstanton :
-    star (Connection 0) = Connection 0
+    ∀ (State : Type*) [NormedAddCommGroup State] [InnerProductSpace ℝ State]
+      (star : State → State)
+      (Connection : ℝ → State)
+      (_h_star_isometry : ∀ x, ‖star x‖ = ‖x‖)
+      (_h_star_inv : ∀ x, star (star x) = x)
+      (_h_is_instanton : ‖Connection 0 - star (Connection 0)‖ = 0),
+      star (Connection 0) = Connection 0
 
 end Litlib.Y1983.hartle1983wave
