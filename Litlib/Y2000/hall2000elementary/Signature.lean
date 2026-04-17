@@ -65,21 +65,22 @@ Litlib.reference MatrixCalculus
   status Standard
 class MatrixCalculus 
     (n : Type*) [Fintype n] [DecidableEq n]
-    (exp : Matrix n n ℂ → Matrix n n ℂ) where
+    (exp : Matrix n n ℂ → Matrix n n ℂ)
+    (holonomy : (ℝ → Matrix n n ℂ) → ℝ → ℝ → Matrix n n ℂ)
+    (integral : (ℝ → Matrix n n ℂ) → ℝ → ℝ → Matrix n n ℂ) where
   /-- Capstone Theorem for CGD: Matrix Calculus and Holonomy. -/
   hIsExp : ∀ X, Tendsto (fun m : ℕ => ∑ k ∈ Finset.range m, (1 / (Nat.factorial k : ℂ)) • X^k) atTop (𝓝 (exp X))
   
-  holonomySelfCommuting
-    (A : ℝ → Matrix n n ℂ)
-    (holonomy : ℝ → ℝ → Matrix n n ℂ)
-    (integral : ℝ → ℝ → Matrix n n ℂ)
-    (hHolonomyOde : ∀ t0 t, HasDerivAt (fun s => holonomy t0 s) (A t * holonomy t0 t) t)
-    (hHolonomyInit : ∀ t0, holonomy t0 t0 = 1)
-    (hIntegralDeriv : ∀ t0 t, HasDerivAt (fun s => integral t0 s) (A t) t)
-    (hIntegralInit : ∀ t0, integral t0 t0 = 0) :
-    ∀ (t0 t1 : ℝ), 
+  hHolonomyInit : ∀ A t0, holonomy A t0 t0 = 1
+  hHolonomyOde : ∀ A t0 t, Continuous A → HasDerivAt (fun s => holonomy A t0 s) (A t * holonomy A t0 t) t
+  
+  hIntegralInit : ∀ A t0, integral A t0 t0 = 0
+  hIntegralDeriv : ∀ A t0 t, Continuous A → HasDerivAt (fun s => integral A t0 s) (A t) t
+  
+  holonomySelfCommuting :
+    ∀ (A : ℝ → Matrix n n ℂ) (t0 t1 : ℝ), 
       (∀ s t, A s * A t = A t * A s) → 
-      holonomy t0 t1 = exp (integral t0 t1)
+      holonomy A t0 t1 = exp (integral A t0 t1)
 
   involutoryEulerFormula
     (mVal : Matrix n n ℂ)

@@ -1,6 +1,7 @@
 -- FILENAME: Litlib/Y1982/uhlenbeck1982connections/Signature.lean
 
 import Litlib.Core
+import Litlib.Math.FermatStationary
 import Mathlib.Topology.Basic
 import Mathlib.Order.Monotone.Basic
 import Mathlib.Data.Real.Basic
@@ -66,10 +67,13 @@ Litlib.reference YangMillsActionDifferentiable
   authors ["Uhlenbeck, Karen K."]
   status Standard
 class YangMillsActionDifferentiable 
-    (Connection : Type*) [NormedAddCommGroup Connection] [NormedSpace ℝ Connection]
+    (Connection : Type*)
+    (isValidVar : (ℝ → Connection) → Prop)
     (Action : Connection → ℝ) where
-  isFrechetDifferentiable :
-    Differentiable ℝ Action
+  is1DDifferentiable :
+    ∀ (A : Connection) (var : ℝ → Connection),
+      isValidVar var → var 0 = A →
+      DifferentiableAt ℝ (fun t => Action (var t)) 0
 
 Litlib.reference YangMillsFunctionalDerivative
   bibtex "uhlenbeck1982connections"
@@ -77,11 +81,12 @@ Litlib.reference YangMillsFunctionalDerivative
   authors ["Uhlenbeck, Karen K."]
   status Standard
 class YangMillsFunctionalDerivative 
-    (Connection Form : Type*) [NormedAddCommGroup Connection] [NormedSpace ℝ Connection] [Zero Form]
+    (Connection Form : Type*) [Zero Form]
+    (isValidVar : (ℝ → Connection) → Prop)
     (Action : Connection → ℝ)
     (F : Connection → Form) (dStar : Form → Form) where
   stationaryImpliesEOM :
     ∀ (A : Connection),
-      HasFDerivAt Action (0 : Connection →L[ℝ] ℝ) A → dStar (F A) = 0
+      Litlib.Math.CalculusOfVariations.IsStationaryPoint Action A isValidVar → dStar (F A) = 0
 
 end Litlib.Y1982.uhlenbeck1982connections
