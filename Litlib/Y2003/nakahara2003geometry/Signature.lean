@@ -56,30 +56,23 @@ class Eq10_128
   windingNumberIntegral :
     ∀ (g : Map), (degree g : ℝ) = (1 / (24 * Real.pi^2)) * cartanMaurerIntegral g
 
-Litlib.reference TopologicalCalculus
+Litlib.reference CartanMaurerTopology
   bibtex "nakahara2003geometry"
   authors["Nakahara, Mikio"]
   status Standard
-class TopologicalCalculus 
-    (Map : Type*) [TopologicalSpace Map]
-    (windingNumber : Map → ℤ)
-    (cartanMaurerIntegral : Map → ℝ)
-    (applyTranslation : Map → Map)
-    (applyGauge : Map → Map)
-    (bpstEnvelope : Map) where
+class CartanMaurerTopology 
+    (GroupMap : Type*) [TopologicalSpace GroupMap]
+    (windingNumber : GroupMap → ℤ)
+    (cartanMaurerIntegral : GroupMap → ℝ) where
+  
+  -- Nakahara Eq 10.128: The integral of the Cartan-Maurer form yields the topological degree.
+  degreeTheorem :
+    ∀ g : GroupMap, cartanMaurerIntegral g = (windingNumber g : ℝ)
+
+  -- Homotopy invariance of the topological degree
   homotopyInvariance
-    (H : ℝ → Map)
+    (H : ℝ → GroupMap)
     (hCont : Continuous H) :
     ∀ t1 t2 : ℝ, windingNumber (H t1) = windingNumber (H t2)
-
-  degreeTheorem :
-    ∀ g, cartanMaurerIntegral g = (windingNumber g : ℝ)
-
-  gaugeAndTranslationInvariance :
-    ∀ g, cartanMaurerIntegral (applyTranslation g) = cartanMaurerIntegral g ∧
-         cartanMaurerIntegral (applyGauge g) = cartanMaurerIntegral g
-
-  bpstBoundaryDegree :
-    cartanMaurerIntegral bpstEnvelope = 1
 
 end Litlib.Y2003.nakahara2003geometry
