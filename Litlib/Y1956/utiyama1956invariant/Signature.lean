@@ -4,6 +4,7 @@ import Litlib.Core
 import Mathlib.Algebra.Lie.Basic
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Matrix.Basic
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 
 open BigOperators
 
@@ -60,5 +61,28 @@ class UtiyamaExpansion where
     (hLGauge : ∀ (F : Fin 4 → Fin 4 → ChiralM) (U : ChiralMˣ), L (fun μ ν => (U : ChiralM) * F μ ν * (↑U⁻¹ : ChiralM)) = L F) :
     ∃ (T : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ), 
       ∀ F, L F = ∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4, T μ ν ρ σ * Trace (F μ ν * F ρ σ)
+
+Litlib.reference AppendixI_LorentzTensor
+  bibtex "utiyama1956invariant"
+  doi "10.1103/PhysRev.101.1597"
+  authors ["Utiyama, Ryoyu"]
+  status Standard
+class AppendixI_LorentzTensor where
+  /--
+  Corollary of Utiyama Appendix I (Invariant Theoretical Interpretation of Interaction): 
+  If the quadratic Lagrangian L is Lorentz invariant, the resulting expansion tensor T 
+  (contracted with the internal gauge invariant H_{μν,ρσ}) must also be Lorentz invariant.
+  -/
+  invariantTensorOfInvariantL
+    (ChiralM : Type*) [Ring ChiralM] [Algebra ℂ ChiralM]
+    (Trace : ChiralM → ℂ)
+    (L : ((Fin 4 → Fin 4 → ChiralM) → ℂ))
+    (T : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
+    (eta : Fin 4 → Fin 4 → ℂ)
+    (hL_eq : ∀ F, L F = ∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4, T μ ν ρ σ * Trace (F μ ν * F ρ σ))
+    (hLLorentz : ∀ Λ : Matrix (Fin 4) (Fin 4) ℂ, Λ * Matrix.of eta * Matrix.transpose Λ = Matrix.of eta → Matrix.det Λ = 1 → ∀ F, L (fun μ ν => ∑ α : Fin 4, ∑ β : Fin 4, (Λ μ α * Λ ν β) • F α β) = L F) :
+    ∃ T_inv : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ,
+      (∀ F, (∀ μ ν, F μ ν = -F ν μ) → L F = ∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4, T_inv μ ν ρ σ * Trace (F μ ν * F ρ σ)) ∧
+      (∀ Λ : Matrix (Fin 4) (Fin 4) ℂ, Λ * Matrix.of eta * Matrix.transpose Λ = Matrix.of eta → Matrix.det Λ = 1 → ∀ μ ν ρ σ, ∑ α : Fin 4, ∑ β : Fin 4, ∑ γ : Fin 4, ∑ δ : Fin 4, Λ μ α * Λ ν β * Λ ρ γ * Λ σ δ * T_inv α β γ δ = T_inv μ ν ρ σ)
 
 end Litlib.Y1956.utiyama1956invariant
