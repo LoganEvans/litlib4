@@ -38,13 +38,17 @@ Litlib.reference Thm1_5
 class Thm1_5 
     (Connection GaugeTransform : Type*) [TopologicalSpace Connection]
     (curvatureLpNorm : Connection → ℝ)
-    (applyGauge : GaugeTransform → Connection → Connection) where
-  uhlenbeckCompactness :
-    ∀ (D : ℕ → Connection) (B : ℝ),
-      (∀ i, curvatureLpNorm (D i) ≤ B) →
-      ∃ (aInfty : Connection) (subseq : ℕ → ℕ) (s : ℕ → GaugeTransform),
-        StrictMono subseq ∧
-        Tendsto (fun i => applyGauge (s i) (D (subseq i))) atTop (𝓝 aInfty)
+    (applyGauge : GaugeTransform → Connection → Connection)
+    (dimM : ℕ)
+    (p : ℝ) where
+  uhlenbeckCompactness
+    (hDim : 2 * p > (dimM : ℝ))
+    (hp : 1 ≤ p)
+    (D : ℕ → Connection) (B : ℝ)
+    (hBound : ∀ i, curvatureLpNorm (D i) ≤ B) :
+    ∃ (aInfty : Connection) (subseq : ℕ → ℕ) (s : ℕ → GaugeTransform),
+      StrictMono subseq ∧
+      Tendsto (fun i => applyGauge (s i) (D (subseq i))) atTop (𝓝 aInfty)
 
 Litlib.reference ConnectionTopology
   bibtex "uhlenbeck1982connections"
