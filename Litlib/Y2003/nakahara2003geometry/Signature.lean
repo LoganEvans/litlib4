@@ -51,10 +51,11 @@ Litlib.reference Eq10_128
   status Standard
 class Eq10_128 
     (Map : Type*)
+    (isSmooth : Map → Prop)
     (degree : Map → ℤ)
     (cartanMaurerIntegral : Map → ℝ) where
   windingNumberIntegral :
-    ∀ (g : Map), (degree g : ℝ) = (1 / (24 * Real.pi^2)) * cartanMaurerIntegral g
+    ∀ (g : Map), isSmooth g → (degree g : ℝ) = (1 / (24 * Real.pi^2)) * cartanMaurerIntegral g
 
 Litlib.reference CartanMaurerTopology
   bibtex "nakahara2003geometry"
@@ -62,12 +63,13 @@ Litlib.reference CartanMaurerTopology
   status Standard
 class CartanMaurerTopology 
     (GroupMap : Type*) [TopologicalSpace GroupMap]
+    (isSmooth : GroupMap → Prop)
     (windingNumber : GroupMap → ℤ)
     (cartanMaurerIntegral : GroupMap → ℝ) where
   
   -- Nakahara Eq 10.128: The integral of the Cartan-Maurer form yields the topological degree.
   degreeTheorem :
-    ∀ g : GroupMap, cartanMaurerIntegral g = (windingNumber g : ℝ)
+    ∀ g : GroupMap, isSmooth g → cartanMaurerIntegral g = (windingNumber g : ℝ)
 
   -- Homotopy invariance of the topological degree
   homotopyInvariance
