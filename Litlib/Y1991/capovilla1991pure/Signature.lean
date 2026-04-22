@@ -4,6 +4,7 @@ import Litlib.Core
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.LinearAlgebra.Matrix.Trace
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 
 open BigOperators
 
@@ -55,6 +56,7 @@ class UrbantkeCDJ
       epsilon4 α β γ δ = -epsilon4 α γ β δ ∧ 
       epsilon4 α β γ δ = -epsilon4 α β δ γ)
     (hEpsilonNondeg : epsilon4 0 1 2 3 ≠ 0)
+    (hNonDegenerate : ∀ x, Matrix.det (Matrix.of (urbantkeMetric F x)) ≠ 0)
     (hPureConnection : ∀ x, 
       (∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4,
         epsilon4 μ ν ρ σ * Matrix.trace (F x μ ν * F x ρ σ)) = 0) :
