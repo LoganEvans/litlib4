@@ -88,9 +88,10 @@ structure IsHomeomorphism {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y
 
 class Eq18
   (BoundaryManifold Group : Type*) [TopologicalSpace BoundaryManifold] [TopologicalSpace Group]
+  (isSmooth : (BoundaryManifold → Group) → Prop)
   (windingNumber : (BoundaryManifold → Group) → ℤ)
   (cartanMaurerIntegral : (BoundaryManifold → Group) → ℝ)
-  [Litlib.Y2003.nakahara2003geometry.CartanMaurerTopology (BoundaryManifold → Group) windingNumber cartanMaurerIntegral] where
+  [Litlib.Y2003.nakahara2003geometry.CartanMaurerTopology (BoundaryManifold → Group) isSmooth windingNumber cartanMaurerIntegral] where
   /--
   GATEKEEPER SECURED TRAPDOOR:
   To instantiate this Belavin axiom, the user must prove their target topological manifold 
