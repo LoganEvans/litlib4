@@ -19,9 +19,12 @@ Litlib.reference Eq2_13
   status Standard
 class Eq2_13 
     (State : Type*) [AddCommGroup State] [Module ℝ State]
-    (Hamiltonian : State → State) where
-  wheelerDewitt :
-    ∃ (psi : State), psi ≠ 0 ∧ Hamiltonian psi = 0
+    (Hamiltonian : State → State)
+    (IsPhysicalState : State → Prop) where
+  /-- Equation 2.13: The Wheeler-DeWitt equation constraints the allowed physical 
+      states of the universe. A state is physical iff it is a non-trivial solution 
+      to HΨ = 0. -/
+  is_physical_iff : ∀ psi, IsPhysicalState psi ↔ psi ≠ 0 ∧ Hamiltonian psi = 0
 
 Litlib.reference NoBoundaryProposal
   bibtex "hartle1983wave"
