@@ -23,9 +23,8 @@ You are formalizing physics. If you over-abstract a physical concept into a gene
 3. **Mathlib Standards**: Use standard Mathlib4 definitions (`TopologicalSpace`, `MeasureSpace`, `Matrix`, `Complex`). Do not invent ad-hoc topologies.
 
 ### Task Instructions:
-For the provided text, generate exactly two files:
+For the provided text, generate exactly one file:
 1. `Litlib/Y[Year]/[bibtex_key]/Signature.lean`
-2. `Litlib/Y[Year]/[bibtex_key]/Proofs/Sorry.lean`
 
 #### Format Requirements for `Signature.lean`
 Use the custom `Litlib.reference` macro. It requires the metadata block, followed IMMEDIATELY by a native `class [Name] where` declaration. Do not use quotes around the status field.
@@ -44,18 +43,5 @@ Use the custom `Litlib.reference` macro. It requires the metadata block, followe
         (GaugeField : Type*) [TopologicalSpace GaugeField]
         (isFully4DSymmetric : GaugeField → Prop) where
       bpst_is_self_dual_iff : ∀ (A : GaugeField), isFully4DSymmetric A ↔ A = A -- (Example)
-
-#### Format Requirements for `Proofs/Sorry.lean`
-You must provide a fallback instance using `sorry`. You must evaluate how difficult this would be to formally prove in Lean 4 and attach a difficulty attribute (`easy`, `medium`, `hard`, or `intractable`). Use explicit field assignments for the sorry values; do NOT use `⟨sorry⟩` brackets.
-
-    import Litlib.Y1975.belavin1975pseudoparticle.Signature
-    
-    namespace Litlib.Y1975.belavin1975pseudoparticle.Proofs
-    
-    @[litlib_difficulty intractable, litlib_status Conjecture]
-    instance : Eq11 where
-      bpst_is_self_dual_iff := sorry
-    
-    end Litlib.Y1975.belavin1975pseudoparticle.Proofs
 
 Please await the literature snippet to transcribe.
