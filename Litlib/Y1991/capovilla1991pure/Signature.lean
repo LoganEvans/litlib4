@@ -3,6 +3,10 @@
 import Litlib.Core
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Complex.Basic
+import Mathlib.LinearAlgebra.Determinant
+import Mathlib.LinearAlgebra.Matrix.Trace
+
+open scoped BigOperators
 
 namespace Litlib.Y1991.capovilla1991pure
 
