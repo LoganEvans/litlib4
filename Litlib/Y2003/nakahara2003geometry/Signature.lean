@@ -134,8 +134,8 @@ Litlib.reference PontryaginActionVariation
   authors ["Nakahara, Mikio"]
   status Standard
 class PontryaginActionVariation 
-    (Universe : Type*)
-    (Action : Universe → ℝ)
+    (Universe β : Type*) [NormedAddCommGroup β] [NormedSpace ℝ β]
+    (Action : Universe → β)
     (isValidVariation : (ℝ → Universe) → Prop) where
   /-- 
   Nakahara 2003, Section 11.5.1 "Chern-Simons forms". 
@@ -146,6 +146,6 @@ class PontryaginActionVariation
   the functional derivative of the action evaluates identically to zero.
   -/
   variation_zero (u : Universe) (v : ℝ → Universe) :
-    isValidVariation v → v 0 = u → HasDerivAt (fun t => Action (v t)) 0 0
+    isValidVariation v → v 0 = u → HasDerivAt (fun t => Action (v t)) (0 : β) (0 : ℝ)
 
 end Litlib.Y2003.nakahara2003geometry
