@@ -7,7 +7,7 @@ open Matrix
 
 namespace Litlib.Y2024.gielen2024unimodular.Proofs
 
-@[Litlib.difficulty easy, Litlib.status Verified]
+@[Litlib.status Verified]
 instance verified_Eq11 : Eq11 where
   pureConnectionMatrix M Minv X hMSymm hMinvSymm hInv hEq := by
     -- In finite dimensions, a right inverse is a left inverse

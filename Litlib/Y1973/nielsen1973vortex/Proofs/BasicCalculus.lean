@@ -36,7 +36,7 @@ instance verified_Eq2_19 : Eq2_19 where
       _ ≤ - c₂^2 / (4 * c₄) + c₄ * (x^2 - c₂ / (2 * c₄))^2 := by linarith [hDiff]
       _ = - c₂ * x^2 + c₄ * x^4 := hRhsExpand
 
-@[Litlib.difficulty medium, Litlib.status Verified]
+@[Litlib.status Verified]
 instance verified_Eq2_21 : Eq2_21 where
   scalarMassSq c₂ c₄ ϕ₀ hc₂ hc₄ hϕ₀Sq := by
     have hC4Neq : c₄ ≠ 0 := ne_of_gt hc₄

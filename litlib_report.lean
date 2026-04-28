@@ -16,7 +16,7 @@ def main (args : List String) : IO UInt32 := do
     IO.println "[Stub] Crawling litlibExt for dependencies to generate .bib file..."
     return 0
   | ["--warnings"] =>
-    IO.println "[Stub] Scanning proofs for @[litlib_status] and @[litlib_difficulty]..."
+    IO.println "[Stub] Scanning proofs for @[litlib_status]..."
     return 0
   | ["--suggest-alternatives"] =>
     IO.println "[Stub] Finding scoped instance alternatives for canonical proofs..."

@@ -30,18 +30,7 @@ initialize litlibExt : MapDeclarationExtension LitlibData ←
 -- 2. Custom Attributes
 -- ==========================================
 
-syntax (name := Litlib.difficulty) "Litlib.difficulty " ident : attr
 syntax (name := Litlib.status) "Litlib.status " ident : attr
-
-initialize litlibDifficultyAttr : ParametricAttribute Name ←
-  registerParametricAttribute {
-    name := `Litlib.difficulty
-    descr := "Difficulty level of a litlib proof instance (e.g., intractable)"
-    getParam := fun _ stx => do
-      match stx with
-      | `(attr| Litlib.difficulty $id:ident) => return id.getId
-      | _ => throwError "Invalid Litlib.difficulty attribute syntax."
-  }
 
 initialize litlibStatusAttr : ParametricAttribute Name ←
   registerParametricAttribute {
@@ -56,6 +45,19 @@ initialize litlibStatusAttr : ParametricAttribute Name ←
 declare_syntax_cat litlibStatus
 syntax ident : litlibStatus
 syntax str : litlibStatus
+
+-- NEW: Dashboard Headline Theorem Attribute
+syntax (name := litlib_theorem) "litlib_theorem " str : attr
+
+initialize litlibTheoremAttr : ParametricAttribute String ←
+  registerParametricAttribute {
+    name := `litlib_theorem
+    descr := "Flags a headline theorem for the Litlib Dashboard report. Requires a friendly name string."
+    getParam := fun _ stx => do
+      match stx with
+      | `(attr| litlib_theorem $s:str) => return s.getString
+      | _ => throwError "Invalid litlib_theorem attribute syntax. Expected a string."
+  }
 
 -- ==========================================
 -- 3. Syntax Definition
