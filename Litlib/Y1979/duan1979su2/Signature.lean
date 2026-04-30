@@ -6,12 +6,17 @@ import Mathlib.Algebra.Group.Defs
 
 namespace Litlib.Y1979.duan1979su2
 
-Litlib.reference Eq1_13_Decomposition
+Litlib.reference GaugeDecomposition
+  type "incollection"
   bibtex "duan1979su2"
-  doi "10.1142/9789813237278_0001"
+  title "SU(2) gauge theory and electrodynamics with N magnetic monopoles"
   authors ["Duan, Yi-Shi", "Ge, Mo-Lin"]
-  status Standard
-class Eq1_13_Decomposition where
+  booktitle "Memorial Volume for Yi-Shi Duan"
+  pages "1--15"
+  year "2018"
+  publisher "World Scientific"
+  doi "10.1142/9789813237278_0001"
+class GaugeDecomposition where
   /-- Equation (1.13): The decomposition of the SU(2) gauge potential W 
       into a parallel Abelian part A and an orthogonal topological part b. -/
   gaugeDecomposition
@@ -30,12 +35,17 @@ class Eq1_13_Decomposition where
     (hW : ∀ μ, W μ = A μ • n + b μ) :
     ∀ μ, dot n (b μ) = 0
 
-Litlib.reference Eq1_33_ElectromagneticTensor
+Litlib.reference ElectromagneticTensor
+  type "incollection"
   bibtex "duan1979su2"
-  doi "10.1142/9789813237278_0001"
+  title "SU(2) gauge theory and electrodynamics with N magnetic monopoles"
   authors ["Duan, Yi-Shi", "Ge, Mo-Lin"]
-  status Standard
-class Eq1_33_ElectromagneticTensor where
+  booktitle "Memorial Volume for Yi-Shi Duan"
+  pages "1--15"
+  year "2018"
+  publisher "World Scientific"
+  doi "10.1142/9789813237278_0001"
+class ElectromagneticTensor where
   /-- Equation (1.33): The U(1) electromagnetic field strength tensor F_μν 
       emerging from the SU(2) field strength G_μν projected along n. -/
   electromagneticTensor

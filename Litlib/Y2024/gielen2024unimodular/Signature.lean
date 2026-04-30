@@ -10,12 +10,19 @@ open BigOperators
 
 namespace Litlib.Y2024.gielen2024unimodular
 
-Litlib.reference Eq3
+Litlib.reference PlebanskiTetradReconstruction
+  type "article"
   bibtex "gielen2024unimodular"
+  title "Unimodular Plebański gravity"
+  authors ["Gielen, Steffen", "Nash, Elliot"]
+  journal "Classical and Quantum Gravity"
+  volume "41"
+  issue "8"
+  pages "085009"
+  year "2024"
+  publisher "IOP Publishing"
   doi "10.1088/1361-6382/ad3277"
-  authors["Gielen, Steffen", "Nash, Elliot"]
-  status Standard
-class Eq3 where
+class PlebanskiTetradReconstruction where
   plebanskiTetradReconstruction
     (e0 : Fin 4 → ℂ)
     (eS : Fin 3 → Fin 4 → ℂ)
@@ -34,12 +41,19 @@ class Eq3 where
     let ω := -2 * Complex.I * detE
     ∀ i j : Fin 3, wedgeSigma i j = if i = j then ω else 0
 
-Litlib.reference Eq7
+Litlib.reference BianchiTraceIdentity
+  type "article"
   bibtex "gielen2024unimodular"
+  title "Unimodular Plebański gravity"
+  authors ["Gielen, Steffen", "Nash, Elliot"]
+  journal "Classical and Quantum Gravity"
+  volume "41"
+  issue "8"
+  pages "085009"
+  year "2024"
+  publisher "IOP Publishing"
   doi "10.1088/1361-6382/ad3277"
-  authors["Gielen, Steffen", "Nash, Elliot"]
-  status Standard
-class Eq7 where
+class BianchiTraceIdentity where
   bianchiTraceIdentity 
     (sigma : Fin 3 → Fin 4 → Fin 4 → ℂ)
     (v : Fin 3 → Fin 3 → Fin 4 → ℂ)
@@ -53,12 +67,19 @@ class Eq7 where
     ∀ ρ, ∑ i : Fin 3, ∑ j : Fin 3, ∑ μ : Fin 4, ∑ ν : Fin 4, sigma i μ ν * (sigma j μ ν * v i j ρ + sigma j ν ρ * v i j μ + sigma j ρ μ * v i j ν) 
       = 2 * ∑ i : Fin 3, ∑ j : Fin 3, (if i = j then (1:ℂ) else 0) * v i j ρ
 
-Litlib.reference Eq11
+Litlib.reference PureConnectionMatrix
+  type "article"
   bibtex "gielen2024unimodular"
-  doi "10.1088/1361-6382/ad3277"
+  title "Unimodular Plebański gravity"
   authors ["Gielen, Steffen", "Nash, Elliot"]
-  status Standard
-class Eq11 where
+  journal "Classical and Quantum Gravity"
+  volume "41"
+  issue "8"
+  pages "085009"
+  year "2024"
+  publisher "IOP Publishing"
+  doi "10.1088/1361-6382/ad3277"
+class PureConnectionMatrix where
   pureConnectionMatrix 
     (M Minv X : Matrix (Fin 3) (Fin 3) ℂ)
     (hMSymm : ∀ i j, M i j = M j i)
@@ -68,10 +89,17 @@ class Eq11 where
     X = M * M
 
 Litlib.reference UnimodularCDJ
+  type "article"
   bibtex "gielen2024unimodular"
-  doi "10.1088/1361-6382/ad3277"
+  title "Unimodular Plebański gravity"
   authors ["Gielen, Steffen", "Nash, Elliot"]
-  status Standard
+  journal "Classical and Quantum Gravity"
+  volume "41"
+  issue "8"
+  pages "085009"
+  year "2024"
+  publisher "IOP Publishing"
+  doi "10.1088/1361-6382/ad3277"
 class UnimodularCDJ 
     (SpacetimePoint : Type*)
     (urbantkeMetric : (Fin 4 → Fin 4 → Matrix (Fin 3) (Fin 3) ℂ) → Matrix (Fin 4) (Fin 4) ℂ) where

@@ -18,70 +18,73 @@ open Filter Topology BigOperators
 namespace Litlib.Y2000.hall2000elementary
 
 Litlib.reference Prop3_3
+  type "article"
   bibtex "hall2000elementary"
-  doi "10.48550/arXiv.math-ph/0005032"
+  title "An elementary introduction to groups and representations"
   authors ["Hall, Brian C."]
-  status Standard
+  journal "arXiv preprint math-ph/0005032"
+  year "2000"
+  doi "10.48550/arXiv.math-ph/0005032"
 class Prop3_3 
     (n : Type*) [Fintype n] [DecidableEq n]
     (exp : Matrix n n ℂ → Matrix n n ℂ) where
-  /-- exp is mathematically constrained to be the Taylor series limit -/
   hIsExp : ∀ X, Tendsto (fun m : ℕ => ∑ k ∈ Finset.range m, (1 / (Nat.factorial k : ℂ)) • X^k) atTop (𝓝 (exp X))
-  /-- Proposition 3.3 (Page 34): If X and Y commute, then e^{X+Y} = e^X e^Y. -/
   commutingExp :
     ∀ X Y : Matrix n n ℂ, X * Y = Y * X → exp (X + Y) = exp X * exp Y
 
 Litlib.reference Thm3_9
+  type "article"
   bibtex "hall2000elementary"
-  doi "10.48550/arXiv.math-ph/0005032"
+  title "An elementary introduction to groups and representations"
   authors ["Hall, Brian C."]
-  status Standard
+  journal "arXiv preprint math-ph/0005032"
+  year "2000"
+  doi "10.48550/arXiv.math-ph/0005032"
 class Thm3_9 
     (n : Type*) [Fintype n] [DecidableEq n]
     (exp : Matrix n n ℂ → Matrix n n ℂ) where
-  /-- Theorem 3.9 (Page 40): The Lie Product Formula (Trotter product formula). -/
   hIsExp : ∀ X, Tendsto (fun m : ℕ => ∑ k ∈ Finset.range m, (1 / (Nat.factorial k : ℂ)) • X^k) atTop (𝓝 (exp X))
   lieProductFormula :
     ∀ X Y : Matrix n n ℂ, 
       Tendsto (fun m : ℕ => (exp ((1 / (m : ℂ)) • X) * exp ((1 / (m : ℂ)) • Y)) ^ m) atTop (𝓝 (exp (X + Y)))
 
 Litlib.reference Thm3_10
+  type "article"
   bibtex "hall2000elementary"
-  doi "10.48550/arXiv.math-ph/0005032"
+  title "An elementary introduction to groups and representations"
   authors ["Hall, Brian C."]
-  status Standard
+  journal "arXiv preprint math-ph/0005032"
+  year "2000"
+  doi "10.48550/arXiv.math-ph/0005032"
 class Thm3_10 
     (n : Type*) [Fintype n] [DecidableEq n]
     (exp : Matrix n n ℂ → Matrix n n ℂ) where
-  /-- Theorem 3.10 (Page 40): det(e^X) = e^{trace(X)}. -/
   hIsExp : ∀ X, Tendsto (fun m : ℕ => ∑ k ∈ Finset.range m, (1 / (Nat.factorial k : ℂ)) • X^k) atTop (𝓝 (exp X))
   detExp :
     ∀ X : Matrix n n ℂ, Matrix.det (exp X) = Complex.exp (Matrix.trace X)
 
 Litlib.reference MatrixCalculus
+  type "article"
   bibtex "hall2000elementary"
-  doi "10.48550/arXiv.math-ph/0005032"
+  title "An elementary introduction to groups and representations"
   authors ["Hall, Brian C."]
-  status Standard
+  journal "arXiv preprint math-ph/0005032"
+  year "2000"
+  doi "10.48550/arXiv.math-ph/0005032"
 class MatrixCalculus 
     (n : Type*) [Fintype n] [DecidableEq n]
     (exp : Matrix n n ℂ → Matrix n n ℂ)
     (holonomy : (ℝ → Matrix n n ℂ) → ℝ → ℝ → Matrix n n ℂ)
     (integral : (ℝ → Matrix n n ℂ) → ℝ → ℝ → Matrix n n ℂ) where
-  /-- Capstone Theorem for CGD: Matrix Calculus and Holonomy. -/
   hIsExp : ∀ X, Tendsto (fun m : ℕ => ∑ k ∈ Finset.range m, (1 / (Nat.factorial k : ℂ)) • X^k) atTop (𝓝 (exp X))
-  
   hHolonomyInit : ∀ A t0, holonomy A t0 t0 = 1
   hHolonomyOde : ∀ A t0 t, Continuous A → HasDerivAt (fun s => holonomy A t0 s) (A t * holonomy A t0 t) t
-  
   hIntegralInit : ∀ A t0, integral A t0 t0 = 0
   hIntegralDeriv : ∀ A t0 t, Continuous A → HasDerivAt (fun s => integral A t0 s) (A t) t
-  
   holonomySelfCommuting :
     ∀ (A : ℝ → Matrix n n ℂ) (t0 t1 : ℝ), 
       (∀ s t, A s * A t = A t * A s) → 
       holonomy A t0 t1 = exp (integral A t0 t1)
-
   involutoryEulerFormula
     (mVal : Matrix n n ℂ)
     (hInvolutory : mVal * mVal = 1) :

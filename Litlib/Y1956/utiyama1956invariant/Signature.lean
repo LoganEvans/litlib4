@@ -10,12 +10,19 @@ open BigOperators
 
 namespace Litlib.Y1956.utiyama1956invariant
 
-Litlib.reference Eq1_20
+Litlib.reference GaugeCovariance
+  type "article"
   bibtex "utiyama1956invariant"
-  doi "10.1103/PhysRev.101.1597"
+  title "Invariant theoretical interpretation of interaction"
   authors ["Utiyama, Ryoyu"]
-  status Standard
-class Eq1_20 where
+  journal "Physical Review"
+  volume "101"
+  issue "5"
+  pages "1597"
+  year "1956"
+  publisher "APS"
+  doi "10.1103/PhysRev.101.1597"
+class GaugeCovariance where
   /-- 
   Equation (1.20) (page 1600): The Yang-Mills field strength tensor transforms 
   cogradiently (in the adjoint representation) under local gauge transformations.
@@ -36,10 +43,17 @@ class Eq1_20 where
     ∀ μ ν x, δF μ ν x = ⁅F μ ν x, ε x⁆
 
 Litlib.reference UtiyamaExpansion
+  type "article"
   bibtex "utiyama1956invariant"
-  doi "10.1103/PhysRev.101.1597"
+  title "Invariant theoretical interpretation of interaction"
   authors ["Utiyama, Ryoyu"]
-  status Standard
+  journal "Physical Review"
+  volume "101"
+  issue "5"
+  pages "1597"
+  year "1956"
+  publisher "APS"
+  doi "10.1103/PhysRev.101.1597"
 class UtiyamaExpansion where
   /--
   Capstone Theorem: Utiyama Expansion Theorem.
@@ -63,15 +77,22 @@ class UtiyamaExpansion where
       ∀ F, L F = ∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4, T μ ν ρ σ * Trace (F μ ν * F ρ σ)
 
 Litlib.reference AppendixI_LorentzTensor
+  type "article"
   bibtex "utiyama1956invariant"
-  doi "10.1103/PhysRev.101.1597"
+  title "Invariant theoretical interpretation of interaction"
   authors ["Utiyama, Ryoyu"]
-  status Standard
+  journal "Physical Review"
+  volume "101"
+  issue "5"
+  pages "1597"
+  year "1956"
+  publisher "APS"
+  doi "10.1103/PhysRev.101.1597"
 class AppendixI_LorentzTensor where
   /--
-  Corollary of Utiyama Appendix I (Invariant Theoretical Interpretation of Interaction): 
+  Corollary of Utiyama Appendix I: 
   If the quadratic Lagrangian L is Lorentz invariant, the resulting expansion tensor T 
-  (contracted with the internal gauge invariant H_{μν,ρσ}) must also be Lorentz invariant.
+  must also be Lorentz invariant.
   -/
   invariantTensorOfInvariantL
     (ChiralM : Type*) [Ring ChiralM] [Algebra ℂ ChiralM]

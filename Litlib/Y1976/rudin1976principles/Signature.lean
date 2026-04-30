@@ -11,11 +11,19 @@ open Filter Topology
 
 namespace Litlib.Y1976.rudin1976principles
 
-Litlib.reference Eq9_39
+Litlib.reference DirectionalDerivativeDef
+  type "book"
   bibtex "rudin1976principles"
+  title "Principles of Mathematical Analysis"
   authors ["Rudin, Walter"]
-  status Standard
-class Eq9_39 where
+  volume "3"
+  year "1976"
+  publisher "McGraw-Hill"
+  address "New York"
+  edition "3rd"
+  series "International Series in Pure and Applied Mathematics"
+  isbn "978-0070542358"
+class DirectionalDerivativeDef where
   /--
   Equation (39) (page 217): The definition of the directional derivative 
   and its equivalence to the Fréchet derivative evaluated on a vector.
@@ -26,14 +34,20 @@ class Eq9_39 where
     (hf : DifferentiableAt ℝ f x) :
     Tendsto (fun t : ℝ => t⁻¹ • (f (x + t • u) - f x)) (𝓝[≠] 0) (𝓝 ((fderiv ℝ f x) u))
 
-Litlib.reference Thm9_19
+Litlib.reference MultidimensionalMVT
+  type "book"
   bibtex "rudin1976principles"
+  title "Principles of Mathematical Analysis"
   authors ["Rudin, Walter"]
-  status Standard
-class Thm9_19 where
-  /--
-  Theorem 9.19 (page 218): The Mean Value Theorem for functions of several variables.
-  -/
+  volume "3"
+  year "1976"
+  publisher "McGraw-Hill"
+  address "New York"
+  edition "3rd"
+  series "International Series in Pure and Applied Mathematics"
+  isbn "978-0070542358"
+class MultidimensionalMVT where
+  /-- Theorem 9.19 (page 218): The Mean Value Theorem for functions of several variables. -/
   multidimensionalMvt
     (V W : Type*) [NormedAddCommGroup V] [NormedSpace ℝ V][NormedAddCommGroup W] [NormedSpace ℝ W]
     (f : V → W)
@@ -44,15 +58,19 @@ class Thm9_19 where
     ‖f b - f a‖ ≤ M * ‖b - a‖
 
 Litlib.reference FrechetToScalarProjection
+  type "book"
   bibtex "rudin1976principles"
-  authors["Rudin, Walter"]
-  status Standard
+  title "Principles of Mathematical Analysis"
+  authors ["Rudin, Walter"]
+  volume "3"
+  year "1976"
+  publisher "McGraw-Hill"
+  address "New York"
+  edition "3rd"
+  series "International Series in Pure and Applied Mathematics"
+  isbn "978-0070542358"
 class FrechetToScalarProjection where
-  /--
-  Capstone Theorem for CGD: Fréchet to Scalar Projection.
-  Mathematical theorem projecting multi-dimensional continuous Fréchet 
-  derivatives down to 1D scalar limits using Mathlib's native topologies.
-  -/
+  /-- Mathematical theorem projecting multi-dimensional continuous Fréchet limits. -/
   projectFrechetTo1d
     (V W : Type*) [NormedAddCommGroup V][NormedSpace ℝ V] [NormedAddCommGroup W] [NormedSpace ℝ W]
     (f : V → W)

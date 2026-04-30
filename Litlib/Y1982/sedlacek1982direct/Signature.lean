@@ -10,16 +10,22 @@ open Filter Topology
 
 namespace Litlib.Y1982.sedlacek1982direct
 
-Litlib.reference Thm5_5
+Litlib.reference ObstructionPreserved
+  type "article"
   bibtex "sedlacek1982direct"
-  doi "10.1007/BF01214887"
+  title "A direct method for minimizing the Yang-Mills functional over 4-manifolds"
   authors ["Sedlacek, Steven"]
-  status Standard
-class Thm5_5 where
+  journal "Communications in Mathematical Physics"
+  volume "86"
+  issue "4"
+  pages "515--527"
+  year "1982"
+  publisher "Springer"
+  doi "10.1007/BF01214887"
+class ObstructionPreserved where
   /--
   Theorem 5.5 (and Corollary 6.2): The obstruction to lifting the structure 
   group is preserved under the minimizing limit of the Yang-Mills functional.
-  Secured using rigorous Mathlib filter limits over a bundle sequence.
   -/
   obstructionPreserved
     (Bundle ObstructionClass : Type*)
@@ -29,12 +35,19 @@ class Thm5_5 where
     (hLimit : Tendsto P atTop (𝓝 pInfty)) :
     ∃ (N : ℕ), ∀ i ≥ N, eta pInfty = eta (P i)
 
-Litlib.reference Thm7_1
+Litlib.reference PontryaginDefectBound
+  type "article"
   bibtex "sedlacek1982direct"
-  doi "10.1007/BF01214887"
+  title "A direct method for minimizing the Yang-Mills functional over 4-manifolds"
   authors ["Sedlacek, Steven"]
-  status Standard
-class Thm7_1 where
+  journal "Communications in Mathematical Physics"
+  volume "86"
+  issue "4"
+  pages "515--527"
+  year "1982"
+  publisher "Springer"
+  doi "10.1007/BF01214887"
+class PontryaginDefectBound where
   /--
   Theorem 7.1: The defect in the first Pontryagin number is bounded by 
   the loss of the Yang-Mills energy functional limit.
@@ -49,10 +62,17 @@ class Thm7_1 where
     ∃ (N : ℕ), ∀ i ≥ N, |p1 (P i) - p1 pInfty| ≤ (m (P i) - m pInfty) / (4 * Real.pi ^ 2)
 
 Litlib.reference YangMillsCoercivity
+  type "article"
   bibtex "sedlacek1982direct"
+  title "A direct method for minimizing the Yang-Mills functional over 4-manifolds"
+  authors ["Sedlacek, Steven"]
+  journal "Communications in Mathematical Physics"
+  volume "86"
+  issue "4"
+  pages "515--527"
+  year "1982"
+  publisher "Springer"
   doi "10.1007/BF01214887"
-  authors["Sedlacek, Steven"]
-  status Standard
 class YangMillsCoercivity where
   /--
   Capstone Theorem: Yang-Mills Coercivity.

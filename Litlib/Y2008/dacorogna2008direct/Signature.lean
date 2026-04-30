@@ -7,10 +7,13 @@ import Mathlib.Topology.Basic
 namespace Litlib.Y2008.dacorogna2008direct
 
 Litlib.reference ConvexityHierarchy
+  type "book"
   bibtex "dacorogna2008direct"
+  title "Direct methods in the calculus of variations"
+  authors ["Dacorogna, Bernard"]
+  year "2008"
+  publisher "Springer"
   doi "10.1007/978-0-387-55249-1"
-  authors["Dacorogna, Bernard"]
-  status Standard
 class ConvexityHierarchy 
     (M : Type*)
     (isConvex isPolyconvex isQuasiconvex isRankOneConvex : (M → ℝ) → Prop) where
@@ -21,10 +24,13 @@ class ConvexityHierarchy
       (isQuasiconvex f → isRankOneConvex f)
 
 Litlib.reference DirectMethod
+  type "book"
   bibtex "dacorogna2008direct"
-  doi "10.1007/978-0-387-55249-1"
+  title "Direct methods in the calculus of variations"
   authors ["Dacorogna, Bernard"]
-  status Standard
+  year "2008"
+  publisher "Springer"
+  doi "10.1007/978-0-387-55249-1"
 class DirectMethod 
     (State : Type*) [TopologicalSpace State]
     (Action : State → ℝ) where
@@ -34,10 +40,13 @@ class DirectMethod
     ∃ (u : State), ∀ (v : State), Action u ≤ Action v
 
 Litlib.reference RelaxationTheorem
+  type "book"
   bibtex "dacorogna2008direct"
-  doi "10.1007/978-0-387-55249-1"
+  title "Direct methods in the calculus of variations"
   authors ["Dacorogna, Bernard"]
-  status Standard
+  year "2008"
+  publisher "Springer"
+  doi "10.1007/978-0-387-55249-1"
 class RelaxationTheorem 
     (State : Type*)
     (Action RelaxedAction : State → ℝ)

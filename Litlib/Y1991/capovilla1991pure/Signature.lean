@@ -10,13 +10,18 @@ open scoped BigOperators
 
 namespace Litlib.Y1991.capovilla1991pure
 
-Litlib.reference Eq2_22
+Litlib.reference UrbantkeMetricSymmetric
+  type "article"
   bibtex "capovilla1991pure"
+  title "A pure spin-connection formulation of gravity"
+  authors ["Capovilla, Richard", "Dell, John", "Jacobson, Ted"]
+  journal "Classical and Quantum Gravity"
+  volume "8"
+  issue "1"
+  pages "59--73"
+  year "1991"
   doi "10.1088/0264-9381/8/1/01"
-  authors ["Capovilla, Riccardo", "Dell, John", "Jacobson, Ted"]
-  status Standard
-
-class Eq2_22 
+class UrbantkeMetricSymmetric 
     (R : Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (eta : ℂ)
     (epsilon : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
@@ -40,13 +45,18 @@ class Eq2_22
                     epsilon α β γ δ * R μ α A B * R β γ B C * R δ ν C A)))))))
     ∀ μ ν, g μ ν = g ν μ
 
-Litlib.reference Eq2_2c
+Litlib.reference UrbantkeIsRicciFlat
+  type "article"
   bibtex "capovilla1991pure"
+  title "A pure spin-connection formulation of gravity"
+  authors ["Capovilla, Richard", "Dell, John", "Jacobson, Ted"]
+  journal "Classical and Quantum Gravity"
+  volume "8"
+  issue "1"
+  pages "59--73"
+  year "1991"
   doi "10.1088/0264-9381/8/1/01"
-  authors ["Capovilla, Riccardo", "Dell, John", "Jacobson, Ted"]
-  status Standard
-
-class Eq2_2c 
+class UrbantkeIsRicciFlat 
     (SpacetimePoint : Type*)
     (partialDeriv : Fin 4 → (SpacetimePoint → ℂ) → SpacetimePoint → ℂ)
     (urbantkeMetric : (SpacetimePoint → Fin 4 → Fin 4 → Matrix (Fin 2) (Fin 2) ℂ) → (Fin 4 → Fin 4 → SpacetimePoint → ℂ))
@@ -54,14 +64,10 @@ class Eq2_2c
     (christoffel : (Fin 4 → Fin 4 → SpacetimePoint → ℂ) → Fin 4 → Fin 4 → Fin 4 → SpacetimePoint → ℂ)
     (ricciTensor : (Fin 4 → Fin 4 → SpacetimePoint → ℂ) → Fin 4 → Fin 4 → SpacetimePoint → ℂ) where
   
-  -- Anti-BS Calculus Constraints
   derivCommute : ∀ μ ν f x, partialDeriv μ (fun p => partialDeriv ν f p) x = partialDeriv ν (fun p => partialDeriv μ f p) x
   derivLeibniz : ∀ μ f1 f2 x, partialDeriv μ (fun p => f1 p * f2 p) x = partialDeriv μ f1 x * f2 x + f1 x * partialDeriv μ f2 x
-  
-  -- Metric Invertibility Constraint
   h_inv : ∀ g x i j, (∑ k : Fin 4, g i k x * metricInv g k j x) = if i = j then 1 else 0
   
-  -- Geometric Integrity: Ricci must be derived from Christoffel symbols, which must be derived from the metric.
   h_christoffel : ∀ g x rho mu nu, 
     christoffel g rho mu nu x = (1/2 : ℂ) * ∑ sigma : Fin 4, metricInv g rho sigma x * (
       partialDeriv mu (fun p => g sigma nu p) x + 
@@ -76,12 +82,6 @@ class Eq2_2c
                          christoffel g rho lambda nu x * christoffel g lambda mu rho x)
     )
 
-  /--
-  Capovilla 1991, Equation (2.2c) + associated text:
-  "The third equation (2.2c) states that the curvature is pure Weyl, i.e. the metric 
-  defined by this tetrad is Ricci flat."
-  By fixing the constraints explicitly to complex functions, we prevent metric mutialation.
-  -/
   urbantkeIsRicciFlat
     (F : SpacetimePoint → Fin 4 → Fin 4 → Matrix (Fin 2) (Fin 2) ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)

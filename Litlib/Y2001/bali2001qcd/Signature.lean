@@ -7,10 +7,17 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 namespace Litlib.Y2001.bali2001qcd
 
 Litlib.reference Eq2_3_and_2_4
+  type "article"
   bibtex "bali2001qcd"
-  doi "10.1016/S0370-1573(00)00079-X"
+  title "QCD forces and heavy quark bound states"
   authors ["Bali, Gunnar S."]
-  status Standard
+  journal "Physics Reports"
+  volume "343"
+  issue "1-2"
+  pages "1--136"
+  year "2001"
+  publisher "Elsevier"
+  doi "10.1016/S0370-1573(00)00079-X"
 class Eq2_3_and_2_4 where
   stringMassAndAngMom (d σ m J : ℝ) 
     (hD : d > 0) (hSigma : σ > 0)
@@ -19,10 +26,17 @@ class Eq2_3_and_2_4 where
     J = (1 / (2 * Real.pi * σ)) * m^2
 
 Litlib.reference Eq4_40
+  type "article"
   bibtex "bali2001qcd"
-  doi "10.1016/S0370-1573(00)00079-X"
+  title "QCD forces and heavy quark bound states"
   authors ["Bali, Gunnar S."]
-  status Standard
+  journal "Physics Reports"
+  volume "343"
+  issue "1-2"
+  pages "1--136"
+  year "2001"
+  publisher "Elsevier"
+  doi "10.1016/S0370-1573(00)00079-X"
 class Eq4_40 where
   singletOctetPotentials (N nA : ℝ) (g q : ℝ) (hN : N > 1) (hNa : nA = N^2 - 1) (hQ : q ≠ 0) :
     let cF := nA / (2 * N)
@@ -31,10 +45,17 @@ class Eq4_40 where
     vO = - (1 / nA) * vS
 
 Litlib.reference Eq5_11
+  type "article"
   bibtex "bali2001qcd"
+  title "QCD forces and heavy quark bound states"
+  authors ["Bali, Gunnar S."]
+  journal "Physics Reports"
+  volume "343"
+  issue "1-2"
+  pages "1--136"
+  year "2001"
+  publisher "Elsevier"
   doi "10.1016/S0370-1573(00)00079-X"
-  authors["Bali, Gunnar S."]
-  status Standard
 class Eq5_11 where
   adjointSelfEnergy (N cA cF vSelf : ℝ) 
     (hN : N > 1)
@@ -43,10 +64,17 @@ class Eq5_11 where
     (cA / cF) * (vSelf / 2) = (N^2 / (N^2 - 1)) * vSelf
 
 Litlib.reference Eq6_48_to_6_50
+  type "article"
   bibtex "bali2001qcd"
+  title "QCD forces and heavy quark bound states"
+  authors ["Bali, Gunnar S."]
+  journal "Physics Reports"
+  volume "343"
+  issue "1-2"
+  pages "1--136"
+  year "2001"
+  publisher "Elsevier"
   doi "10.1016/S0370-1573(00)00079-X"
-  authors["Bali, Gunnar S."]
-  status Standard
 class Eq6_48_to_6_50 where
   gromesAndBbpRelations (e h σ vSelf cB cD : ℝ) :
     let v0 := fun (r : ℝ) => vSelf - e / r + σ * r
@@ -64,10 +92,17 @@ class Eq6_48_to_6_50 where
     (∀ r, r ≠ 0 → vC r + 2 * vE r = - (r / 2) * v0Prime r)
 
 Litlib.reference FluxTubeEnergyBounds
+  type "article"
   bibtex "bali2001qcd"
+  title "QCD forces and heavy quark bound states"
+  authors ["Bali, Gunnar S."]
+  journal "Physics Reports"
+  volume "343"
+  issue "1-2"
+  pages "1--136"
+  year "2001"
+  publisher "Elsevier"
   doi "10.1016/S0370-1573(00)00079-X"
-  authors["Bali, Gunnar S."]
-  status Standard
 class FluxTubeEnergyBounds 
     (FluxTubeState : Type*)
     (spatialEnergy : FluxTubeState → ℝ)
