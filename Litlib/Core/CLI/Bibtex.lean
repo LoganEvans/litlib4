@@ -10,11 +10,13 @@ namespace Litlib.Core.CLI
 def runBibtex (globalData : GlobalData) : IO UInt32 := do
   let mut sortedRefs := globalData.litRefs
   
-  -- Sort by first author, falling back to BibTeX key
+  -- Sort uniformly by First Author -> Year -> Title -> BibTeX key
   sortedRefs := sortedRefs.qsort (fun a b =>
     let authorA := if a.data.authors.isEmpty then "" else a.data.authors.head!
     let authorB := if b.data.authors.isEmpty then "" else b.data.authors.head!
     if authorA != authorB then authorA < authorB
+    else if a.data.year != b.data.year then a.data.year < b.data.year
+    else if a.data.title != b.data.title then a.data.title < b.data.title
     else a.data.bibtex < b.data.bibtex
   )
 

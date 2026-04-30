@@ -14,23 +14,49 @@ def parseArgs (args : List String) : CliContext := Id.run do
   let mut ctx : CliContext := {}
   for arg in args do
     if arg == "--dashboard" then ctx := { ctx with action := "dashboard" }
-    else if arg == "--code-summary" then ctx := { ctx with action := "code-summary" }
-    else if arg == "--bibtex" then ctx := { ctx with action := "bibtex" }
-    else if arg.startsWith "--theorems=" then
-      let globs := (arg.drop 11).toString.splitOn "," |>.map myTrim
+    else if arg.startsWith "--code-summary" then
+      ctx := { ctx with action := "code-summary" }
+      let val := if arg.contains "=" then 
+        let parts := arg.splitOn "="
+        if parts.length >= 2 then parts[1]! else "all"
+      else "all"
+      
+      if val == "all" || val == "" then
+        ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
+      else if val == "theorem" || val == "theorems" then
+        ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := false }
+      else if val == "reference" || val == "references" then
+        ctx := { ctx with targetTheorems := false, targetReferences := true, referenceGlobs := ["all"] }
+      else
+        let globs := val.splitOn "," |>.map myTrim
+        ctx := { ctx with targetTheorems := true, theoremGlobs := globs, targetReferences := true, referenceGlobs := globs }
+    else if arg == "--bibtex" then
+      ctx := { ctx with action := "bibtex" }
+    else if arg.startsWith "--bibtex=" then
+      let globs := (arg.drop 9).toString.splitOn "," |>.map myTrim
+      ctx := { ctx with action := "bibtex", targetReferences := true, referenceGlobs := globs }
+    else if arg.startsWith "--theorem=" then
+      let globs := (arg.drop 10).toString.splitOn "," |>.map myTrim
       ctx := { ctx with targetTheorems := true, theoremGlobs := globs }
-    else if arg == "--theorems" then
+    else if arg == "--theorem" then
       ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"] }
-    else if arg.startsWith "--references=" then
-      let globs := (arg.drop 13).toString.splitOn "," |>.map myTrim
+    else if arg.startsWith "--reference=" then
+      let globs := (arg.drop 12).toString.splitOn "," |>.map myTrim
       ctx := { ctx with targetReferences := true, referenceGlobs := globs }
-    else if arg == "--references" then
+    else if arg == "--reference" then
       ctx := { ctx with targetReferences := true, referenceGlobs := ["all"] }
     else if arg == "--all" then
       ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
 
+  -- Default filtering behaviors
   if !ctx.targetTheorems && !ctx.targetReferences then
-    ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"] }
+    if ctx.action == "bibtex" then
+      ctx := { ctx with targetReferences := true, referenceGlobs := ["all"] }
+    else if ctx.action == "code-summary" then
+      ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
+    else
+      ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"] }
+      
   return ctx
 
 def runCli (rootModule : Name) (args : List String) : IO UInt32 := do
