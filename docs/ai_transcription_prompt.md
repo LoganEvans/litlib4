@@ -27,7 +27,7 @@ For the provided text, generate exactly one file:
 1. `Litlib/Y[Year]/[bibtex_key]/Signature.lean`
 
 #### Format Requirements for `Signature.lean`
-Use the custom `Litlib.reference` macro. It requires the metadata block, followed IMMEDIATELY by a native `class [Name] where` declaration. Do not use quotes around the status field.
+Use the custom `Litlib.reference` macro. It requires the metadata block, followed IMMEDIATELY by a native `class [Name] where` declaration. All metadata values MUST be strings.
 
     import Litlib.Core
     import Mathlib.Topology.Basic
@@ -38,7 +38,6 @@ Use the custom `Litlib.reference` macro. It requires the metadata block, followe
       bibtex "belavin1975pseudoparticle"
       doi "10.1016/0370-2693(75)90163-X"
       authors ["Belavin, A.A.", "Polyakov, A.M."]
-      status Standard
     class Eq11 
         (GaugeField : Type*) [TopologicalSpace GaugeField]
         (isFully4DSymmetric : GaugeField → Prop) where
