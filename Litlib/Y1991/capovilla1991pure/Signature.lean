@@ -10,7 +10,7 @@ open scoped BigOperators
 
 namespace Litlib.Y1991.capovilla1991pure
 
-Litlib.reference UrbantkeMetricSymmetric
+Litlib.reference Eq2_22
   type "article"
   bibtex "capovilla1991pure"
   title "A pure spin-connection formulation of gravity"
@@ -21,7 +21,7 @@ Litlib.reference UrbantkeMetricSymmetric
   pages "59--73"
   year "1991"
   doi "10.1088/0264-9381/8/1/01"
-class UrbantkeMetricSymmetric 
+class Eq2_22 
     (R : Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (eta : ℂ)
     (epsilon : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
@@ -45,7 +45,7 @@ class UrbantkeMetricSymmetric
                     epsilon α β γ δ * R μ α A B * R β γ B C * R δ ν C A)))))))
     ∀ μ ν, g μ ν = g ν μ
 
-Litlib.reference UrbantkeIsRicciFlat
+Litlib.reference Eq2_2c
   type "article"
   bibtex "capovilla1991pure"
   title "A pure spin-connection formulation of gravity"
@@ -56,7 +56,7 @@ Litlib.reference UrbantkeIsRicciFlat
   pages "59--73"
   year "1991"
   doi "10.1088/0264-9381/8/1/01"
-class UrbantkeIsRicciFlat 
+class Eq2_2c 
     (SpacetimePoint : Type*)
     (partialDeriv : Fin 4 → (SpacetimePoint → ℂ) → SpacetimePoint → ℂ)
     (urbantkeMetric : (SpacetimePoint → Fin 4 → Fin 4 → Matrix (Fin 2) (Fin 2) ℂ) → (Fin 4 → Fin 4 → SpacetimePoint → ℂ))

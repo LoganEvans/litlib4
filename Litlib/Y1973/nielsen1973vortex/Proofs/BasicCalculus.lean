@@ -10,7 +10,7 @@ import Mathlib.Analysis.Calculus.Deriv.Mul
 
 namespace Litlib.Y1973.nielsen1973vortex.Proofs
 
-instance verified_Eq2_19 : VacuumPotentialMinimum where
+instance verified_Eq2_19 : Eq2_19 where
   vacuumValue c₂ c₄ hc₂ hc₄ ϕ₀ hϕ₀Pos hϕ₀Sq x := by
     have hC4Neq : c₄ ≠ 0 := ne_of_gt hc₄
     have hDiff : 0 ≤ c₄ * (x^2 - c₂ / (2 * c₄))^2 := by
@@ -35,7 +35,7 @@ instance verified_Eq2_19 : VacuumPotentialMinimum where
       _ ≤ - c₂^2 / (4 * c₄) + c₄ * (x^2 - c₂ / (2 * c₄))^2 := by linarith [hDiff]
       _ = - c₂ * x^2 + c₄ * x^4 := hRhsExpand
 
-instance verified_Eq2_21 : ScalarMassSquared where
+instance verified_Eq2_21 : Eq2_21 where
   scalarMassSq c₂ c₄ ϕ₀ hc₂ hc₄ hϕ₀Sq := by
     have hC4Neq : c₄ ≠ 0 := ne_of_gt hc₄
     let V := fun ρ => (1/2 : ℝ) * (- c₂ * (ϕ₀ + ρ)^2 + c₄ * (ϕ₀ + ρ)^4)

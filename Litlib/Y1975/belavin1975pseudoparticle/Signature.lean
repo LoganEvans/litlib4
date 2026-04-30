@@ -121,4 +121,7 @@ class DegreeOfHomeomorphism
     IsHomeomorphism f →
     windingNumber f = 1 ∨ windingNumber f = -1
 
+-- Downstream backwards compatibility alias
+abbrev Eq18 := DegreeOfHomeomorphism
+
 end Litlib.Y1975.belavin1975pseudoparticle

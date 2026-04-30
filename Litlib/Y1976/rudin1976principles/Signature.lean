@@ -11,7 +11,7 @@ open Filter Topology
 
 namespace Litlib.Y1976.rudin1976principles
 
-Litlib.reference DirectionalDerivativeDef
+Litlib.reference Eq9_39
   type "book"
   bibtex "rudin1976principles"
   title "Principles of Mathematical Analysis"
@@ -23,7 +23,7 @@ Litlib.reference DirectionalDerivativeDef
   edition "3rd"
   series "International Series in Pure and Applied Mathematics"
   isbn "978-0070542358"
-class DirectionalDerivativeDef where
+class Eq9_39 where
   /--
   Equation (39) (page 217): The definition of the directional derivative 
   and its equivalence to the Fréchet derivative evaluated on a vector.
@@ -34,7 +34,7 @@ class DirectionalDerivativeDef where
     (hf : DifferentiableAt ℝ f x) :
     Tendsto (fun t : ℝ => t⁻¹ • (f (x + t • u) - f x)) (𝓝[≠] 0) (𝓝 ((fderiv ℝ f x) u))
 
-Litlib.reference MultidimensionalMVT
+Litlib.reference Thm9_19
   type "book"
   bibtex "rudin1976principles"
   title "Principles of Mathematical Analysis"
@@ -46,7 +46,7 @@ Litlib.reference MultidimensionalMVT
   edition "3rd"
   series "International Series in Pure and Applied Mathematics"
   isbn "978-0070542358"
-class MultidimensionalMVT where
+class Thm9_19 where
   /-- Theorem 9.19 (page 218): The Mean Value Theorem for functions of several variables. -/
   multidimensionalMvt
     (V W : Type*) [NormedAddCommGroup V] [NormedSpace ℝ V][NormedAddCommGroup W] [NormedSpace ℝ W]

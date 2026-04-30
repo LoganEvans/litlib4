@@ -166,4 +166,7 @@ class PontryaginActionVariation
   variation_zero (u : Universe) (v : ℝ → Universe) :
     isValidVariation v → v 0 = u → HasDerivAt (fun t => Action (v t)) (0 : β) (0 : ℝ)
 
+-- Downstream backwards compatibility alias
+abbrev Eq7_85 := ContractedBianchiIdentity
+
 end Litlib.Y2003.nakahara2003geometry
