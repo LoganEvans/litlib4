@@ -6,8 +6,6 @@ import Litlib.Core.CLI
 open Lean
 
 def main (args : List String) : IO UInt32 := do
-  Lean.initSearchPath (← Lean.findSysroot)
-  
   let lakePackageFile := System.FilePath.mk "lakefile.lean"
   if !(← lakePackageFile.pathExists) then
     IO.println "Error: Must be run from the root of a Lake project containing 'lakefile.lean'."
@@ -34,4 +32,5 @@ def main (args : List String) : IO UInt32 := do
 
   let rootModule := Name.mkSimple rootModuleName
   
+  -- The search paths are now natively hydrated inside runCli
   Litlib.Core.CLI.runCli rootModule args

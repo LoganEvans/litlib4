@@ -60,6 +60,31 @@ def parseArgs (args : List String) : CliContext := Id.run do
   return ctx
 
 def runCli (rootModule : Name) (args : List String) : IO UInt32 := do
+  -- 1. Universally populate the search path so that downstream CLI wrappers don't fail
+  Lean.initSearchPath (← Lean.findSysroot)
+  let mut sp ← Lean.searchPathRef.get
+  
+  let candidates := #[
+    System.FilePath.mk ".lake" / "build" / "lib",
+    System.FilePath.mk "build" / "lib"
+  ]
+  for c in candidates do
+    if ← c.isDir then
+      if !sp.contains c then sp := c :: sp
+
+  let packagesDir := System.FilePath.mk ".lake" / "packages"
+  if ← packagesDir.isDir then
+    for entry in ← packagesDir.readDir do
+      let pkgLib1 := entry.path / "build" / "lib"
+      let pkgLib2 := entry.path / ".lake" / "build" / "lib"
+      if ← pkgLib1.isDir then
+        if !sp.contains pkgLib1 then sp := pkgLib1 :: sp
+      if ← pkgLib2.isDir then
+        if !sp.contains pkgLib2 then sp := pkgLib2 :: sp
+
+  Lean.searchPathRef.set sp
+
+  -- 2. Execute CLI engine
   let ctx := parseArgs args
   let modules ← discoverModules rootModule
 
