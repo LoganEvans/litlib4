@@ -16,12 +16,23 @@ custom attributes, and syntax macros used by `litlib4` to track scientific liter
 -- ==========================================
 
 structure LitlibData where
-  bibtex : String
-  title : String
-  doi : String
-  authors : List String
-  status : String
-  granularity : String
+  entryType : String := "article"
+  bibtex : String := ""
+  title : String := ""
+  authors : List String := []
+  journal : String := ""
+  volume : String := ""
+  issue : String := ""
+  pages : String := ""
+  year : String := ""
+  publisher : String := ""
+  booktitle : String := ""
+  editor : String := ""
+  address : String := ""
+  edition : String := ""
+  series : String := ""
+  isbn : String := ""
+  doi : String := ""
   deriving Inhabited, Repr
 
 initialize litlibExt : MapDeclarationExtension LitlibData ←
@@ -38,31 +49,19 @@ initialize litlibTheoremExt : MapDeclarationExtension String ←
 -- 3. Syntax Definitions
 -- ==========================================
 
-declare_syntax_cat litlibStatus
-syntax ident : litlibStatus
-syntax str : litlibStatus
+/-- 
+A universally robust parser rule. 
+Matches an identifier followed by ANY valid Lean 4 term (e.g. a string literal or an array). 
+-/
+syntax litlibField := ident term
 
-syntax (name := Litlib.status) "Litlib.status" ident : attr
-
-initialize litlibStatusAttr : ParametricAttribute Name ←
-  registerParametricAttribute {
-    name := `Litlib.status
-    descr := "Status of a litlib theorem (e.g., Retracted, Verified)"
-    getParam := fun _ stx => do
-      match stx with
-      | `(attr| Litlib.status $id:ident) => return id.getId
-      | _ => throwError "Invalid Litlib.status attribute syntax."
-  }
-
--- FIX: Added the optional `title` parameter
+/-- 
+A flexible block for declaring mathematical signatures mapped to literature references.
+Accepts an arbitrary sequence of standard BibTeX fields.
+-/
 syntax (name := literatureAxiom) 
   "Litlib.reference" ident
-  "bibtex" str
-  ("title" str)?
-  ("doi" str)?
-  "authors" "[" str,* "]"
-  ("status" litlibStatus)?
-  ("granularity" str)?
+  litlibField*
   command : command
 
 -- Beautiful block syntax for downstream physics theorems
@@ -75,44 +74,62 @@ syntax (name := litlibTheoremCmd)
 -- 4. The Elaborators
 -- ==========================================
 
+/-- Recursively extracts all string literals embedded inside a Syntax node (useful for array terms). -/
+partial def extractStrings (stx : Syntax) : List String := Id.run do
+  if let some s := stx.isStrLit? then
+    return [s]
+  else
+    let mut arr := #[]
+    for arg in stx.getArgs do
+      for str in extractStrings arg do
+        arr := arr.push str
+    return arr.toList
+
 @[command_elab literatureAxiom]
 def elabLiteratureAxiom : CommandElab := fun stx => do
-  -- Strict, deterministic index mapping based on the syntax array
   let nameId := stx[1].getId
-  let bibStr := stx[3].isStrLit?.getD ""
-  
-  let titleOptNode := stx[4]
-  let titleStr := if titleOptNode.isNone then "" else titleOptNode[1].isStrLit?.getD ""
-  
-  let doiOptNode := stx[5]
-  let doiStr := if doiOptNode.isNone then "" else doiOptNode[1].isStrLit?.getD ""
-  
-  let authStrs := stx[8].getSepArgs.filterMap (·.isStrLit?) |>.toList
-  
-  let statusOptNode := stx[10]
-  let statusStr := if statusOptNode.isNone then "Transcribed" else
-    let rawStatus := statusOptNode[1].reprint.getD "Transcribed"
-    let chars := rawStatus.toList
-    String.ofList (chars.takeWhile (fun c => c != ' ' && c != '\n' && c != '\r'))
+  let fields := stx[2].getArgs
+  let classCmd := stx[3]
+
+  let mut data : LitlibData := {}
+
+  for field in fields do
+    let key := field[0].getId.toString
+    let termStx := field[1]
     
-  let granOptNode := stx[11]
-  let granStr := if granOptNode.isNone then "default" else granOptNode[1].isStrLit?.getD ""
-  
-  let classCmd := stx[12]
+    -- Extract the first string for singular fields, or all strings for list fields
+    let strs := extractStrings termStx
+    let firstStr := if strs.isEmpty then "" else strs.head!
+    
+    match key with
+    | "type" => data := { data with entryType := firstStr }
+    | "bibtex" => data := { data with bibtex := firstStr }
+    | "title" => data := { data with title := firstStr }
+    | "authors" => data := { data with authors := strs }
+    | "journal" => data := { data with journal := firstStr }
+    | "volume" => data := { data with volume := firstStr }
+    | "number" => data := { data with issue := firstStr }
+    | "issue" => data := { data with issue := firstStr }
+    | "pages" => data := { data with pages := firstStr }
+    | "year" => data := { data with year := firstStr }
+    | "publisher" => data := { data with publisher := firstStr }
+    | "booktitle" => data := { data with booktitle := firstStr }
+    | "editor" => data := { data with editor := firstStr }
+    | "address" => data := { data with address := firstStr }
+    | "edition" => data := { data with edition := firstStr }
+    | "series" => data := { data with series := firstStr }
+    | "isbn" => data := { data with isbn := firstStr }
+    | "doi" => data := { data with doi := firstStr }
+    | _ => pure ()
 
   -- 1. Natively execute the underlying `class ... where` command
   elabCommand classCmd
 
-  -- 2. Persist the metadata using the mathematically fully-qualified identifier
-  let data := LitlibData.mk bibStr titleStr doiStr authStrs statusStr granStr
-  
+  -- 2. Persist the metadata
   let currNs ← getCurrNamespace
-  
-  -- If nameId has no dots (getRoot == nameId), it's a simple name, so prepend the namespace.
   let resolvedName := if nameId.getRoot == nameId then currNs ++ nameId else nameId
   
   modifyEnv fun env => litlibExt.insert env resolvedName data
-
 
 /-- Recursively hunts an AST to find the first Name Identifier. -/
 partial def findFirstIdent (s : Syntax) : Option Name :=
@@ -142,10 +159,7 @@ def elabLitlibTheoremCmd : CommandElab := fun stx => do
   
   if let some thmName := targetNameOpt then
     let currNs ← getCurrNamespace
-    
-    -- Same logic: if it's a simple name, prepend namespace
     let resolvedName := if thmName.getRoot == thmName then currNs ++ thmName else thmName
-      
     modifyEnv fun e => litlibTheoremExt.insert e resolvedName desc
   else
     logWarning m!"Litlib.theorem: Could not extract theorem name from command."

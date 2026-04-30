@@ -2,56 +2,56 @@
 
 import Lean
 import Litlib.Core.CLI.Engine
-import Litlib.Core.CLI.Dashboard
 import Litlib.Core.CLI.Bibtex
 import Litlib.Core.CLI.CodeSummary
+import Litlib.Core.CLI.Dashboard
 
 open Lean
 
 namespace Litlib.Core.CLI
 
-/-- Core entry point for the Litlib CLI. -/
+def parseArgs (args : List String) : CliContext := Id.run do
+  let mut ctx : CliContext := {}
+  for arg in args do
+    if arg == "--dashboard" then ctx := { ctx with action := "dashboard" }
+    else if arg == "--code-summary" then ctx := { ctx with action := "code-summary" }
+    else if arg == "--bibtex" then ctx := { ctx with action := "bibtex" }
+    else if arg.startsWith "--theorems=" then
+      let globs := (arg.drop 11).toString.splitOn "," |>.map myTrim
+      ctx := { ctx with targetTheorems := true, theoremGlobs := globs }
+    else if arg == "--theorems" then
+      ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"] }
+    else if arg.startsWith "--references=" then
+      let globs := (arg.drop 13).toString.splitOn "," |>.map myTrim
+      ctx := { ctx with targetReferences := true, referenceGlobs := globs }
+    else if arg == "--references" then
+      ctx := { ctx with targetReferences := true, referenceGlobs := ["all"] }
+    else if arg == "--all" then
+      ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
+
+  if !ctx.targetTheorems && !ctx.targetReferences then
+    ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"] }
+  return ctx
+
 def runCli (rootModule : Name) (args : List String) : IO UInt32 := do
-  Lean.initSearchPath (← Lean.findSysroot)
-  
-  -- 1. Scan for all valid non-stale files
-  let allMods ← discoverModules rootModule
-  IO.println s!"[Info] Discovered {allMods.size} module(s). Processing..."
-  
-  -- 2. Load the mathematically sound, unified environment
-  let imports := allMods.map (fun m => { module := m : Import })
-  let env ← try
-    Lean.importModules imports Options.empty
-  catch e =>
-    IO.println ""
-    IO.println "===================================================================="
-    IO.println "             FATAL ERROR: NAMESPACE COLLISION DETECTED"
-    IO.println "===================================================================="
-    IO.println "Lean's C++ kernel requires a mathematically unified environment to"
-    IO.println "build the project dependency graph. It looks like you have a duplicate"
-    IO.println "global definition across your files."
-    IO.println ""
-    IO.println s!"Details: {e.toString}"
-    IO.println ""
-    IO.println "Please deduplicate the offending definition and try again."
-    IO.println "===================================================================="
-    return (1 : UInt32)
+  let ctx := parseArgs args
+  let modules ← discoverModules rootModule
 
-  -- 3. Extract the theorems securely inside a single optimized CoreM run
-  let ctx : Core.Context := { fileName := "<cli>", fileMap := default }
-  let state : Core.State := { env := env }
-  let (globalData, _) ← (extractAllTheorems env).toIO ctx state
+  if modules.isEmpty then
+    IO.println s!"No compiled modules found for {rootModule}. Did you run 'lake build'?"
+    return 1
 
-  -- 4. Dispatch to the presentation logic
-  match args with
-  | ["--bibtex"] | ["--litlib-bibtex"] => 
-    runBibtex globalData
-  | ["--dashboard"] | ["--litlib-dashboard"] => 
-    runDashboard rootModule globalData
-  | ["--code-summary"] | ["--litlib-code-summary"] => 
-    runCodeSummary globalData
-  | _ =>
-    IO.println "Usage: [exe] [--litlib-bibtex | --litlib-dashboard | --litlib-code-summary]"
-    return (1 : UInt32)
+  let env ← Lean.importModules (modules.map (fun m => { module := m })) {}
+  let (globalData, _) ← (extractAllTheorems env ctx).toIO { fileName := "<litlib>", fileMap := default } { env := env }
+
+  if ctx.action == "dashboard" then
+    return ← runDashboard rootModule globalData ctx
+  else if ctx.action == "code-summary" then
+    return ← runCodeSummary globalData
+  else if ctx.action == "bibtex" then
+    return ← runBibtex globalData
+  else
+    IO.println s!"Unknown action: {ctx.action}"
+    return 1
 
 end Litlib.Core.CLI

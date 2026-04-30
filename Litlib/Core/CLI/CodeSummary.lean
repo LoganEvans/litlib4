@@ -9,10 +9,9 @@ namespace Litlib.Core.CLI
 
 def runCodeSummary (globalData : GlobalData) : IO UInt32 := do
   if globalData.summaryItems.isEmpty then
-    IO.println "No tracked theorems or definitions found."
+    IO.println "No tracked theorems or definitions found for the given filters."
     return 0
 
-  -- Group items by module natively using NameSet and filtering
   let mut modules : Lean.NameSet := {}
   for item in globalData.summaryItems do
     modules := modules.insert item.moduleName
