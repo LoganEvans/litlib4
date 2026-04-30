@@ -49,11 +49,13 @@ initialize litlibTheoremExt : MapDeclarationExtension String ←
 -- 3. Syntax Definitions
 -- ==========================================
 
-/-- 
-A universally robust parser rule. 
-Matches an identifier followed by ANY valid Lean 4 term (e.g. a string literal or an array). 
--/
-syntax litlibField := ident term
+-- Define specific syntax rules for the values to ensure they parse as pure strings,
+-- bypassing the Lean `term` wrapper which hides the string tokens from `isStrLit?`.
+syntax litlibValStr := str
+syntax litlibValArray := "[" str,* "]"
+
+-- The parser consumes the field name (ident), then cleanly branches between a string or array
+syntax litlibField := ident (litlibValStr <|> litlibValArray)
 
 /-- 
 A flexible block for declaring mathematical signatures mapped to literature references.
@@ -74,7 +76,7 @@ syntax (name := litlibTheoremCmd)
 -- 4. The Elaborators
 -- ==========================================
 
-/-- Recursively extracts all string literals embedded inside a Syntax node (useful for array terms). -/
+/-- Recursively extracts all string literals embedded inside a Syntax node. -/
 partial def extractStrings (stx : Syntax) : List String := Id.run do
   if let some s := stx.isStrLit? then
     return [s]
@@ -95,10 +97,10 @@ def elabLiteratureAxiom : CommandElab := fun stx => do
 
   for field in fields do
     let key := field[0].getId.toString
-    let termStx := field[1]
+    let valStx := field[1]
     
     -- Extract the first string for singular fields, or all strings for list fields
-    let strs := extractStrings termStx
+    let strs := extractStrings valStx
     let firstStr := if strs.isEmpty then "" else strs.head!
     
     match key with
