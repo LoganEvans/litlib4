@@ -17,6 +17,7 @@ custom attributes, and syntax macros used by `litlib4` to track scientific liter
 
 structure LitlibData where
   bibtex : String
+  title : String
   doi : String
   authors : List String
   status : String
@@ -41,7 +42,6 @@ declare_syntax_cat litlibStatus
 syntax ident : litlibStatus
 syntax str : litlibStatus
 
--- FIX: Removed the trailing space from "Litlib.status"
 syntax (name := Litlib.status) "Litlib.status" ident : attr
 
 initialize litlibStatusAttr : ParametricAttribute Name ←
@@ -54,9 +54,11 @@ initialize litlibStatusAttr : ParametricAttribute Name ←
       | _ => throwError "Invalid Litlib.status attribute syntax."
   }
 
+-- FIX: Added the optional `title` parameter
 syntax (name := literatureAxiom) 
   "Litlib.reference" ident
   "bibtex" str
+  ("title" str)?
   ("doi" str)?
   "authors" "[" str,* "]"
   ("status" litlibStatus)?
@@ -75,42 +77,41 @@ syntax (name := litlibTheoremCmd)
 
 @[command_elab literatureAxiom]
 def elabLiteratureAxiom : CommandElab := fun stx => do
-  let args := stx.getArgs
-  let nameId := args[1]!.getId
-  let classCmd := args[args.size - 1]!
-
-  let mut bibStr := ""
-  let mut doiStr := ""
-  let mut authStrs : List String := []
-  let mut statusStr := "Transcribed"
-  let mut granStr := "default"
-
-  for i in [0:args.size] do
-    let node := args[i]!
-    let nodeStr := node.reprint.getD ""
+  -- Strict, deterministic index mapping based on the syntax array
+  let nameId := stx[1].getId
+  let bibStr := stx[3].isStrLit?.getD ""
+  
+  let titleOptNode := stx[4]
+  let titleStr := if titleOptNode.isNone then "" else titleOptNode[1].isStrLit?.getD ""
+  
+  let doiOptNode := stx[5]
+  let doiStr := if doiOptNode.isNone then "" else doiOptNode[1].isStrLit?.getD ""
+  
+  let authStrs := stx[8].getSepArgs.filterMap (·.isStrLit?) |>.toList
+  
+  let statusOptNode := stx[10]
+  let statusStr := if statusOptNode.isNone then "Transcribed" else
+    let rawStatus := statusOptNode[1].reprint.getD "Transcribed"
+    let chars := rawStatus.toList
+    String.ofList (chars.takeWhile (fun c => c != ' ' && c != '\n' && c != '\r'))
     
-    if nodeStr.startsWith "bibtex" then
-      bibStr := args[i+1]!.isStrLit?.getD ""
-    else if nodeStr.startsWith "doi" then
-      let doiNode := args[i+1]!.getArgs
-      if doiNode.size == 2 then doiStr := doiNode[1]!.isStrLit?.getD ""
-    else if nodeStr.startsWith "authors" then
-      authStrs := args[i+2]!.getArgs.filterMap (·.isStrLit?) |>.toList
-    else if nodeStr.startsWith "status" then
-      let rawStatus := args[i+1]!.reprint.getD "Transcribed"
-      let chars := rawStatus.toList
-      let cleanChars := chars.takeWhile (fun c => c != ' ' && c != '\n' && c != '\r')
-      statusStr := String.ofList cleanChars
-    else if nodeStr.startsWith "granularity" then
-      let granNode := args[i+1]!.getArgs
-      if granNode.size == 2 then granStr := granNode[1]!.isStrLit?.getD ""
+  let granOptNode := stx[11]
+  let granStr := if granOptNode.isNone then "default" else granOptNode[1].isStrLit?.getD ""
+  
+  let classCmd := stx[12]
 
   -- 1. Natively execute the underlying `class ... where` command
   elabCommand classCmd
 
-  -- 2. Persist the metadata using the extracted identifier
-  let data := LitlibData.mk bibStr doiStr authStrs statusStr granStr
-  modifyEnv fun env => litlibExt.insert env nameId data
+  -- 2. Persist the metadata using the mathematically fully-qualified identifier
+  let data := LitlibData.mk bibStr titleStr doiStr authStrs statusStr granStr
+  
+  let currNs ← getCurrNamespace
+  
+  -- If nameId has no dots (getRoot == nameId), it's a simple name, so prepend the namespace.
+  let resolvedName := if nameId.getRoot == nameId then currNs ++ nameId else nameId
+  
+  modifyEnv fun env => litlibExt.insert env resolvedName data
 
 
 /-- Recursively hunts an AST to find the first Name Identifier. -/
@@ -119,6 +120,13 @@ partial def findFirstIdent (s : Syntax) : Option Name :=
     some s.getId
   else
     s.getArgs.findSome? findFirstIdent
+
+/-- Specifically looks for the declId node which contains the actual declaration name. -/
+partial def findDeclId (s : Syntax) : Option Name :=
+  if s.getKind == ``Lean.Parser.Command.declId then
+    some s[0].getId
+  else
+    s.getArgs.findSome? findDeclId
 
 @[command_elab litlibTheoremCmd]
 def elabLitlibTheoremCmd : CommandElab := fun stx => do
@@ -130,20 +138,14 @@ def elabLitlibTheoremCmd : CommandElab := fun stx => do
   elabCommand cmd
 
   -- 2. Register it in the dashboard tracker
-  if let some thmName := findFirstIdent cmd then
-    let env ← getEnv
+  let targetNameOpt := findDeclId cmd <|> findFirstIdent cmd
+  
+  if let some thmName := targetNameOpt then
     let currNs ← getCurrNamespace
-    let fullNsName := currNs ++ thmName
     
-    let mut resolvedName := Name.anonymous
-    if env.contains fullNsName then
-      resolvedName := fullNsName
-    else if env.contains thmName then
-      resolvedName := thmName
+    -- Same logic: if it's a simple name, prepend namespace
+    let resolvedName := if thmName.getRoot == thmName then currNs ++ thmName else thmName
       
-    if resolvedName != Name.anonymous then
-      modifyEnv fun e => litlibTheoremExt.insert e resolvedName desc
-    else
-      logWarning m!"Litlib.theorem: Could not resolve theorem '{thmName}' for dashboard."
+    modifyEnv fun e => litlibTheoremExt.insert e resolvedName desc
   else
     logWarning m!"Litlib.theorem: Could not extract theorem name from command."
