@@ -7,8 +7,7 @@ open Matrix
 
 namespace Litlib.Y2024.gielen2024unimodular.Proofs
 
-@[Litlib.status Verified]
-instance verified_Eq11 : Eq11 where
+instance verified_Eq11 : PureConnectionMatrix where
   pureConnectionMatrix M Minv X hMSymm hMinvSymm hInv hEq := by
     -- In finite dimensions, a right inverse is a left inverse
     have hComm : Minv * M = 1 := hInv

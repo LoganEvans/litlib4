@@ -6,7 +6,6 @@ import Mathlib.Tactic.Ring
 
 namespace Litlib.Y2001.bali2001qcd.Proofs
 
-@[Litlib.status Verified]
 instance verified_Eq2_3_and_2_4 : Eq2_3_and_2_4 where
   stringMassAndAngMom d σ m J hD hSigma hM hJ := by
     rw [hM, hJ]
@@ -15,7 +14,6 @@ instance verified_Eq2_3_and_2_4 : Eq2_3_and_2_4 where
     field_simp
     try ring
 
-@[Litlib.status Verified]
 instance verified_Eq4_40 : Eq4_40 where
   singletOctetPotentials N nA g q hN hNa hQ := by
     have hNNeq : N ≠ 0 := by linarith
@@ -27,7 +25,6 @@ instance verified_Eq4_40 : Eq4_40 where
     field_simp
     try ring
 
-@[Litlib.status Verified]
 instance verified_Eq5_11 : Eq5_11 where
   adjointSelfEnergy N cA cF vSelf hN hCa hCf := by
     have hNNeq : N ≠ 0 := by linarith
@@ -43,7 +40,6 @@ instance verified_Eq5_11 : Eq5_11 where
     field_simp
     try ring
 
-@[Litlib.status Verified]
 instance verified_Eq6_48_to_6_50 : Eq6_48_to_6_50 where
   gromesAndBbpRelations e h σ vSelf cB cD := by
     constructor

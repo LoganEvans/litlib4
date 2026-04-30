@@ -13,7 +13,6 @@ open ContinuousLinearMap
 The rigorous functional analysis proof linking multi-dimensional Fréchet 
 derivatives to 1D scalar limits, adapted from the CGD bridges.
 -/
-@[Litlib.status Verified]
 instance : FrechetToScalarProjection where
   projectFrechetTo1d V W _ _ _ _ f x u hf := by
     let g := fun (t : ℝ) => x + t • u
