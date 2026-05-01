@@ -12,7 +12,7 @@ open Filter Topology
 
 namespace Litlib.Y1975.belavin1975pseudoparticle
 
-Litlib.reference TopologicalEnergyBound
+Litlib.reference Eq10_11
   type "article"
   bibtex "belavin1975pseudoparticle"
   title "Pseudoparticle solutions of the Yang-Mills equations"
@@ -24,7 +24,7 @@ Litlib.reference TopologicalEnergyBound
   year "1975"
   publisher "Elsevier"
   doi "10.1016/0370-2693(75)90163-X"
-class TopologicalEnergyBound where
+class Eq10_11 where
   /--
   Equations (10) and (11) (page 86): The Topological Action Bound.
   Abstracted to a real Hilbert space equipped with an isometric involution (the Hodge star).
@@ -41,7 +41,9 @@ class TopologicalEnergyBound where
       |Q| ≤ E ∧
       (star v = v ∨ star v = -v → E = |Q|)
 
-Litlib.reference RadialProfileODE
+abbrev TopologicalEnergyBound.{u} := Eq10_11.{u}
+
+Litlib.reference Eq16
   type "article"
   bibtex "belavin1975pseudoparticle"
   title "Pseudoparticle solutions of the Yang-Mills equations"
@@ -53,13 +55,15 @@ Litlib.reference RadialProfileODE
   year "1975"
   publisher "Elsevier"
   doi "10.1016/0370-2693(75)90163-X"
-class RadialProfileODE where
+class Eq16 where
   /-- Equation (16) (page 86): The radial profile of the BPST instanton. -/
   bpstProfileOde (lam : ℝ) :
     let f := fun (r : ℝ) => 2 / (r^2 + lam^2)
     ∀ r : ℝ, r ≠ 0 → deriv f r / r + (f r)^2 = 0
 
-Litlib.reference BpstModuliUniqueness
+abbrev RadialProfileODE := Eq16
+
+Litlib.reference Eq16_Uniqueness
   type "article"
   bibtex "belavin1975pseudoparticle"
   title "Pseudoparticle solutions of the Yang-Mills equations"
@@ -71,21 +75,27 @@ Litlib.reference BpstModuliUniqueness
   year "1975"
   publisher "Elsevier"
   doi "10.1016/0370-2693(75)90163-X"
-class BpstModuliUniqueness where
+class Eq16_Uniqueness where
   /--
   Capstone Theorem: BPST Profile Uniqueness.
   The only regular solutions to the BPST self-dual radial ODE 
   that vanish at infinity are the 1-parameter family of instanton profiles 
   f(r) = 2 / (r^2 + λ^2). This mathematically rigidifies the Moduli Uniqueness 
   for the spherically symmetric ansatz without using unconstrained predicates.
+  
+  Note: Requires continuity everywhere (`hfRegular`) to strictly seal the 
+  singular r=0 zero-size trapdoor (e.g. f(r) = 2/r^2).
   -/
   bpstProfileUniqueness
     (f : ℝ → ℝ)
+    (hfRegular : Continuous f)
     (hfDiff : DifferentiableOn ℝ f (Set.Ioi 0))
     (hfOde : ∀ r > 0, deriv f r / r + (f r)^2 = 0)
     (hfLimit : Tendsto f atTop (nhds 0))
     (hfPos : ∃ r > 0, f r > 0) :
     ∃ (lam : ℝ), lam > 0 ∧ ∀ r > 0, f r = 2 / (r^2 + lam^2)
+
+abbrev BpstModuliUniqueness := Eq16_Uniqueness
 
 /-- A mathematically strict definition of a topological homeomorphism: 
 A bijection between two topological spaces that is continuous and has a continuous inverse. -/
@@ -94,7 +104,7 @@ structure IsHomeomorphism {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y
   cont : Continuous f
   inv_cont : ∃ (g : Y → X), Function.LeftInverse g f ∧ Function.RightInverse g f ∧ Continuous g
 
-Litlib.reference DegreeOfHomeomorphism
+Litlib.reference Eq18
   type "article"
   bibtex "belavin1975pseudoparticle"
   title "Pseudoparticle solutions of the Yang-Mills equations"
@@ -106,7 +116,7 @@ Litlib.reference DegreeOfHomeomorphism
   year "1975"
   publisher "Elsevier"
   doi "10.1016/0370-2693(75)90163-X"
-class DegreeOfHomeomorphism
+class Eq18
   (BoundaryManifold Group : Type*) [TopologicalSpace BoundaryManifold] [TopologicalSpace Group]
   (isSmooth : (BoundaryManifold → Group) → Prop)
   (windingNumber : (BoundaryManifold → Group) → ℤ)
@@ -122,6 +132,6 @@ class DegreeOfHomeomorphism
     windingNumber f = 1 ∨ windingNumber f = -1
 
 -- Downstream backwards compatibility alias
-abbrev Eq18 := DegreeOfHomeomorphism
+abbrev DegreeOfHomeomorphism.{u, v} := Eq18.{u, v}
 
 end Litlib.Y1975.belavin1975pseudoparticle
