@@ -109,10 +109,11 @@ class FluxTubeEnergyBounds
     (intactFluxTube : ℝ → FluxTubeState)
     (snappedFluxTube : ℝ → FluxTubeState)
     (sigma M : ℝ) where
-  intactEnergy (L : ℝ) :
+  h_M_nonneg : M ≥ 0
+  intactEnergy (L : ℝ) (hL : L > 0) :
     spatialEnergy (intactFluxTube L) = sigma * L
   
-  snappedEnergy (L : ℝ) :
+  snappedEnergy (L : ℝ) (hL : L > 0) :
     spatialEnergy (snappedFluxTube L) = 2 * M
 
 end Litlib.Y2001.bali2001qcd
