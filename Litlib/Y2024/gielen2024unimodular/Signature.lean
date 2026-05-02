@@ -102,8 +102,10 @@ Litlib.reference Eq12
   doi "10.1088/1361-6382/ad3277"
 class Eq12 
     (SpacetimePoint : Type*)
+    (partialDeriv : Fin 4 → (SpacetimePoint → ℂ) → SpacetimePoint → ℂ)
     (urbantkeMetric : (Fin 4 → Fin 4 → Matrix (Fin 3) (Fin 3) ℂ) → Matrix (Fin 4) (Fin 4) ℂ) where
   cdjImpliesConstantVolume
+    (A : Fin 4 → SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ)
     (F : Fin 4 → Fin 4 → SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
     (Λ : ℂ)
@@ -112,6 +114,10 @@ class Eq12
       epsilon4 α β γ δ = -epsilon4 α γ β δ ∧ 
       epsilon4 α β γ δ = -epsilon4 α β δ γ)
     (hEpsilonNondeg : epsilon4 0 1 2 3 ≠ 0)
+    (hF_def : ∀ μ ν x i j, F μ ν x i j = 
+      partialDeriv μ (fun p => A ν p i j) x - 
+      partialDeriv ν (fun p => A μ p i j) x + 
+      (A μ x * A ν x - A ν x * A μ x) i j)
     (hLambdaNz : Λ ≠ 0)
     (hCdjConstraint : ∀ x, 
       (∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4,

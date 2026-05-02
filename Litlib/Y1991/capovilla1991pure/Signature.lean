@@ -83,6 +83,7 @@ class Eq2_2c
     )
 
   urbantkeIsRicciFlat
+    (A : SpacetimePoint → Fin 4 → Matrix (Fin 2) (Fin 2) ℂ)
     (F : SpacetimePoint → Fin 4 → Fin 4 → Matrix (Fin 2) (Fin 2) ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
     (hEpsilonAlt : ∀ α β γ δ, 
@@ -90,6 +91,10 @@ class Eq2_2c
       epsilon4 α β γ δ = -epsilon4 α γ β δ ∧ 
       epsilon4 α β γ δ = -epsilon4 α β δ γ)
     (hEpsilonNondeg : epsilon4 0 1 2 3 ≠ 0)
+    (hF_def : ∀ x μ ν i j, F x μ ν i j = 
+      partialDeriv μ (fun p => A p ν i j) x - 
+      partialDeriv ν (fun p => A p μ i j) x + 
+      (A x μ * A x ν - A x ν * A x μ) i j)
     (hNonDegenerate : ∀ x, Matrix.det (Matrix.of (fun i j => urbantkeMetric F i j x)) ≠ 0)
     (hPureConnection : ∀ x, 
       (∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4,
