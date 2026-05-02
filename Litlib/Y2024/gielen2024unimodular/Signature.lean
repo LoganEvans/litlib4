@@ -88,7 +88,7 @@ class Eq11 where
     (hEq : Minv * X * Minv = 1) :
     X = M * M
 
-Litlib.reference UnimodularCDJ
+Litlib.reference Eq12
   type "article"
   bibtex "gielen2024unimodular"
   title "Unimodular Plebański gravity"
@@ -100,7 +100,7 @@ Litlib.reference UnimodularCDJ
   year "2024"
   publisher "IOP Publishing"
   doi "10.1088/1361-6382/ad3277"
-class UnimodularCDJ 
+class Eq12 
     (SpacetimePoint : Type*)
     (urbantkeMetric : (Fin 4 → Fin 4 → Matrix (Fin 3) (Fin 3) ℂ) → Matrix (Fin 4) (Fin 4) ℂ) where
   cdjImpliesConstantVolume
