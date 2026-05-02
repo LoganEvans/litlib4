@@ -41,7 +41,6 @@ Litlib.reference ContractedBianchiIdentity
   isbn "0750306068"
 class ContractedBianchiIdentity 
     (Point Index : Type*) [Fintype Index] [DecidableEq Index]
-    (isSmooth : (Point → ℂ) → Prop)
     (g g_inv : Index → Index → Point → ℂ)
     (christoffel : Index → Index → Index → Point → ℂ)
     (ricci : Index → Index → Point → ℂ)
@@ -73,8 +72,6 @@ class ContractedBianchiIdentity
   h_G : ∀ x mu nu, G mu nu x = ricci mu nu x - (1/2 : ℂ) * g mu nu x * scalarCurv x
 
   contractedBianchi :
-    (hg_smooth : ∀ i j, isSmooth (fun p => g i j p)) →
-    (hginv_smooth : ∀ i j, isSmooth (fun p => g_inv i j p)) →
     ∀ (nu : Index) (x : Point),
       ∑ mu : Index, ∑ alpha : Index, g_inv mu alpha x * (
         partialDeriv alpha (fun p => G mu nu p) x -
