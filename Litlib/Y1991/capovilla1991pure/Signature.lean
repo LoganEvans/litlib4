@@ -82,6 +82,7 @@ class Eq2_2c
   urbantkeIsRicciFlat
     (A : SpacetimePoint → Fin 4 → Matrix (Fin 2) (Fin 2) ℂ)
     (F : SpacetimePoint → Fin 4 → Fin 4 → Matrix (Fin 2) (Fin 2) ℂ)
+    (F_adj : SpacetimePoint → Fin 4 → Fin 4 → Matrix (Fin 3) (Fin 3) ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
     (hEpsilonAlt : ∀ α β γ δ, 
       epsilon4 α β γ δ = -epsilon4 β α γ δ ∧ 
@@ -95,7 +96,7 @@ class Eq2_2c
     (hNonDegenerate : ∀ x, Matrix.det (Matrix.of (fun i j => urbantkeMetric F i j x)) ≠ 0)
     (hPureConnection : ∀ x, 
       (∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4,
-        epsilon4 μ ν ρ σ * Matrix.trace (F x μ ν * F x ρ σ)) = 0) :
+        epsilon4 μ ν ρ σ • (F_adj x μ ν * F_adj x ρ σ)) = 0) :
     ∀ (x : SpacetimePoint) (μ ν : Fin 4), ricciTensor (urbantkeMetric F) μ ν x = 0
 
 end Litlib.Y1991.capovilla1991pure
