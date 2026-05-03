@@ -17,14 +17,18 @@ open Filter Topology BigOperators
 
 namespace Litlib.Y2000.hall2000elementary
 
-Litlib.reference Prop3_3
+Litlib.paper "hall2000elementary"
   type "article"
-  bibtex "hall2000elementary"
   title "An elementary introduction to groups and representations"
   authors ["Hall, Brian C."]
   journal "arXiv preprint math-ph/0005032"
   year "2000"
   doi "10.48550/arXiv.math-ph/0005032"
+
+Litlib.equation "hall2000elementary"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class Prop3_3 
     (n : Type*) [Fintype n] [DecidableEq n]
     (exp : Matrix n n ℂ → Matrix n n ℂ) where
@@ -32,14 +36,10 @@ class Prop3_3
   commutingExp :
     ∀ X Y : Matrix n n ℂ, X * Y = Y * X → exp (X + Y) = exp X * exp Y
 
-Litlib.reference Thm3_9
-  type "article"
-  bibtex "hall2000elementary"
-  title "An elementary introduction to groups and representations"
-  authors ["Hall, Brian C."]
-  journal "arXiv preprint math-ph/0005032"
-  year "2000"
-  doi "10.48550/arXiv.math-ph/0005032"
+Litlib.equation "hall2000elementary"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class Thm3_9 
     (n : Type*) [Fintype n] [DecidableEq n]
     (exp : Matrix n n ℂ → Matrix n n ℂ) where
@@ -48,14 +48,10 @@ class Thm3_9
     ∀ X Y : Matrix n n ℂ, 
       Tendsto (fun m : ℕ => (exp ((1 / (m : ℂ)) • X) * exp ((1 / (m : ℂ)) • Y)) ^ m) atTop (𝓝 (exp (X + Y)))
 
-Litlib.reference Thm3_10
-  type "article"
-  bibtex "hall2000elementary"
-  title "An elementary introduction to groups and representations"
-  authors ["Hall, Brian C."]
-  journal "arXiv preprint math-ph/0005032"
-  year "2000"
-  doi "10.48550/arXiv.math-ph/0005032"
+Litlib.equation "hall2000elementary"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class Thm3_10 
     (n : Type*) [Fintype n] [DecidableEq n]
     (exp : Matrix n n ℂ → Matrix n n ℂ) where
@@ -63,14 +59,10 @@ class Thm3_10
   detExp :
     ∀ X : Matrix n n ℂ, Matrix.det (exp X) = Complex.exp (Matrix.trace X)
 
-Litlib.reference MatrixCalculus
-  type "article"
-  bibtex "hall2000elementary"
-  title "An elementary introduction to groups and representations"
-  authors ["Hall, Brian C."]
-  journal "arXiv preprint math-ph/0005032"
-  year "2000"
-  doi "10.48550/arXiv.math-ph/0005032"
+Litlib.equation "hall2000elementary"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class MatrixCalculus 
     (n : Type*) [Fintype n] [DecidableEq n]
     (exp : Matrix n n ℂ → Matrix n n ℂ)

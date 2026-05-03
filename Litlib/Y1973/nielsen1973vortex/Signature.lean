@@ -10,9 +10,8 @@ open Filter Topology
 
 namespace Litlib.Y1973.nielsen1973vortex
 
-Litlib.reference Eq2_19
+Litlib.paper "nielsen1973vortex"
   type "article"
-  bibtex "nielsen1973vortex"
   title "Vortex-line models for dual strings"
   authors ["Nielsen, Holger Bech", "Olesen, Poul"]
   journal "Nuclear Physics B"
@@ -21,23 +20,21 @@ Litlib.reference Eq2_19
   year "1973"
   publisher "Elsevier"
   doi "10.1016/0550-3213(73)90350-7"
+
+Litlib.equation "nielsen1973vortex"
+  eq "2.19"
+  page "49"
+  kind "Unknown"
 class Eq2_19 where
   /-- Equation (2.19) (page 49): The vacuum-value of the field |ϕ| which 
       minimizes the classical potential V(|ϕ|) = -c₂|ϕ|² + c₄|ϕ|⁴. -/
   vacuumValue (c₂ c₄ : ℝ) (hc₂ : 0 < c₂) (hc₄ : 0 < c₄) (ϕ₀ : ℝ) (hϕ₀Pos : 0 < ϕ₀) (hϕ₀Sq : ϕ₀^2 = c₂ / (2 * c₄)) :
     ∀ x : ℝ, (- c₂ * ϕ₀^2 + c₄ * ϕ₀^4) ≤ (- c₂ * x^2 + c₄ * x^4)
 
-Litlib.reference Eq2_21
-  type "article"
-  bibtex "nielsen1973vortex"
-  title "Vortex-line models for dual strings"
-  authors ["Nielsen, Holger Bech", "Olesen, Poul"]
-  journal "Nuclear Physics B"
-  volume "61"
-  pages "45--61"
-  year "1973"
-  publisher "Elsevier"
-  doi "10.1016/0550-3213(73)90350-7"
+Litlib.equation "nielsen1973vortex"
+  eq "2.21"
+  page "49"
+  kind "Unknown"
 class Eq2_21 where
   /-- Equation (2.21) (page 49): The mass square of the scalar particle is given by 
       the second derivative of the potential at the vacuum minimum. -/
@@ -45,17 +42,10 @@ class Eq2_21 where
     let V := fun ρ => (1/2 : ℝ) * (- c₂ * (ϕ₀ + ρ)^2 + c₄ * (ϕ₀ + ρ)^4)
     deriv (deriv V) 0 = 2 * c₂
 
-Litlib.reference NielsenOlesenVortex
-  type "article"
-  bibtex "nielsen1973vortex"
-  title "Vortex-line models for dual strings"
-  authors ["Nielsen, Holger Bech", "Olesen, Poul"]
-  journal "Nuclear Physics B"
-  volume "61"
-  pages "45--61"
-  year "1973"
-  publisher "Elsevier"
-  doi "10.1016/0550-3213(73)90350-7"
+Litlib.equation "nielsen1973vortex"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class NielsenOlesenVortex where
   /--
   Capstone Theorem: Nielsen-Olesen Vortex.

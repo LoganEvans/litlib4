@@ -16,65 +16,53 @@ open Matrix BigOperators
 
 namespace Litlib.Y1946.weyl1946classical
 
-Litlib.reference SchursLemma
+Litlib.paper "weyl1946classical"
   type "book"
-  bibtex "weyl1946classical"
   title "The classical groups: their invariants and representations"
   authors ["Weyl, Hermann"]
   volume "1"
   year "1946"
   publisher "Princeton university press"
+
+Litlib.equation "weyl1946classical"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class SchursLemma where
   /-- Chapter III, Lemma 3.1.A -/
   endOfSimpleModuleIsDivisionRing (R V : Type*) [Ring R] [AddCommGroup V] [Module R V] [IsSimpleModule R V] : 
     Nonempty (DivisionRing (Module.End R V))
 
-Litlib.reference DivRingIsSimple
-  type "book"
-  bibtex "weyl1946classical"
-  title "The classical groups: their invariants and representations"
-  authors ["Weyl, Hermann"]
-  volume "1"
-  year "1946"
-  publisher "Princeton university press"
+Litlib.equation "weyl1946classical"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class DivRingIsSimple where
   /-- Chapter III, Theorem 3.3.A -/
   divisionRingIsSimpleRing (D : Type*) [DivisionRing D] : IsSimpleRing D
 
-Litlib.reference MaschkesTheorem
-  type "book"
-  bibtex "weyl1946classical"
-  title "The classical groups: their invariants and representations"
-  authors ["Weyl, Hermann"]
-  volume "1"
-  year "1946"
-  publisher "Princeton university press"
+Litlib.equation "weyl1946classical"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class MaschkesTheorem where
   /-- Chapter III, Section 7 -/
   groupRingIsSemisimple (k G : Type*) [Field k] [Group G] [Fintype G] [Invertible (Fintype.card G : k)] :
     IsSemisimpleRing (MonoidAlgebra k G)
 
-Litlib.reference HilbertBasisTheorem
-  type "book"
-  bibtex "weyl1946classical"
-  title "The classical groups: their invariants and representations"
-  authors ["Weyl, Hermann"]
-  volume "1"
-  year "1946"
-  publisher "Princeton university press"
+Litlib.equation "weyl1946classical"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class HilbertBasisTheorem where
   /-- Chapter VIII, Theorem 8.6.A -/
   polynomialIsNoetherian (R : Type*) [CommRing R] [IsNoetherianRing R] : 
     IsNoetherianRing (Polynomial R)
 
-Litlib.reference FirstMainTheoremOrthogonalRank4
-  type "book"
-  bibtex "weyl1946classical"
-  title "The classical groups: their invariants and representations"
-  authors ["Weyl, Hermann"]
-  volume "1"
-  year "1946"
-  publisher "Princeton university press"
+Litlib.equation "weyl1946classical"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class FirstMainTheoremOrthogonalRank4 where
   /-- Chapter II, Theorem 2.9.A -/
   uniqueLorentzInvariantRank4 

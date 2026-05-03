@@ -35,7 +35,17 @@ structure LitlibData where
   doi : String := ""
   deriving Inhabited, Repr
 
-initialize litlibExt : MapDeclarationExtension LitlibData ←
+structure LitlibEqData where
+  paperId : String
+  eqNum : String := ""
+  page : String := ""
+  kind : String := ""
+  deriving Inhabited, Repr
+
+initialize litlibPaperExt : MapDeclarationExtension LitlibData ←
+  mkMapDeclarationExtension
+
+initialize litlibEqExt : MapDeclarationExtension LitlibEqData ←
   mkMapDeclarationExtension
 
 -- ==========================================
@@ -58,11 +68,18 @@ syntax litlibValArray := "[" str,* "]"
 syntax litlibField := ident (litlibValStr <|> litlibValArray)
 
 /-- 
-A flexible block for declaring mathematical signatures mapped to literature references.
-Accepts an arbitrary sequence of standard BibTeX fields.
+Declares a literature source with standard BibTeX fields.
 -/
-syntax (name := literatureAxiom) 
-  "Litlib.reference" ident
+syntax (name := litlibPaper) 
+  "Litlib.paper" str
+  litlibField*
+  : command
+
+/-- 
+Decorates a signature class with equation metadata linked to a paper.
+-/
+syntax (name := litlibEquation) 
+  "Litlib.equation" str
   litlibField*
   command : command
 
@@ -87,13 +104,12 @@ partial def extractStrings (stx : Syntax) : List String := Id.run do
         arr := arr.push str
     return arr.toList
 
-@[command_elab literatureAxiom]
-def elabLiteratureAxiom : CommandElab := fun stx => do
-  let nameId := stx[1].getId
+@[command_elab litlibPaper]
+def elabLitlibPaper : CommandElab := fun stx => do
+  let paperIdStr := stx[1].isStrLit?.getD ""
   let fields := stx[2].getArgs
-  let classCmd := stx[3]
 
-  let mut data : LitlibData := {}
+  let mut data : LitlibData := { bibtex := paperIdStr }
 
   for field in fields do
     let key := field[0].getId.toString
@@ -124,14 +140,8 @@ def elabLiteratureAxiom : CommandElab := fun stx => do
     | "doi" => data := { data with doi := firstStr }
     | _ => pure ()
 
-  -- 1. Natively execute the underlying `class ... where` command
-  elabCommand classCmd
-
-  -- 2. Persist the metadata
-  let currNs ← getCurrNamespace
-  let resolvedName := if nameId.getRoot == nameId then currNs ++ nameId else nameId
-  
-  modifyEnv fun env => litlibExt.insert env resolvedName data
+  -- Persist the metadata using the string ID as a Name key
+  modifyEnv fun env => litlibPaperExt.insert env (Name.mkSimple paperIdStr) data
 
 /-- Recursively hunts an AST to find the first Name Identifier. -/
 partial def findFirstIdent (s : Syntax) : Option Name :=
@@ -146,6 +156,39 @@ partial def findDeclId (s : Syntax) : Option Name :=
     some s[0].getId
   else
     s.getArgs.findSome? findDeclId
+
+@[command_elab litlibEquation]
+def elabLitlibEquation : CommandElab := fun stx => do
+  let paperIdStr := stx[1].isStrLit?.getD ""
+  let fields := stx[2].getArgs
+  let classCmd := stx[3]
+
+  let mut data : LitlibEqData := { paperId := paperIdStr }
+
+  for field in fields do
+    let key := field[0].getId.toString
+    let valStx := field[1]
+    
+    let strs := extractStrings valStx
+    let firstStr := if strs.isEmpty then "" else strs.head!
+    
+    match key with
+    | "eq" => data := { data with eqNum := firstStr }
+    | "page" => data := { data with page := firstStr }
+    | "kind" => data := { data with kind := firstStr }
+    | _ => pure ()
+
+  -- 1. Natively execute the underlying `class ... where` command
+  elabCommand classCmd
+
+  -- 2. Extract the name of the defined class/theorem
+  let targetNameOpt := findDeclId classCmd <|> findFirstIdent classCmd
+  if let some nameId := targetNameOpt then
+    let currNs ← getCurrNamespace
+    let resolvedName := if nameId.getRoot == nameId then currNs ++ nameId else nameId
+    modifyEnv fun env => litlibEqExt.insert env resolvedName data
+  else
+    logWarning m!"Litlib.equation: Could not extract target name from command."
 
 @[command_elab litlibTheoremCmd]
 def elabLitlibTheoremCmd : CommandElab := fun stx => do

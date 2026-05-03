@@ -10,9 +10,8 @@ open BigOperators
 
 namespace Litlib.Y2024.gielen2024unimodular
 
-Litlib.reference Eq3
+Litlib.paper "gielen2024unimodular"
   type "article"
-  bibtex "gielen2024unimodular"
   title "Unimodular Plebański gravity"
   authors ["Gielen, Steffen", "Nash, Elliot"]
   journal "Classical and Quantum Gravity"
@@ -22,6 +21,11 @@ Litlib.reference Eq3
   year "2024"
   publisher "IOP Publishing"
   doi "10.1088/1361-6382/ad3277"
+
+Litlib.equation "gielen2024unimodular"
+  eq "3"
+  page "Unknown"
+  kind "Unknown"
 class Eq3 where
   plebanskiTetradReconstruction
     (e0 : Fin 4 → ℂ)
@@ -41,18 +45,10 @@ class Eq3 where
     let ω := -2 * Complex.I * detE
     ∀ i j : Fin 3, wedgeSigma i j = if i = j then ω else 0
 
-Litlib.reference Eq7
-  type "article"
-  bibtex "gielen2024unimodular"
-  title "Unimodular Plebański gravity"
-  authors ["Gielen, Steffen", "Nash, Elliot"]
-  journal "Classical and Quantum Gravity"
-  volume "41"
-  issue "8"
-  pages "085009"
-  year "2024"
-  publisher "IOP Publishing"
-  doi "10.1088/1361-6382/ad3277"
+Litlib.equation "gielen2024unimodular"
+  eq "7"
+  page "Unknown"
+  kind "Unknown"
 class Eq7 where
   bianchiTraceIdentity 
     (sigma : Fin 3 → Fin 4 → Fin 4 → ℂ)
@@ -67,18 +63,10 @@ class Eq7 where
     ∀ ρ, ∑ i : Fin 3, ∑ j : Fin 3, ∑ μ : Fin 4, ∑ ν : Fin 4, sigma i μ ν * (sigma j μ ν * v i j ρ + sigma j ν ρ * v i j μ + sigma j ρ μ * v i j ν) 
       = 2 * ∑ i : Fin 3, ∑ j : Fin 3, (if i = j then (1:ℂ) else 0) * v i j ρ
 
-Litlib.reference Eq11
-  type "article"
-  bibtex "gielen2024unimodular"
-  title "Unimodular Plebański gravity"
-  authors ["Gielen, Steffen", "Nash, Elliot"]
-  journal "Classical and Quantum Gravity"
-  volume "41"
-  issue "8"
-  pages "085009"
-  year "2024"
-  publisher "IOP Publishing"
-  doi "10.1088/1361-6382/ad3277"
+Litlib.equation "gielen2024unimodular"
+  eq "11"
+  page "Unknown"
+  kind "Unknown"
 class Eq11 where
   pureConnectionMatrix 
     (M Minv X : Matrix (Fin 3) (Fin 3) ℂ)
@@ -88,18 +76,10 @@ class Eq11 where
     (hEq : Minv * X * Minv = 1) :
     X = M * M
 
-Litlib.reference Eq12
-  type "article"
-  bibtex "gielen2024unimodular"
-  title "Unimodular Plebański gravity"
-  authors ["Gielen, Steffen", "Nash, Elliot"]
-  journal "Classical and Quantum Gravity"
-  volume "41"
-  issue "8"
-  pages "085009"
-  year "2024"
-  publisher "IOP Publishing"
-  doi "10.1088/1361-6382/ad3277"
+Litlib.equation "gielen2024unimodular"
+  eq "12"
+  page "Unknown"
+  kind "Unknown"
 class Eq12 
     (SpacetimePoint : Type*)
     (partialDeriv : Fin 4 → (SpacetimePoint → ℂ) → SpacetimePoint → ℂ)

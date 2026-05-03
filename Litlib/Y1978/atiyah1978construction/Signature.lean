@@ -7,9 +7,8 @@ import Mathlib.Data.Matrix.Basic
 
 namespace Litlib.Y1978.atiyah1978construction
 
-Litlib.reference Page185Algebra
+Litlib.paper "atiyah1978construction"
   type "article"
-  bibtex "atiyah1978construction"
   title "Construction of instantons"
   authors ["Atiyah, Michael F", "Hitchin, Nigel J", "Drinfeld, Vladimir G", "Manin, Yuri I"]
   journal "Physics Letters A"
@@ -19,6 +18,11 @@ Litlib.reference Page185Algebra
   year "1978"
   publisher "Elsevier Science"
   doi "10.1016/0375-9601(78)90141-X"
+
+Litlib.equation "atiyah1978construction"
+  eq "Unknown"
+  page "185"
+  kind "Unknown"
 class Page185Algebra where
   /-- The core linear algebra lemma on page 185: Ensures that "real" lines of P3(C) are never jumping lines. -/
   jumpingLinesTrivial
@@ -39,18 +43,10 @@ class Page185Algebra where
     (hvInUzAnnihilator : ∀ u ∈ Uz, B u v = 0) :
     v = 0
 
-Litlib.reference AdhmModuliUniqueness
-  type "article"
-  bibtex "atiyah1978construction"
-  title "Construction of instantons"
-  authors ["Atiyah, Michael F", "Hitchin, Nigel J", "Drinfeld, Vladimir G", "Manin, Yuri I"]
-  journal "Physics Letters A"
-  volume "65"
-  issue "3"
-  pages "185--187"
-  year "1978"
-  publisher "Elsevier Science"
-  doi "10.1016/0375-9601(78)90141-X"
+Litlib.equation "atiyah1978construction"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class AdhmModuliUniqueness where
   /--
   Capstone Theorem: ADHM Charge 1 Trivialization.

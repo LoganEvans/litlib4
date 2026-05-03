@@ -7,9 +7,8 @@ import Mathlib.Topology.Basic
 
 namespace Litlib.Y1982.taubes1982existence
 
-Litlib.reference YangMillsHiggsVariations
+Litlib.paper "taubes1982existence"
   type "article"
-  bibtex "taubes1982existence"
   title "The existence of a non-minimal solution to the SU(2) Yang-Mills-Higgs equations on ℝ3. Part I"
   authors ["Taubes, Clifford Henry"]
   journal "Communications in Mathematical Physics"
@@ -19,6 +18,11 @@ Litlib.reference YangMillsHiggsVariations
   year "1982"
   publisher "Springer"
   doi "10.1007/BF01206014"
+
+Litlib.equation "taubes1982existence"
+  eq "2.7, 2.8"
+  page "263"
+  kind "Unknown"
 class YangMillsHiggsVariations where
   /-- Equations (2.7) and (2.8) (page 263): Gradient and Hessian of the YMH action functional. -/
   ymhVariations
@@ -32,18 +36,10 @@ class YangMillsHiggsVariations where
                   2 * inner ℝ omegaWedgeOmega fA + 2 * inner ℝ bracketOmegaEta dAPhi + 2 * inner ℝ bracketOmegaPhi dAEta
     deriv a 0 = gradA ∧ deriv (deriv a) 0 = hessA
 
-Litlib.reference BogomolnyiExistence
-  type "article"
-  bibtex "taubes1982existence"
-  title "The existence of a non-minimal solution to the SU(2) Yang-Mills-Higgs equations on ℝ3. Part I"
-  authors ["Taubes, Clifford Henry"]
-  journal "Communications in Mathematical Physics"
-  volume "86"
-  issue "2"
-  pages "257--298"
-  year "1982"
-  publisher "Springer"
-  doi "10.1007/BF01206014"
+Litlib.equation "taubes1982existence"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class BogomolnyiExistence where
   /--
   Capstone Theorem: Bogomolnyi Existence.

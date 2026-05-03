@@ -10,9 +10,8 @@ open Filter Topology
 
 namespace Litlib.Y1982.sedlacek1982direct
 
-Litlib.reference ObstructionPreserved
+Litlib.paper "sedlacek1982direct"
   type "article"
-  bibtex "sedlacek1982direct"
   title "A direct method for minimizing the Yang-Mills functional over 4-manifolds"
   authors ["Sedlacek, Steven"]
   journal "Communications in Mathematical Physics"
@@ -22,6 +21,11 @@ Litlib.reference ObstructionPreserved
   year "1982"
   publisher "Springer"
   doi "10.1007/BF01214887"
+
+Litlib.equation "sedlacek1982direct"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class ObstructionPreserved where
   /--
   Theorem 5.5 (and Corollary 6.2): The obstruction to lifting the structure 
@@ -35,18 +39,10 @@ class ObstructionPreserved where
     (hLimit : Tendsto P atTop (𝓝 pInfty)) :
     ∃ (N : ℕ), ∀ i ≥ N, eta pInfty = eta (P i)
 
-Litlib.reference PontryaginDefectBound
-  type "article"
-  bibtex "sedlacek1982direct"
-  title "A direct method for minimizing the Yang-Mills functional over 4-manifolds"
-  authors ["Sedlacek, Steven"]
-  journal "Communications in Mathematical Physics"
-  volume "86"
-  issue "4"
-  pages "515--527"
-  year "1982"
-  publisher "Springer"
-  doi "10.1007/BF01214887"
+Litlib.equation "sedlacek1982direct"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class PontryaginDefectBound where
   /--
   Theorem 7.1: The defect in the first Pontryagin number is bounded by 
@@ -61,18 +57,10 @@ class PontryaginDefectBound where
     (hLimit : Tendsto P atTop (𝓝 pInfty)) :
     ∃ (N : ℕ), ∀ i ≥ N, |p1 (P i) - p1 pInfty| ≤ (m (P i) - m pInfty) / (4 * Real.pi ^ 2)
 
-Litlib.reference YangMillsCoercivity
-  type "article"
-  bibtex "sedlacek1982direct"
-  title "A direct method for minimizing the Yang-Mills functional over 4-manifolds"
-  authors ["Sedlacek, Steven"]
-  journal "Communications in Mathematical Physics"
-  volume "86"
-  issue "4"
-  pages "515--527"
-  year "1982"
-  publisher "Springer"
-  doi "10.1007/BF01214887"
+Litlib.equation "sedlacek1982direct"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class YangMillsCoercivity where
   /--
   Capstone Theorem: Yang-Mills Coercivity.

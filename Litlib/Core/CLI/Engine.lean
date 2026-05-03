@@ -162,7 +162,7 @@ abbrev DepM := StateM DepState
 
 partial def findLitRef (env : Environment) (n : Name) : Option Name :=
   if n == Name.anonymous then none
-  else if (litlibExt.find? env n).isSome then some n
+  else if (litlibEqExt.find? env n).isSome then some n
   else match n with
   | .str p _ => findLitRef env p
   | .num p _ => findLitRef env p
@@ -423,9 +423,10 @@ def extractAllTheorems (env : Environment) (ctx : CliContext) : CoreM GlobalData
     
     let mut thmLitRefs := #[]
     for ref in depRes.litRefs.toList do
-      if let some data := litlibExt.find? env ref then
-        thmLitRefs := thmLitRefs.push { name := ref, data := data }
-        if !globalLitRefs.contains ref then globalLitRefs := globalLitRefs.insert ref data
+      if let some eqData := litlibEqExt.find? env ref then
+        if let some data := litlibPaperExt.find? env (Name.mkSimple eqData.paperId) then
+          thmLitRefs := thmLitRefs.push { name := ref, data := data }
+          if !globalLitRefs.contains ref then globalLitRefs := globalLitRefs.insert ref data
 
     theorems := theorems.push { name := declName, desc := desc, hasSorry := depRes.hasSorry, litRefs := thmLitRefs }
 
@@ -449,23 +450,24 @@ def extractAllTheorems (env : Environment) (ctx : CliContext) : CoreM GlobalData
     summaryItems := newItems; renderedNames := newNames; depState := newState
 
   -- 1.5. Grab everything tagged as a Reference (catches standalone signatures)
-  let refKeys : Array Name := env.constants.fold (fun acc declName _ => if (litlibExt.find? env declName).isSome then acc.push declName else acc) (#[] : Array Name)
+  let refKeys : Array Name := env.constants.fold (fun acc declName _ => if (litlibEqExt.find? env declName).isSome then acc.push declName else acc) (#[] : Array Name)
   for n in refKeys do
-    if let some data := litlibExt.find? env n then
-      if !globalLitRefs.contains n then globalLitRefs := globalLitRefs.insert n data
-      
-      let (refRes, nextState) := (collectDepsMemo env n).run depState
-      depState := nextState
-      
-      if !renderedNames.contains n then
-        renderedNames := renderedNames.insert n
-        let code ← processDecl env n prefixes refRes.hasSorry
-        let modName := match env.getModuleIdxFor? n with | some idx => env.header.moduleNames[idx.toNat]! | none => `Unknown
-        summaryItems := summaryItems.push { moduleName := modName, declName := n, codeStr := code, type := "litRef", desc := "" }
-      
-      -- Gather local variables explicitly for the reference
-      let (newItems, newNames, newState) ← extractLocals n summaryItems renderedNames depState
-      summaryItems := newItems; renderedNames := newNames; depState := newState
+    if let some eqData := litlibEqExt.find? env n then
+      if let some data := litlibPaperExt.find? env (Name.mkSimple eqData.paperId) then
+        if !globalLitRefs.contains n then globalLitRefs := globalLitRefs.insert n data
+        
+        let (refRes, nextState) := (collectDepsMemo env n).run depState
+        depState := nextState
+        
+        if !renderedNames.contains n then
+          renderedNames := renderedNames.insert n
+          let code ← processDecl env n prefixes refRes.hasSorry
+          let modName := match env.getModuleIdxFor? n with | some idx => env.header.moduleNames[idx.toNat]! | none => `Unknown
+          summaryItems := summaryItems.push { moduleName := modName, declName := n, codeStr := code, type := "litRef", desc := "" }
+        
+        -- Gather local variables explicitly for the reference
+        let (newItems, newNames, newState) ← extractLocals n summaryItems renderedNames depState
+        summaryItems := newItems; renderedNames := newNames; depState := newState
 
 
   -- 2. Filter the gathered items based on the CLI context and dependency graph

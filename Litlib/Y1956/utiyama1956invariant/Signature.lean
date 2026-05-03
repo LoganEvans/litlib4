@@ -10,9 +10,8 @@ open BigOperators
 
 namespace Litlib.Y1956.utiyama1956invariant
 
-Litlib.reference Eq1_20
+Litlib.paper "utiyama1956invariant"
   type "article"
-  bibtex "utiyama1956invariant"
   title "Invariant theoretical interpretation of interaction"
   authors ["Utiyama, Ryoyu"]
   journal "Physical Review"
@@ -22,6 +21,11 @@ Litlib.reference Eq1_20
   year "1956"
   publisher "APS"
   doi "10.1103/PhysRev.101.1597"
+
+Litlib.equation "utiyama1956invariant"
+  eq "1.20"
+  page "1600"
+  kind "Unknown"
 class Eq1_20 where
   /-- 
   Equation (1.20) (page 1600): The Yang-Mills field strength tensor transforms 
@@ -44,18 +48,10 @@ class Eq1_20 where
 
 abbrev GaugeCovariance.{u, v} := Eq1_20.{u, v}
 
-Litlib.reference AppendixI_Expansion
-  type "article"
-  bibtex "utiyama1956invariant"
-  title "Invariant theoretical interpretation of interaction"
-  authors ["Utiyama, Ryoyu"]
-  journal "Physical Review"
-  volume "101"
-  issue "5"
-  pages "1597"
-  year "1956"
-  publisher "APS"
-  doi "10.1103/PhysRev.101.1597"
+Litlib.equation "utiyama1956invariant"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class AppendixI_Expansion where
   /--
   Capstone Theorem: Utiyama Expansion Theorem.
@@ -91,18 +87,10 @@ class AppendixI_Expansion where
 
 abbrev UtiyamaExpansion.{u} := AppendixI_Expansion.{u}
 
-Litlib.reference AppendixI_LorentzTensor
-  type "article"
-  bibtex "utiyama1956invariant"
-  title "Invariant theoretical interpretation of interaction"
-  authors ["Utiyama, Ryoyu"]
-  journal "Physical Review"
-  volume "101"
-  issue "5"
-  pages "1597"
-  year "1956"
-  publisher "APS"
-  doi "10.1103/PhysRev.101.1597"
+Litlib.equation "utiyama1956invariant"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class AppendixI_LorentzTensor where
   /--
   Corollary of Utiyama Appendix I: 
@@ -127,18 +115,10 @@ class AppendixI_LorentzTensor where
       (∀ Λ : Matrix (Fin 4) (Fin 4) ℂ, Λ * Matrix.of eta * Matrix.transpose Λ = Matrix.of eta → Matrix.det Λ = 1 → 
         ∀ μ ν ρ σ, ∑ α : Fin 4, ∑ β : Fin 4, ∑ γ : Fin 4, ∑ δ : Fin 4, Λ μ α * Λ ν β * Λ ρ γ * Λ σ δ * T_inv α β γ δ = T_inv μ ν ρ σ)
 
-Litlib.reference AppendixI_BilinearForm
-  type "article"
-  bibtex "utiyama1956invariant"
-  title "Invariant theoretical interpretation of interaction"
-  authors ["Utiyama, Ryoyu"]
-  journal "Physical Review"
-  volume "101"
-  issue "5"
-  pages "1597"
-  year "1956"
-  publisher "APS"
-  doi "10.1103/PhysRev.101.1597"
+Litlib.equation "utiyama1956invariant"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class AppendixI_BilinearForm where
   /-- 
   Utiyama 1956, Appendix I. 

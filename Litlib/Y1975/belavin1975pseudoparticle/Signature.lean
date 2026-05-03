@@ -12,9 +12,8 @@ open Filter Topology
 
 namespace Litlib.Y1975.belavin1975pseudoparticle
 
-Litlib.reference Eq10_11
+Litlib.paper "belavin1975pseudoparticle"
   type "article"
-  bibtex "belavin1975pseudoparticle"
   title "Pseudoparticle solutions of the Yang-Mills equations"
   authors ["Belavin, Alexander A", "Polyakov, Alexander M", "Schwartz, Albert S", "Tyupkin, Yu S"]
   journal "Physics Letters B"
@@ -24,6 +23,11 @@ Litlib.reference Eq10_11
   year "1975"
   publisher "Elsevier"
   doi "10.1016/0370-2693(75)90163-X"
+
+Litlib.equation "belavin1975pseudoparticle"
+  eq "10, 11"
+  page "86"
+  kind "Unknown"
 class Eq10_11 where
   /--
   Equations (10) and (11) (page 86): The Topological Action Bound.
@@ -43,18 +47,10 @@ class Eq10_11 where
 
 abbrev TopologicalEnergyBound.{u} := Eq10_11.{u}
 
-Litlib.reference Eq16
-  type "article"
-  bibtex "belavin1975pseudoparticle"
-  title "Pseudoparticle solutions of the Yang-Mills equations"
-  authors ["Belavin, Alexander A", "Polyakov, Alexander M", "Schwartz, Albert S", "Tyupkin, Yu S"]
-  journal "Physics Letters B"
-  volume "59"
-  issue "1"
-  pages "85--87"
-  year "1975"
-  publisher "Elsevier"
-  doi "10.1016/0370-2693(75)90163-X"
+Litlib.equation "belavin1975pseudoparticle"
+  eq "16"
+  page "86"
+  kind "Unknown"
 class Eq16 where
   /-- Equation (16) (page 86): The radial profile of the BPST instanton. -/
   bpstProfileOde (lam : ℝ) :
@@ -63,18 +59,10 @@ class Eq16 where
 
 abbrev RadialProfileODE := Eq16
 
-Litlib.reference Eq16_Uniqueness
-  type "article"
-  bibtex "belavin1975pseudoparticle"
-  title "Pseudoparticle solutions of the Yang-Mills equations"
-  authors ["Belavin, Alexander A", "Polyakov, Alexander M", "Schwartz, Albert S", "Tyupkin, Yu S"]
-  journal "Physics Letters B"
-  volume "59"
-  issue "1"
-  pages "85--87"
-  year "1975"
-  publisher "Elsevier"
-  doi "10.1016/0370-2693(75)90163-X"
+Litlib.equation "belavin1975pseudoparticle"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class Eq16_Uniqueness where
   /--
   Capstone Theorem: BPST Profile Uniqueness.
@@ -104,18 +92,10 @@ structure IsHomeomorphism {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y
   cont : Continuous f
   inv_cont : ∃ (g : Y → X), Function.LeftInverse g f ∧ Function.RightInverse g f ∧ Continuous g
 
-Litlib.reference Eq18
-  type "article"
-  bibtex "belavin1975pseudoparticle"
-  title "Pseudoparticle solutions of the Yang-Mills equations"
-  authors ["Belavin, Alexander A", "Polyakov, Alexander M", "Schwartz, Albert S", "Tyupkin, Yu S"]
-  journal "Physics Letters B"
-  volume "59"
-  issue "1"
-  pages "85--87"
-  year "1975"
-  publisher "Elsevier"
-  doi "10.1016/0370-2693(75)90163-X"
+Litlib.equation "belavin1975pseudoparticle"
+  eq "18"
+  page "86"
+  kind "Unknown"
 class Eq18
   (BoundaryManifold Group : Type*) [TopologicalSpace BoundaryManifold] [TopologicalSpace Group]
   (isSmooth : (BoundaryManifold → Group) → Prop)

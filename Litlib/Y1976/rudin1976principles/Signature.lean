@@ -11,9 +11,8 @@ open Filter Topology
 
 namespace Litlib.Y1976.rudin1976principles
 
-Litlib.reference Eq9_39
+Litlib.paper "rudin1976principles"
   type "book"
-  bibtex "rudin1976principles"
   title "Principles of Mathematical Analysis"
   authors ["Rudin, Walter"]
   volume "3"
@@ -23,6 +22,11 @@ Litlib.reference Eq9_39
   edition "3rd"
   series "International Series in Pure and Applied Mathematics"
   isbn "978-0070542358"
+
+Litlib.equation "rudin1976principles"
+  eq "39"
+  page "217"
+  kind "Unknown"
 class Eq9_39 where
   /--
   Equation (39) (page 217): The definition of the directional derivative 
@@ -34,18 +38,10 @@ class Eq9_39 where
     (hf : DifferentiableAt ℝ f x) :
     Tendsto (fun t : ℝ => t⁻¹ • (f (x + t • u) - f x)) (𝓝[≠] 0) (𝓝 ((fderiv ℝ f x) u))
 
-Litlib.reference Thm9_19
-  type "book"
-  bibtex "rudin1976principles"
-  title "Principles of Mathematical Analysis"
-  authors ["Rudin, Walter"]
-  volume "3"
-  year "1976"
-  publisher "McGraw-Hill"
-  address "New York"
-  edition "3rd"
-  series "International Series in Pure and Applied Mathematics"
-  isbn "978-0070542358"
+Litlib.equation "rudin1976principles"
+  eq "Unknown"
+  page "218"
+  kind "Unknown"
 class Thm9_19 where
   /-- Theorem 9.19 (page 218): The Mean Value Theorem for functions of several variables. -/
   multidimensionalMvt
@@ -57,18 +53,10 @@ class Thm9_19 where
     (∀ x, ‖fderiv ℝ f x (b - a)‖ ≤ M * ‖b - a‖) →
     ‖f b - f a‖ ≤ M * ‖b - a‖
 
-Litlib.reference FrechetToScalarProjection
-  type "book"
-  bibtex "rudin1976principles"
-  title "Principles of Mathematical Analysis"
-  authors ["Rudin, Walter"]
-  volume "3"
-  year "1976"
-  publisher "McGraw-Hill"
-  address "New York"
-  edition "3rd"
-  series "International Series in Pure and Applied Mathematics"
-  isbn "978-0070542358"
+Litlib.equation "rudin1976principles"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class FrechetToScalarProjection where
   /-- Mathematical theorem projecting multi-dimensional continuous Fréchet limits. -/
   projectFrechetTo1d

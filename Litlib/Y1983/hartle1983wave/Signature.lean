@@ -12,9 +12,8 @@ open Filter Topology
 
 namespace Litlib.Y1983.hartle1983wave
 
-Litlib.reference WheelerDeWittConstraint
+Litlib.paper "hartle1983wave"
   type "article"
-  bibtex "hartle1983wave"
   title "Wave function of the universe"
   authors ["Hartle, James B", "Hawking, Stephen W"]
   journal "Physical Review D"
@@ -24,6 +23,11 @@ Litlib.reference WheelerDeWittConstraint
   year "1983"
   publisher "APS"
   doi "10.1103/PhysRevD.28.2960"
+
+Litlib.equation "hartle1983wave"
+  eq "2.13"
+  page "Unknown"
+  kind "Unknown"
 class WheelerDeWittConstraint 
     (State : Type*) [AddCommGroup State] [Module ℝ State]
     (Hamiltonian : State → State)
@@ -31,18 +35,10 @@ class WheelerDeWittConstraint
   /-- Equation 2.13: The Wheeler-DeWitt equation constraints the allowed physical states. -/
   is_physical_iff : ∀ psi, IsPhysicalState psi ↔ psi ≠ 0 ∧ Hamiltonian psi = 0
 
-Litlib.reference NoBoundaryProposal
-  type "article"
-  bibtex "hartle1983wave"
-  title "Wave function of the universe"
-  authors ["Hartle, James B", "Hawking, Stephen W"]
-  journal "Physical Review D"
-  volume "28"
-  issue "12"
-  pages "2960"
-  year "1983"
-  publisher "APS"
-  doi "10.1103/PhysRevD.28.2960"
+Litlib.equation "hartle1983wave"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class NoBoundaryProposal 
     (ThreeGeometry FourGeometry : Type*)
     (boundaryOf : FourGeometry → ThreeGeometry)
@@ -53,18 +49,10 @@ class NoBoundaryProposal
     ∀ (h : ThreeGeometry), 
       amplitude h = pathIntegral (fun g => Real.exp (-EuclideanAction g)) {g | boundaryOf g = h}
 
-Litlib.reference SemiclassicalGroundState
-  type "article"
-  bibtex "hartle1983wave"
-  title "Wave function of the universe"
-  authors ["Hartle, James B", "Hawking, Stephen W"]
-  journal "Physical Review D"
-  volume "28"
-  issue "12"
-  pages "2960"
-  year "1983"
-  publisher "APS"
-  doi "10.1103/PhysRevD.28.2960"
+Litlib.equation "hartle1983wave"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class SemiclassicalGroundState 
     (ThreeGeometry : Type*)
     (Action : ThreeGeometry → ℝ)
@@ -74,18 +62,10 @@ class SemiclassicalGroundState
     ∀ (h : ThreeGeometry), 
       Tendsto (fun ħ => WaveFunction ħ h) (𝓝[>] 0) (𝓝 (PreFactor h * Real.exp (-Action h)))
 
-Litlib.reference BigBangInstantonBoundary
-  type "article"
-  bibtex "hartle1983wave"
-  title "Wave function of the universe"
-  authors ["Hartle, James B", "Hawking, Stephen W"]
-  journal "Physical Review D"
-  volume "28"
-  issue "12"
-  pages "2960"
-  year "1983"
-  publisher "APS"
-  doi "10.1103/PhysRevD.28.2960"
+Litlib.equation "hartle1983wave"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class BigBangInstantonBoundary 
     (State : Type*) [NormedAddCommGroup State] [InnerProductSpace ℝ State]
     (star : State → State)

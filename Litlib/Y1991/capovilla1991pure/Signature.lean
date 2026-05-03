@@ -10,9 +10,8 @@ open scoped BigOperators
 
 namespace Litlib.Y1991.capovilla1991pure
 
-Litlib.reference Eq2_22
+Litlib.paper "capovilla1991pure"
   type "article"
-  bibtex "capovilla1991pure"
   title "A pure spin-connection formulation of gravity"
   authors ["Capovilla, Richard", "Dell, John", "Jacobson, Ted"]
   journal "Classical and Quantum Gravity"
@@ -21,6 +20,11 @@ Litlib.reference Eq2_22
   pages "59--73"
   year "1991"
   doi "10.1088/0264-9381/8/1/01"
+
+Litlib.equation "capovilla1991pure"
+  eq "2.22"
+  page "Unknown"
+  kind "Unknown"
 class Eq2_22 
     (R : Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (eta : ℂ)
@@ -45,17 +49,10 @@ class Eq2_22
                     epsilon α β γ δ * R μ α A B * R β γ B C * R δ ν C A)))))))
     ∀ μ ν, g μ ν = g ν μ
 
-Litlib.reference Eq2_2c
-  type "article"
-  bibtex "capovilla1991pure"
-  title "A pure spin-connection formulation of gravity"
-  authors ["Capovilla, Richard", "Dell, John", "Jacobson, Ted"]
-  journal "Classical and Quantum Gravity"
-  volume "8"
-  issue "1"
-  pages "59--73"
-  year "1991"
-  doi "10.1088/0264-9381/8/1/01"
+Litlib.equation "capovilla1991pure"
+  eq "2.2c"
+  page "Unknown"
+  kind "Unknown"
 class Eq2_2c 
     (SpacetimePoint : Type*)
     (partialDeriv : Fin 4 → (SpacetimePoint → ℂ) → SpacetimePoint → ℂ)

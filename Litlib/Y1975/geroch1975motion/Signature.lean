@@ -7,9 +7,8 @@ import Mathlib.Data.Complex.Basic
 
 namespace Litlib.Y1975.geroch1975motion
 
-Litlib.reference Thm_MotionOfBody
+Litlib.paper "geroch1975motion"
   type "article"
-  bibtex "geroch1975motion"
   title "Motion of a body in general relativity"
   authors ["Geroch, Robert", "Jang, Pong Soo"]
   journal "Journal of Mathematical Physics"
@@ -18,6 +17,11 @@ Litlib.reference Thm_MotionOfBody
   pages "65"
   year "1975"
   doi "10.1063/1.522416"
+
+Litlib.equation "geroch1975motion"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class Thm_MotionOfBody 
   (Point : Type) [TopologicalSpace Point]
   (Index : Type) [Fintype Index] [DecidableEq Index]

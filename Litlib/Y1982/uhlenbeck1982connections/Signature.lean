@@ -14,9 +14,8 @@ open Filter Topology
 
 namespace Litlib.Y1982.uhlenbeck1982connections
 
-Litlib.reference ExistsCoulombGauge
+Litlib.paper "uhlenbeck1982connections"
   type "article"
-  bibtex "uhlenbeck1982connections"
   title "Connections with Lp bounds on curvature"
   authors ["Uhlenbeck, Karen K"]
   journal "Communications in Mathematical Physics"
@@ -26,6 +25,11 @@ Litlib.reference ExistsCoulombGauge
   year "1982"
   publisher "Springer"
   doi "10.1007/BF01206014"
+
+Litlib.equation "uhlenbeck1982connections"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class ExistsCoulombGauge 
     (Connection GaugeTransform Form : Type*) [Zero Form]
     (curvatureLn2Norm : Connection → ℝ)
@@ -37,18 +41,10 @@ class ExistsCoulombGauge
       curvatureLn2Norm A ≤ κ →
       ∃ (g : GaugeTransform), dStar (applyGauge g A) = 0
 
-Litlib.reference UhlenbeckCompactness
-  type "article"
-  bibtex "uhlenbeck1982connections"
-  title "Connections with Lp bounds on curvature"
-  authors ["Uhlenbeck, Karen K"]
-  journal "Communications in Mathematical Physics"
-  volume "83"
-  issue "1"
-  pages "31--42"
-  year "1982"
-  publisher "Springer"
-  doi "10.1007/BF01206014"
+Litlib.equation "uhlenbeck1982connections"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class UhlenbeckCompactness 
     (Connection GaugeTransform : Type*) [TopologicalSpace Connection]
     (curvatureLpNorm : Connection → ℝ)
@@ -64,18 +60,10 @@ class UhlenbeckCompactness
       StrictMono subseq ∧
       Tendsto (fun i => applyGauge (s i) (D (subseq i))) atTop (𝓝 aInfty)
 
-Litlib.reference ConnectionTopology
-  type "article"
-  bibtex "uhlenbeck1982connections"
-  title "Connections with Lp bounds on curvature"
-  authors ["Uhlenbeck, Karen K"]
-  journal "Communications in Mathematical Physics"
-  volume "83"
-  issue "1"
-  pages "31--42"
-  year "1982"
-  publisher "Springer"
-  doi "10.1007/BF01206014"
+Litlib.equation "uhlenbeck1982connections"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class ConnectionTopology 
     (Connection GaugeTransform : Type*)
     (applyGauge : GaugeTransform → Connection → Connection) where
@@ -86,18 +74,10 @@ class ConnectionTopology
       (∀ a b, dist a b = dist b a) ∧
       (∀ a b c, dist a c ≤ dist a b + dist b c)
 
-Litlib.reference YangMillsActionDifferentiable
-  type "article"
-  bibtex "uhlenbeck1982connections"
-  title "Connections with Lp bounds on curvature"
-  authors ["Uhlenbeck, Karen K"]
-  journal "Communications in Mathematical Physics"
-  volume "83"
-  issue "1"
-  pages "31--42"
-  year "1982"
-  publisher "Springer"
-  doi "10.1007/BF01206014"
+Litlib.equation "uhlenbeck1982connections"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class YangMillsActionDifferentiable 
     (Connection : Type*)
     (isValidVar : (ℝ → Connection) → Prop)
@@ -107,18 +87,10 @@ class YangMillsActionDifferentiable
       isValidVar var → var 0 = A →
       DifferentiableAt ℝ (fun t => Action (var t)) 0
 
-Litlib.reference YangMillsFunctionalDerivative
-  type "article"
-  bibtex "uhlenbeck1982connections"
-  title "Connections with Lp bounds on curvature"
-  authors ["Uhlenbeck, Karen K"]
-  journal "Communications in Mathematical Physics"
-  volume "83"
-  issue "1"
-  pages "31--42"
-  year "1982"
-  publisher "Springer"
-  doi "10.1007/BF01206014"
+Litlib.equation "uhlenbeck1982connections"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class YangMillsFunctionalDerivative 
     (Connection Form : Type*) [Zero Form]
     (isValidVar : (ℝ → Connection) → Prop)

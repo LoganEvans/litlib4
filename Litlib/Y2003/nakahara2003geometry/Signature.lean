@@ -12,15 +12,19 @@ open BigOperators
 
 namespace Litlib.Y2003.nakahara2003geometry
 
-Litlib.reference StokesTheorem
+Litlib.paper "nakahara2003geometry"
   type "book"
-  bibtex "nakahara2003geometry"
   title "Geometry, Topology and Physics"
   authors ["Nakahara, Mikio"]
   edition "2nd"
   year "2003"
   publisher "Institute of Physics Publishing"
   isbn "0750306068"
+
+Litlib.equation "nakahara2003geometry"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class StokesTheorem 
     (Chain Form : Type*)
     (integral : Chain → Form → ℝ)
@@ -30,15 +34,10 @@ class StokesTheorem
     ∀ (c : Chain) (omega : Form), 
       integral c (exteriorDeriv omega) = integral (boundary c) omega
 
-Litlib.reference ContractedBianchiIdentity
-  type "book"
-  bibtex "nakahara2003geometry"
-  title "Geometry, Topology and Physics"
-  authors ["Nakahara, Mikio"]
-  edition "2nd"
-  year "2003"
-  publisher "Institute of Physics Publishing"
-  isbn "0750306068"
+Litlib.equation "nakahara2003geometry"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class ContractedBianchiIdentity 
     (Point Index : Type*) [Fintype Index] [DecidableEq Index]
     (g g_inv : Index → Index → Point → ℂ)
@@ -79,15 +78,10 @@ class ContractedBianchiIdentity
                            christoffel lambda alpha nu x * G mu lambda x)
       ) = 0
 
-Litlib.reference CartanStructureEquation
-  type "book"
-  bibtex "nakahara2003geometry"
-  title "Geometry, Topology and Physics"
-  authors ["Nakahara, Mikio"]
-  edition "2nd"
-  year "2003"
-  publisher "Institute of Physics Publishing"
-  isbn "0750306068"
+Litlib.equation "nakahara2003geometry"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class CartanStructureEquation 
     (Form : Type*) [AddCommGroup Form]
     (exteriorDeriv : Form → Form)
@@ -96,15 +90,10 @@ class CartanStructureEquation
     (omega Omega : Form) :
     Omega = exteriorDeriv omega + wedge omega omega
 
-Litlib.reference BianchiIdentity
-  type "book"
-  bibtex "nakahara2003geometry"
-  title "Geometry, Topology and Physics"
-  authors ["Nakahara, Mikio"]
-  edition "2nd"
-  year "2003"
-  publisher "Institute of Physics Publishing"
-  isbn "0750306068"
+Litlib.equation "nakahara2003geometry"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class BianchiIdentity 
     (Form : Type*) [Zero Form]
     (covariantDeriv : Form → Form) where
@@ -112,15 +101,10 @@ class BianchiIdentity
     (Omega : Form) :
     covariantDeriv Omega = 0
 
-Litlib.reference WindingNumberIntegral
-  type "book"
-  bibtex "nakahara2003geometry"
-  title "Geometry, Topology and Physics"
-  authors ["Nakahara, Mikio"]
-  edition "2nd"
-  year "2003"
-  publisher "Institute of Physics Publishing"
-  isbn "0750306068"
+Litlib.equation "nakahara2003geometry"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class WindingNumberIntegral 
     (Map : Type*)
     (isSmooth : Map → Prop)
@@ -129,15 +113,10 @@ class WindingNumberIntegral
   windingNumberIntegral :
     ∀ (g : Map), isSmooth g → (degree g : ℝ) = (1 / (24 * Real.pi^2)) * cartanMaurerIntegral g
 
-Litlib.reference CartanMaurerTopology
-  type "book"
-  bibtex "nakahara2003geometry"
-  title "Geometry, Topology and Physics"
-  authors ["Nakahara, Mikio"]
-  edition "2nd"
-  year "2003"
-  publisher "Institute of Physics Publishing"
-  isbn "0750306068"
+Litlib.equation "nakahara2003geometry"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class CartanMaurerTopology 
     (GroupMap : Type*) [TopologicalSpace GroupMap]
     (isSmooth : GroupMap → Prop)
@@ -150,15 +129,10 @@ class CartanMaurerTopology
     (hCont : Continuous H) :
     ∀ t1 t2 : ℝ, windingNumber (H t1) = windingNumber (H t2)
 
-Litlib.reference PontryaginActionVariation
-  type "book"
-  bibtex "nakahara2003geometry"
-  title "Geometry, Topology and Physics"
-  authors ["Nakahara, Mikio"]
-  edition "2nd"
-  year "2003"
-  publisher "Institute of Physics Publishing"
-  isbn "0750306068"
+Litlib.equation "nakahara2003geometry"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class PontryaginActionVariation 
     (Universe β : Type*) [NormedAddCommGroup β] [NormedSpace ℝ β]
     (Action : Universe → β)

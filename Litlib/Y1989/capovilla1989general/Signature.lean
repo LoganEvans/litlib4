@@ -11,9 +11,8 @@ open BigOperators
 
 namespace Litlib.Y1989.capovilla1989general
 
-Litlib.reference CDJIntegrand
+Litlib.paper "capovilla1989general"
   type "article"
-  bibtex "capovilla1989general"
   title "General relativity without the metric"
   authors ["Capovilla, Riccardo", "Jacobson, Ted", "Dell, John"]
   journal "Physical Review Letters"
@@ -23,6 +22,11 @@ Litlib.reference CDJIntegrand
   year "1989"
   publisher "APS"
   doi "10.1103/PhysRevLett.63.2325"
+
+Litlib.equation "capovilla1989general"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class CDJIntegrand 
     (SpacetimePoint : Type*)
     (F : SpacetimePoint → Fin 4 → Fin 4 → Matrix (Fin 3) (Fin 3) ℂ)
@@ -38,18 +42,10 @@ class CDJIntegrand
     ∀ x, Integrand x = η x * ∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4,
       epsilon4 μ ν ρ σ * Matrix.trace (F x μ ν * F x ρ σ)
 
-Litlib.reference CDJImpliesRicciFlat
-  type "article"
-  bibtex "capovilla1989general"
-  title "General relativity without the metric"
-  authors ["Capovilla, Riccardo", "Jacobson, Ted", "Dell, John"]
-  journal "Physical Review Letters"
-  volume "63"
-  issue "21"
-  pages "2325"
-  year "1989"
-  publisher "APS"
-  doi "10.1103/PhysRevLett.63.2325"
+Litlib.equation "capovilla1989general"
+  eq "Unknown"
+  page "Unknown"
+  kind "Unknown"
 class CDJImpliesRicciFlat
     (SpacetimePoint : Type*)
     (urbantkeMetric : (SpacetimePoint → Fin 4 → Fin 4 → Matrix (Fin 3) (Fin 3) ℂ) → (SpacetimePoint → Fin 4 → Fin 4 → ℝ))

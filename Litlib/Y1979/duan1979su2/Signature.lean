@@ -6,9 +6,8 @@ import Mathlib.Algebra.Group.Defs
 
 namespace Litlib.Y1979.duan1979su2
 
-Litlib.reference GaugeDecomposition
+Litlib.paper "duan1979su2"
   type "incollection"
-  bibtex "duan1979su2"
   title "SU(2) gauge theory and electrodynamics with N magnetic monopoles"
   authors ["Duan, Yi-Shi", "Ge, Mo-Lin"]
   booktitle "Memorial Volume for Yi-Shi Duan"
@@ -16,6 +15,11 @@ Litlib.reference GaugeDecomposition
   year "2018"
   publisher "World Scientific"
   doi "10.1142/9789813237278_0001"
+
+Litlib.equation "duan1979su2"
+  eq "1.13"
+  page "Unknown"
+  kind "Unknown"
 class GaugeDecomposition where
   /-- Equation (1.13): The decomposition of the SU(2) gauge potential W 
       into a parallel Abelian part A and an orthogonal topological part b. -/
@@ -35,16 +39,10 @@ class GaugeDecomposition where
     (hW : ∀ μ, W μ = A μ • n + b μ) :
     ∀ μ, dot n (b μ) = 0
 
-Litlib.reference ElectromagneticTensor
-  type "incollection"
-  bibtex "duan1979su2"
-  title "SU(2) gauge theory and electrodynamics with N magnetic monopoles"
-  authors ["Duan, Yi-Shi", "Ge, Mo-Lin"]
-  booktitle "Memorial Volume for Yi-Shi Duan"
-  pages "1--15"
-  year "2018"
-  publisher "World Scientific"
-  doi "10.1142/9789813237278_0001"
+Litlib.equation "duan1979su2"
+  eq "1.33"
+  page "Unknown"
+  kind "Unknown"
 class ElectromagneticTensor where
   /-- Equation (1.33): The U(1) electromagnetic field strength tensor F_μν 
       emerging from the SU(2) field strength G_μν projected along n. -/
