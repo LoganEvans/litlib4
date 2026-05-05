@@ -143,13 +143,6 @@ def elabLitlibPaper : CommandElab := fun stx => do
   -- Persist the metadata using the string ID as a Name key
   modifyEnv fun env => litlibPaperExt.insert env (Name.mkSimple paperIdStr) data
 
-/-- Recursively hunts an AST to find the first Name Identifier. -/
-partial def findFirstIdent (s : Syntax) : Option Name :=
-  if s.isIdent then
-    some s.getId
-  else
-    s.getArgs.findSome? findFirstIdent
-
 /-- Specifically looks for the declId node which contains the actual declaration name. -/
 partial def findDeclId (s : Syntax) : Option Name :=
   if s.getKind == ``Lean.Parser.Command.declId then
@@ -182,7 +175,7 @@ def elabLitlibEquation : CommandElab := fun stx => do
   elabCommand classCmd
 
   -- 2. Extract the name of the defined class/theorem
-  let targetNameOpt := findDeclId classCmd <|> findFirstIdent classCmd
+  let targetNameOpt := findDeclId classCmd
   if let some nameId := targetNameOpt then
     let currNs ← getCurrNamespace
     let resolvedName := if nameId.getRoot == nameId then currNs ++ nameId else nameId
@@ -200,7 +193,7 @@ def elabLitlibTheoremCmd : CommandElab := fun stx => do
   elabCommand cmd
 
   -- 2. Register it in the dashboard tracker
-  let targetNameOpt := findDeclId cmd <|> findFirstIdent cmd
+  let targetNameOpt := findDeclId cmd
   
   if let some thmName := targetNameOpt then
     let currNs ← getCurrNamespace

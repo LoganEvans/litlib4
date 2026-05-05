@@ -276,7 +276,7 @@ def extractSourceCode (env : Environment) (n : Name) : CoreM (Option String) := 
 
 def withPPOptions {α} (x : MetaM α) : MetaM α := do
   let opts := (← getOptions)
-    |>.setNat `maxHeartbeats 0 |>.setNat `maxRecDepth 1000000 |>.setNat `pp.maxDepth 1000000
+    |>.setNat `maxHeartbeats 500000 |>.setNat `maxRecDepth 10000 |>.setNat `pp.maxDepth 10000
     |>.setNat `pp.maxSteps 1000000 |>.setBool `pp.deepTerms true |>.setBool `pp.notation true
     |>.setBool `pp.proofs false |>.setBool `pp.universes false |>.setBool `pp.fullNames false
     |>.setBool `pp.explicit false |>.setBool `pp.analyze.typeAscription false |>.setBool `pp.match false
@@ -344,22 +344,87 @@ def ppDeclFallback (env : Environment) (n : Name) (prefixes : Array String) : Me
 
 def stripProofToSignature (s : String) : String := Id.run do
   let chars := s.toList.toArray
-  let mut level := 0; let mut letHaveCount := 0; let mut currentWord : Array Char := #[]; let mut out : Array Char := #[]
+  let mut level := 0
+  let mut letHaveCount := 0
+  let mut currentWord : Array Char := #[]
+  let mut out : Array Char := #[]
   let mut i := 0
+  let mut inString := false
+  let mut inLineComment := false
+  let mut blockCommentDepth := 0
+
   while i < chars.size do
     let c := chars[i]!
-    if c.isAlphanum || c == '_' then currentWord := currentWord.push c
+    let nextC := if i + 1 < chars.size then chars[i+1]! else ' '
+
+    -- Handle single line comments
+    if inLineComment then
+      if c == '\n' then inLineComment := false
+      out := out.push c
+      i := i + 1
+      continue
+
+    -- Handle block comments
+    if blockCommentDepth > 0 then
+      if c == '/' && nextC == '-' then
+        blockCommentDepth := blockCommentDepth + 1
+        out := out.push c; out := out.push nextC; i := i + 2
+        continue
+      else if c == '-' && nextC == '/' then
+        blockCommentDepth := blockCommentDepth - 1
+        out := out.push c; out := out.push nextC; i := i + 2
+        continue
+      out := out.push c
+      i := i + 1
+      continue
+
+    -- Handle strings
+    if inString then
+      if c == '"' && (i == 0 || chars[i-1]! != '\\') then
+        inString := false
+      out := out.push c
+      i := i + 1
+      continue
+
+    -- Entering contexts
+    if c == '"' then
+      inString := true
+      out := out.push c
+      i := i + 1
+      continue
+    if c == '-' && nextC == '-' then
+      inLineComment := true
+      out := out.push c; out := out.push nextC; i := i + 2
+      continue
+    if c == '/' && nextC == '-' then
+      blockCommentDepth := 1
+      out := out.push c; out := out.push nextC; i := i + 2
+      continue
+
+    -- Accumulate identifiers to check for keywords (only tracked at root level)
+    if c.isAlphanum || c == '_' then
+      currentWord := currentWord.push c
     else
       if level == 0 then
         let w := String.ofList currentWord.toList
         if w == "let" || w == "have" || w == "obtain" then letHaveCount := letHaveCount + 1
       currentWord := #[]
+
+    -- Balance brackets
     if c == '(' || c == '[' || c == '{' || c == '⦃' then level := level + 1
     else if c == ')' || c == ']' || c == '}' || c == '⦄' then level := level - 1
-    if level == 0 && i + 1 < chars.size && chars[i]! == ':' && chars[i+1]! == '=' then
-      if letHaveCount > 0 then letHaveCount := letHaveCount - 1
-      else return String.ofList out.toList
-    out := out.push c; i := i + 1
+
+    -- Termination: If we hit := at level 0 and we've satisfied all pending let/have statements
+    if level == 0 && c == ':' && nextC == '=' then
+      if letHaveCount > 0 then
+        letHaveCount := letHaveCount - 1
+        -- Continue processing the source
+      else
+        return String.ofList out.toList
+
+    out := out.push c
+    i := i + 1
+
   return s
 
 def processDecl (env : Environment) (declName : Name) (prefixes : Array String) (isSorry : Bool) : CoreM String := do
