@@ -101,7 +101,7 @@ class Eq12
     (hLambdaNz : Λ ≠ 0)
     (hCdjConstraint : ∀ x, 
       (∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4,
-        epsilon4 μ ν ρ σ * Matrix.trace (F μ ν x * F ρ σ x)) = Λ) :
+        epsilon4 μ ν ρ σ • (F μ ν x * F ρ σ x)) = Λ • 1) :
     ∃ (c : ℂ), c ≠ 0 ∧ ∀ x, Matrix.det (urbantkeMetric (fun m n => F m n x)) = c
 
 end Litlib.Y2024.gielen2024unimodular
