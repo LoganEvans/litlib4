@@ -1,14 +1,11 @@
 -- FILENAME: Litlib/Y1982/uhlenbeck1982connections/Signature.lean
 
 import Litlib.Core
-import Litlib.Math.FermatStationary
 import Mathlib.Topology.Basic
 import Mathlib.Order.Monotone.Basic
 import Mathlib.Data.Real.Basic
 import Mathlib.Order.Filter.Basic
-import Mathlib.Analysis.Calculus.FDeriv.Basic
-import Mathlib.Analysis.Calculus.FDeriv.Add
-import Mathlib.Analysis.Calculus.FDeriv.Linear
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 open Filter Topology
 
@@ -17,7 +14,7 @@ namespace Litlib.Y1982.uhlenbeck1982connections
 Litlib.paper "uhlenbeck1982connections"
   type "article"
   title "Connections with Lp bounds on curvature"
-  authors ["Uhlenbeck, Karen K"]
+  authors ["Uhlenbeck, Karen K."]
   journal "Communications in Mathematical Physics"
   volume "83"
   issue "1"
@@ -27,77 +24,60 @@ Litlib.paper "uhlenbeck1982connections"
   doi "10.1007/BF01206014"
 
 Litlib.equation "uhlenbeck1982connections"
-  eq "Unknown"
-  page "Unknown"
-  kind "Unknown"
-class ExistsCoulombGauge 
-    (Connection GaugeTransform Form : Type*) [Zero Form]
-    (curvatureLn2Norm : Connection → ℝ)
+  eq "Theorem 2.1"
+  page "34"
+  kind "Theorem"
+class LocalCoulombGauge
+    (Connection GaugeTransform Form BoundaryForm : Type*) [Zero Form] [Zero BoundaryForm]
+    (curvatureLn2Integral curvatureLpHalfIntegral : Connection → ℝ)
+    (sobolevLn21Norm sobolevLp1Norm : Connection → ℝ)
     (applyGauge : GaugeTransform → Connection → Connection)
-    (dStar : Connection → Form) where
-  existsCoulombGauge :
-    ∃ (κ : ℝ), κ > 0 ∧
+    (dStar : Connection → Form)
+    (normalTrace : Connection → BoundaryForm)
+    (dimM : ℕ)
+    (p : ℝ) where
+  /--
+  Theorem 2.1: Local existence of Coulomb gauge.
+  Over a ball B^n, if the L^{n/2} integral of the curvature is sufficiently small,
+  the connection is gauge equivalent to one satisfying the Coulomb condition
+  d*A = 0 and the Neumann boundary condition x \cdot A = 0, with rigorous Sobolev bounds.
+  -/
+  theorem_2_1
+    (hDim : (dimM : ℝ) > p ∧ p > (dimM : ℝ) / 2) :
+    ∃ (κ : ℝ) (c : ℝ), κ > 0 ∧ c > 0 ∧
     ∀ (A : Connection),
-      curvatureLn2Norm A ≤ κ →
-      ∃ (g : GaugeTransform), dStar (applyGauge g A) = 0
+      curvatureLn2Integral A ≤ κ →
+      ∃ (g : GaugeTransform),
+        let Ag := applyGauge g A
+        dStar Ag = 0 ∧
+        normalTrace Ag = 0 ∧
+        sobolevLn21Norm Ag ≤ c * (curvatureLn2Integral A) ^ (2 / (dimM : ℝ)) ∧
+        sobolevLp1Norm Ag ≤ c * (curvatureLpHalfIntegral A) ^ (1 / p)
 
 Litlib.equation "uhlenbeck1982connections"
-  eq "Unknown"
-  page "Unknown"
-  kind "Unknown"
-class UhlenbeckCompactness 
-    (Connection GaugeTransform : Type*) [TopologicalSpace Connection]
-    (curvatureLpNorm : Connection → ℝ)
+  eq "Theorem 1.5, 3.6"
+  page "34"
+  kind "Theorem"
+class WeakCompactness
+    (Connection GaugeTransform : Type*)
+    [TopologicalSpace Connection]
+    (curvatureLpIntegral : Connection → ℝ)
     (applyGauge : GaugeTransform → Connection → Connection)
     (dimM : ℕ)
     (p : ℝ) where
-  uhlenbeckCompactness
+  /--
+  Theorem 1.5 (and 3.6): Global weak compactness.
+  If 2p > dim M, a sequence of connections with bounded L^p curvature integrals
+  has a subsequence that converges weakly modulo gauge transformations,
+  and the limit obeys the same curvature bound.
+  -/
+  theorem_1_5
     (hDim : 2 * p > (dimM : ℝ))
-    (hp : 1 ≤ p)
     (D : ℕ → Connection) (B : ℝ)
-    (hBound : ∀ i, curvatureLpNorm (D i) ≤ B) :
-    ∃ (aInfty : Connection) (subseq : ℕ → ℕ) (s : ℕ → GaugeTransform),
+    (hBound : ∀ i, curvatureLpIntegral (D i) ≤ B) :
+    ∃ (DInfty : Connection) (subseq : ℕ → ℕ) (g : ℕ → GaugeTransform),
       StrictMono subseq ∧
-      Tendsto (fun i => applyGauge (s i) (D (subseq i))) atTop (𝓝 aInfty)
-
-Litlib.equation "uhlenbeck1982connections"
-  eq "Unknown"
-  page "Unknown"
-  kind "Unknown"
-class ConnectionTopology 
-    (Connection GaugeTransform : Type*)
-    (applyGauge : GaugeTransform → Connection → Connection) where
-  existsGaugeMetric :
-    ∃ (dist : Connection → Connection → ℝ),
-      (∀ a b, dist a b ≥ 0) ∧
-      (∀ a b, dist a b = 0 ↔ ∃ g, applyGauge g a = b) ∧
-      (∀ a b, dist a b = dist b a) ∧
-      (∀ a b c, dist a c ≤ dist a b + dist b c)
-
-Litlib.equation "uhlenbeck1982connections"
-  eq "Unknown"
-  page "Unknown"
-  kind "Unknown"
-class YangMillsActionDifferentiable 
-    (Connection : Type*)
-    (isValidVar : (ℝ → Connection) → Prop)
-    (Action : Connection → ℝ) where
-  is1DDifferentiable :
-    ∀ (A : Connection) (var : ℝ → Connection),
-      isValidVar var → var 0 = A →
-      DifferentiableAt ℝ (fun t => Action (var t)) 0
-
-Litlib.equation "uhlenbeck1982connections"
-  eq "Unknown"
-  page "Unknown"
-  kind "Unknown"
-class YangMillsFunctionalDerivative 
-    (Connection Form : Type*) [Zero Form]
-    (isValidVar : (ℝ → Connection) → Prop)
-    (Action : Connection → ℝ)
-    (F : Connection → Form) (dStar : Form → Form) where
-  stationaryImpliesEOM :
-    ∀ (A : Connection),
-      Litlib.Math.CalculusOfVariations.IsStationaryPoint Action A isValidVar → dStar (F A) = 0
+      Tendsto (fun i => applyGauge (g i) (D (subseq i))) atTop (𝓝 DInfty) ∧
+      curvatureLpIntegral DInfty ≤ B
 
 end Litlib.Y1982.uhlenbeck1982connections
