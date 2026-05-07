@@ -43,26 +43,32 @@ class Eq2_21 where
     deriv (deriv V) 0 = 2 * c₂
 
 Litlib.equation "nielsen1973vortex"
-  eq "Unknown"
-  page "Unknown"
-  kind "Unknown"
-class NielsenOlesenVortex where
+  eq "2.12, 2.13"
+  page "48"
+  kind "Equations"
+class Eq2_12_13 where
   /--
-  Capstone Theorem: Nielsen-Olesen Vortex.
+  Equations (2.12) and (2.13) (page 48): The Nielsen-Olesen Vortex.
   The classical Euler-Lagrange equations for the Abelian Higgs model 
   admit a regular vortex solution satisfying the topological boundary conditions.
   -/
   existsVortexSolution
-    (c₂ c₄ ϕ₀ : ℝ)
-    (hC₂ : 0 < c₂) (hC₄ : 0 < c₄)
-    (hΦ₀ : 0 < ϕ₀ ∧ ϕ₀^2 = c₂ / (2 * c₄)) :
-    ∃ (f a : ℝ → ℝ),
+    (c₂ c₄ e ϕ₀ : ℝ)
+    (hc₂ : 0 < c₂) (hc₄ : 0 < c₄) (he : 0 < e)
+    (hϕ₀ : ϕ₀^2 = c₂ / (2 * c₄)) :
+    ∃ (f A : ℝ → ℝ),
+      (ContinuousOn f (Set.Ici 0)) ∧ 
+      (ContinuousOn A (Set.Ici 0)) ∧
+      (DifferentiableOn ℝ f (Set.Ioi 0)) ∧
+      (DifferentiableOn ℝ A (Set.Ioi 0)) ∧
+      (DifferentiableOn ℝ (fun x => x * deriv f x) (Set.Ioi 0)) ∧
+      (DifferentiableOn ℝ (fun x => (1 / x) * deriv (fun y => y * A y) x) (Set.Ioi 0)) ∧
       (Tendsto f atTop (nhds ϕ₀)) ∧ 
-      (Tendsto a atTop (nhds 1)) ∧ 
-      (f 0 = 0) ∧ (a 0 = 0) ∧
+      (Tendsto (fun r => e * r * A r) atTop (nhds 1)) ∧ 
+      (f 0 = 0) ∧ (A 0 = 0) ∧
       (∀ r > 0, 
-        deriv (deriv f) r + (1 / r) * deriv f r - ((1 - a r)^2 / r^2) * f r + c₂ * f r - 2 * c₄ * (f r)^3 = 0) ∧
+        - (1 / r) * deriv (fun x => x * deriv f x) r + ((1 / r - e * A r)^2 - 2 * c₂ + 4 * c₄ * (f r)^2) * f r = 0) ∧
       (∀ r > 0, 
-        deriv (deriv a) r - (1 / r) * deriv a r + (f r)^2 * (1 - a r) = 0)
+        - deriv (fun x => (1 / x) * deriv (fun y => y * A y) x) r + (f r)^2 * (A r * e^2 - e / r) = 0)
 
 end Litlib.Y1973.nielsen1973vortex
