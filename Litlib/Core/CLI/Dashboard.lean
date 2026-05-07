@@ -7,126 +7,69 @@ open Lean
 
 namespace Litlib.Core.CLI
 
-structure RefGroup where
-  key : String
-  data : LitlibData
-  signatures : Array Name
-  deriving Inhabited
-
-def getAuthor (d : LitlibData) : String :=
-  if d.authors.isEmpty then "Unknown" else d.authors.head!
-
-def sortLitRefs (refs : Array LitRefData) : Array LitRefData :=
-  refs.qsort (fun a b =>
-    let authA := getAuthor a.data
-    let authB := getAuthor b.data
-    if authA != authB then authA < authB
-    else if a.data.year != b.data.year then a.data.year < b.data.year
-    else if a.data.title != b.data.title then a.data.title < b.data.title
-    else a.data.bibtex < b.data.bibtex
-  )
-
-def runDashboard (rootModule : Name) (globalData : GlobalData) (ctx : CliContext) : IO UInt32 := do
+def runDashboard (rootModule : Name) (globalData : GlobalData) (_ctx : CliContext) : IO UInt32 := do
   IO.println "\n===================================================================="
   IO.println s!"                        {rootModule.toString.toUpper} DASHBOARD"
   IO.println "===================================================================="
 
-  if ctx.targetTheorems then
-    if globalData.theorems.isEmpty then
-      IO.println "\n  [No proven theorems matching filter found.]\n"
-    else
-      let mut fullyProved := 0
-      let mut incomplete := 0
+  if globalData.papers.isEmpty && globalData.theorems.isEmpty then
+    IO.println "\n  [No tracked papers or theorems found matching the filter.]\n"
+    return 0
 
-      -- Sort theorems by Author -> Year -> Title of their primary literature reference
-      let sortedTheorems := globalData.theorems.qsort (fun a b =>
-        let authA := if a.litRefs.isEmpty then "" else getAuthor a.litRefs[0]!.data
-        let authB := if b.litRefs.isEmpty then "" else getAuthor b.litRefs[0]!.data
-        let yearA := if a.litRefs.isEmpty then "" else a.litRefs[0]!.data.year
-        let yearB := if b.litRefs.isEmpty then "" else b.litRefs[0]!.data.year
-        let titleA := if a.litRefs.isEmpty then "" else a.litRefs[0]!.data.title
-        let titleB := if b.litRefs.isEmpty then "" else b.litRefs[0]!.data.title
-        
-        if authA != authB then authA < authB
-        else if yearA != yearB then yearA < yearB
-        else if titleA != titleB then titleA < titleB
-        else a.name.toString < b.name.toString
-      )
+  if !globalData.papers.isEmpty then
+    IO.println "\n[LITERATURE AND EQUATIONS]"
+    for paper in globalData.papers do
+      let authDisplay := if paper.data.authors.isEmpty then "Unknown" else paper.data.authors.head!
+      IO.println s!"\n📖 {paper.paperId.toString} - {paper.data.title}"
+      IO.println s!"   ├─ Authors: {authDisplay} et al. ({paper.data.year})"
+      if !paper.data.doi.isEmpty then 
+        IO.println s!"   ├─ DOI: {paper.data.doi}"
 
-      for info in sortedTheorems do
-        if info.hasSorry then incomplete := incomplete + 1 else fullyProved := fullyProved + 1
-        let statusIcon := if info.hasSorry then "[⚠ SORRY ]" else "[✔ PROVED]"
-        
-        IO.println s!"\n{statusIcon} {info.desc}"
-        IO.println s!"  ↳ Lean: {info.name}"
-        
-        if !info.litRefs.isEmpty then
-          IO.println "  ↳ Literature Dependencies:"
-          let sortedDeps := sortLitRefs info.litRefs
-          for refInfo in sortedDeps do
-            let authDisplay := getAuthor refInfo.data
-            IO.println s!"    • {authDisplay} ({refInfo.data.year}) - {refInfo.name.toString}"
+      if paper.equations.isEmpty then
+        IO.println s!"   └─ Equations: [None tracked]"
+      else
+        IO.println s!"   └─ Equations:"
+        let sortedEqs := paper.equations.qsort fun a b => a.data.eqNum < b.data.eqNum
+        let maxEqIdx := sortedEqs.size - 1
+        let mut eqIdx := 0
+        for eq in sortedEqs do
+          let isProved := !eq.proofs.isEmpty && eq.proofs.any (fun p => !p.hasSorry)
+          let icon := if isProved then "✔" else "⚠"
+          let branch := if eqIdx == maxEqIdx then "└─" else "├─"
+          let eqName := if eq.data.eqNum.isEmpty then "Unknown" else eq.data.eqNum
+          
+          IO.println s!"      {branch} {icon} Equation {eqName} ({eq.declName})"
+          eqIdx := eqIdx + 1
 
-      IO.println "\n--------------------------------------------------------------------"
-      IO.println s!"Total Matching Theorems: {globalData.theorems.size}  |  Fully Proved: {fullyProved}  |  Incomplete: {incomplete}\n"
+  if !globalData.theorems.isEmpty then
+    IO.println "\n--------------------------------------------------------------------"
+    IO.println "[STANDALONE THEOREMS]"
+    let mut fullyProved := 0
+    let mut incomplete := 0
+    
+    let sortedTheorems := globalData.theorems.qsort fun a b => a.declName.toString < b.declName.toString
+    
+    for thm in sortedTheorems do
+      if thm.hasSorry then incomplete := incomplete + 1 else fullyProved := fullyProved + 1
+      let icon := if thm.hasSorry then "⚠" else "✔"
+      
+      IO.println s!"\n {icon} {thm.desc} ({thm.declName})"
+      
+      if !thm.deps.isEmpty then
+        let sortedDeps := thm.deps.qsort fun a b => a.paperId < b.paperId
+        let maxDepIdx := sortedDeps.size - 1
+        let mut depIdx := 0
+        for dep in sortedDeps do
+          let branch := if depIdx == maxDepIdx then "└─" else "├─"
+          let eqName := if dep.eqNum.isEmpty then "Unknown" else dep.eqNum
+          let depIcon := if dep.isProved then "✔" else "⚠"
+          let formalizedStr := if dep.isProved then "Formalized" else "Unformalized"
+          IO.println s!"    {branch} Depends on: {dep.paperId} Eq {eqName} ({depIcon} {formalizedStr})"
+          depIdx := depIdx + 1
 
-  if ctx.targetReferences then
-    if globalData.litRefs.isEmpty then
-      IO.println "\n  [No literature references matching filter found.]\n"
-    else
-      -- Group references by their BibTeX key (or namespace if BibTeX is missing)
-      let mut groups : Array RefGroup := #[]
-      for ref in globalData.litRefs do
-        let key := if ref.data.bibtex.isEmpty then 
-                     match ref.name with
-                     | .str p _ => p.toString
-                     | _ => ref.name.toString
-                   else ref.data.bibtex
-                   
-        if let some idx := groups.findIdx? (fun g => g.key == key) then
-          let g := groups[idx]!
-          groups := groups.set! idx { g with signatures := g.signatures.push ref.name }
-        else
-          groups := groups.push { key := key, data := ref.data, signatures := #[ref.name] }
+    IO.println s!"\nTotal Standalone Theorems: {globalData.theorems.size}  |  Fully Proved: {fullyProved}  |  Incomplete: {incomplete}"
 
-      -- Sort the groupings by Author -> Year -> Title
-      let sortedGroups := groups.qsort (fun a b =>
-        let authA := getAuthor a.data
-        let authB := getAuthor b.data
-        if authA != authB then authA < authB
-        else if a.data.year != b.data.year then a.data.year < b.data.year
-        else if a.data.title != b.data.title then a.data.title < b.data.title
-        else a.key < b.key
-      )
-
-      IO.println s!"\n[LITERATURE SOURCES ({sortedGroups.size} sources, {globalData.litRefs.size} signatures)]"
-      for g in sortedGroups do
-        let authDisplay := getAuthor g.data
-        let titleDisplay := if g.data.title.isEmpty then "<No Title provided>" else g.data.title
-        
-        -- Extract the base parent namespace for display (e.g. Litlib.Y1989.capovilla1989general)
-        let parentNameStr := match g.signatures[0]! with
-          | .str p _ => p.toString
-          | n => n.toString
-
-        IO.println s!"\n  📖 {parentNameStr}"
-        IO.println s!"     Title:   {titleDisplay}"
-        IO.println s!"     Authors: {authDisplay} et al."
-        IO.println s!"     Year:    {g.data.year}"
-        if !g.data.bibtex.isEmpty then IO.println s!"     BibTeX:  {g.data.bibtex}"
-        if !g.data.doi.isEmpty then IO.println s!"     DOI:     {g.data.doi}"
-        
-        IO.println s!"     Signatures:"
-        -- Sort the sub-signatures alphabetically for neatness
-        let sortedSigs := g.signatures.qsort (fun x y => x.toString < y.toString)
-        for sig in sortedSigs do
-          -- Only print the final class name
-          let sigNameStr := match sig with
-            | .str _ s => s
-            | _ => sig.toString
-          IO.println s!"       ⊢ {sigNameStr}"
-      IO.println ""
-
+  IO.println "\n====================================================================\n"
   return 0
 
 end Litlib.Core.CLI

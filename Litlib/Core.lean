@@ -16,6 +16,7 @@ custom attributes, and syntax macros used by `litlib4` to track scientific liter
 -- ==========================================
 
 structure LitlibData where
+  id : String := ""
   entryType : String := "article"
   bibtex : String := ""
   title : String := ""
@@ -59,31 +60,20 @@ initialize litlibTheoremExt : MapDeclarationExtension String ←
 -- 3. Syntax Definitions
 -- ==========================================
 
--- Define specific syntax rules for the values to ensure they parse as pure strings,
--- bypassing the Lean `term` wrapper which hides the string tokens from `isStrLit?`.
 syntax litlibValStr := str
 syntax litlibValArray := "[" str,* "]"
-
--- The parser consumes the field name (ident), then cleanly branches between a string or array
 syntax litlibField := ident (litlibValStr <|> litlibValArray)
 
-/-- 
-Declares a literature source with standard BibTeX fields.
--/
 syntax (name := litlibPaper) 
   "Litlib.paper" str
   litlibField*
   : command
 
-/-- 
-Decorates a signature class with equation metadata linked to a paper.
--/
 syntax (name := litlibEquation) 
   "Litlib.equation" str
   litlibField*
   command : command
 
--- Beautiful block syntax for downstream physics theorems
 syntax (name := litlibTheoremCmd) 
   "Litlib.theorem"
   "description" str
@@ -93,7 +83,6 @@ syntax (name := litlibTheoremCmd)
 -- 4. The Elaborators
 -- ==========================================
 
-/-- Recursively extracts all string literals embedded inside a Syntax node. -/
 partial def extractStrings (stx : Syntax) : List String := Id.run do
   if let some s := stx.isStrLit? then
     return [s]
@@ -109,13 +98,12 @@ def elabLitlibPaper : CommandElab := fun stx => do
   let paperIdStr := stx[1].isStrLit?.getD ""
   let fields := stx[2].getArgs
 
-  let mut data : LitlibData := { bibtex := paperIdStr }
+  let mut data : LitlibData := { id := paperIdStr, bibtex := paperIdStr }
 
   for field in fields do
     let key := field[0].getId.toString
     let valStx := field[1]
     
-    -- Extract the first string for singular fields, or all strings for list fields
     let strs := extractStrings valStx
     let firstStr := if strs.isEmpty then "" else strs.head!
     
@@ -140,10 +128,17 @@ def elabLitlibPaper : CommandElab := fun stx => do
     | "doi" => data := { data with doi := firstStr }
     | _ => pure ()
 
-  -- Persist the metadata using the string ID as a Name key
-  modifyEnv fun env => litlibPaperExt.insert env (Name.mkSimple paperIdStr) data
+  -- 1. Create a dummy declaration so the Extension has a valid environment key to bind to
+  let metaName := Name.mkSimple (paperIdStr ++ "_paper_meta")
+  let idIdent := mkIdent metaName
+  let cmd ← `(def $idIdent : Unit := ())
+  elabCommand cmd
 
-/-- Specifically looks for the declId node which contains the actual declaration name. -/
+  -- 2. Bind the data to the generated declaration
+  let currNs ← getCurrNamespace
+  let resolvedName := if metaName.getRoot == metaName then currNs ++ metaName else metaName
+  modifyEnv fun env => litlibPaperExt.insert env resolvedName data
+
 partial def findDeclId (s : Syntax) : Option Name :=
   if s.getKind == ``Lean.Parser.Command.declId then
     some s[0].getId
@@ -171,10 +166,8 @@ def elabLitlibEquation : CommandElab := fun stx => do
     | "kind" => data := { data with kind := firstStr }
     | _ => pure ()
 
-  -- 1. Natively execute the underlying `class ... where` command
   elabCommand classCmd
 
-  -- 2. Extract the name of the defined class/theorem
   let targetNameOpt := findDeclId classCmd
   if let some nameId := targetNameOpt then
     let currNs ← getCurrNamespace
@@ -189,10 +182,8 @@ def elabLitlibTheoremCmd : CommandElab := fun stx => do
   let desc := args[2]!.isStrLit?.getD ""
   let cmd := args[3]!
 
-  -- 1. Execute the downstream command natively
   elabCommand cmd
 
-  -- 2. Register it in the dashboard tracker
   let targetNameOpt := findDeclId cmd
   
   if let some thmName := targetNameOpt then
