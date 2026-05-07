@@ -46,8 +46,6 @@ class Eq1_20 where
     (defδF : ∀ μ ν x, δF μ ν x = deriv μ (δA ν) x - deriv ν (δA μ) x + ⁅δA μ x, A ν x⁆ + ⁅A μ x, δA ν x⁆) :
     ∀ μ ν x, δF μ ν x = ⁅F μ ν x, ε x⁆
 
-abbrev GaugeCovariance.{u, v} := Eq1_20.{u, v}
-
 Litlib.equation "utiyama1956invariant"
   eq "Unknown"
   page "Unknown"
@@ -85,8 +83,6 @@ class AppendixI_Expansion where
       ∀ F, (∀ μ ν, isLieAlgebra (F μ ν)) → 
       L F = ∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4, T μ ν ρ σ * Trace (F μ ν * F ρ σ)
 
-abbrev UtiyamaExpansion.{u} := AppendixI_Expansion.{u}
-
 Litlib.equation "utiyama1956invariant"
   eq "Unknown"
   page "Unknown"
@@ -103,16 +99,16 @@ class AppendixI_LorentzTensor where
     (isLieAlgebra : M → Prop)
     (L : ((Fin 4 → Fin 4 → M) → ℂ))
     (T : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    (eta : Fin 4 → Fin 4 → ℂ)
+    (eta : Matrix (Fin 4) (Fin 4) ℂ)
     (hL_eq : ∀ F, (∀ μ ν, isLieAlgebra (F μ ν)) → L F = ∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4, T μ ν ρ σ * Trace (F μ ν * F ρ σ))
-    (hLLorentz : ∀ Λ : Matrix (Fin 4) (Fin 4) ℂ, Λ * Matrix.of eta * Matrix.transpose Λ = Matrix.of eta → Matrix.det Λ = 1 → 
+    (hLLorentz : ∀ Λ : Matrix (Fin 4) (Fin 4) ℂ, Λ * eta * Matrix.transpose Λ = eta → Matrix.det Λ = 1 → 
       ∀ F, (∀ μ ν, isLieAlgebra (F μ ν)) → 
       (∀ μ ν, isLieAlgebra (∑ α : Fin 4, ∑ β : Fin 4, (Λ μ α * Λ ν β) • F α β)) → 
       L (fun μ ν => ∑ α : Fin 4, ∑ β : Fin 4, (Λ μ α * Λ ν β) • F α β) = L F) :
     ∃ T_inv : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ,
       (∀ F, (∀ μ ν, isLieAlgebra (F μ ν)) → (∀ μ ν, F μ ν = -F ν μ) → 
         L F = ∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4, T_inv μ ν ρ σ * Trace (F μ ν * F ρ σ)) ∧
-      (∀ Λ : Matrix (Fin 4) (Fin 4) ℂ, Λ * Matrix.of eta * Matrix.transpose Λ = Matrix.of eta → Matrix.det Λ = 1 → 
+      (∀ Λ : Matrix (Fin 4) (Fin 4) ℂ, Λ * eta * Matrix.transpose Λ = eta → Matrix.det Λ = 1 → 
         ∀ μ ν ρ σ, ∑ α : Fin 4, ∑ β : Fin 4, ∑ γ : Fin 4, ∑ δ : Fin 4, Λ μ α * Λ ν β * Λ ρ γ * Λ σ δ * T_inv α β γ δ = T_inv μ ν ρ σ)
 
 Litlib.equation "utiyama1956invariant"
@@ -140,7 +136,5 @@ class AppendixI_BilinearForm where
       isLieAlgebra ((U : M) * y * (↑U⁻¹ : M)) → 
       B ((U : M) * x * (↑U⁻¹ : M)) ((U : M) * y * (↑U⁻¹ : M)) = B x y) →
     ∃ (k : ℂ), ∀ x y, isLieAlgebra x → isLieAlgebra y → B x y = k * Trace (x * y)
-
-abbrev AppendixI_InvariantBilinearForm.{u} := AppendixI_BilinearForm.{u}
 
 end Litlib.Y1956.utiyama1956invariant
