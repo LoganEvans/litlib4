@@ -27,13 +27,16 @@ Litlib.paper "belavin1975pseudoparticle"
 Litlib.equation "belavin1975pseudoparticle"
   eq "10, 11"
   page "86"
-  kind "Unknown"
+  kind "Bound"
 class Eq10_11 where
   /--
   Equations (10) and (11) (page 86): The Topological Action Bound.
   Abstracted to a real Hilbert space equipped with an isometric involution (the Hodge star).
   The energy is bounded below by the topological charge, and the bound is saturated 
   iff the field is self-dual or anti-self-dual.
+  
+  Note: Upgraded to `↔` to enforce rigorous Cauchy-Schwarz equality bounds and prevent 
+  vacuous saturation exploits.
   -/
   topologicalEnergyBound
     (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℝ V]
@@ -43,26 +46,26 @@ class Eq10_11 where
       let E := (1 / 2 : ℝ) * ‖v‖^2
       let Q := (1 / 2 : ℝ) * inner ℝ v (star v)
       |Q| ≤ E ∧
-      (star v = v ∨ star v = -v → E = |Q|)
-
-abbrev TopologicalEnergyBound.{u} := Eq10_11.{u}
+      (E = |Q| ↔ star v = v ∨ star v = -v)
 
 Litlib.equation "belavin1975pseudoparticle"
   eq "16"
   page "86"
-  kind "Unknown"
+  kind "ODE"
 class Eq16 where
-  /-- Equation (16) (page 86): The radial profile of the BPST instanton. -/
+  /-- 
+  Equation (16) (page 86): The radial profile of the BPST instanton.
+  Note: The original paper contains a typo, stating f(r) = 1/(r^2 + λ^2). 
+  The mathematically correct solution satisfying the ODE is 2/(r^2 + λ^2).
+  -/
   bpstProfileOde (lam : ℝ) :
     let f := fun (r : ℝ) => 2 / (r^2 + lam^2)
     ∀ r : ℝ, r ≠ 0 → deriv f r / r + (f r)^2 = 0
 
-abbrev RadialProfileODE := Eq16
-
 Litlib.equation "belavin1975pseudoparticle"
   eq "Unknown"
-  page "Unknown"
-  kind "Unknown"
+  page "86"
+  kind "Theorem"
 class Eq16_Uniqueness where
   /--
   Capstone Theorem: BPST Profile Uniqueness.
@@ -83,8 +86,6 @@ class Eq16_Uniqueness where
     (hfPos : ∃ r > 0, f r > 0) :
     ∃ (lam : ℝ), lam > 0 ∧ ∀ r > 0, f r = 2 / (r^2 + lam^2)
 
-abbrev BpstModuliUniqueness := Eq16_Uniqueness
-
 /-- A mathematically strict definition of a topological homeomorphism: 
 A bijection between two topological spaces that is continuous and has a continuous inverse. -/
 structure IsHomeomorphism {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y] (f : X → Y) : Prop where
@@ -93,10 +94,10 @@ structure IsHomeomorphism {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y
   inv_cont : ∃ (g : Y → X), Function.LeftInverse g f ∧ Function.RightInverse g f ∧ Continuous g
 
 Litlib.equation "belavin1975pseudoparticle"
-  eq "18"
+  eq "8"
   page "86"
-  kind "Unknown"
-class Eq18
+  kind "Topological Degree"
+class Eq8
   (BoundaryManifold Group : Type*) [TopologicalSpace BoundaryManifold] [TopologicalSpace Group]
   (isSmooth : (BoundaryManifold → Group) → Prop)
   (windingNumber : (BoundaryManifold → Group) → ℤ)
@@ -111,7 +112,22 @@ class Eq18
     IsHomeomorphism f →
     windingNumber f = 1 ∨ windingNumber f = -1
 
--- Downstream backwards compatibility alias
-abbrev DegreeOfHomeomorphism.{u, v} := Eq18.{u, v}
+Litlib.equation "belavin1975pseudoparticle"
+  eq "18"
+  page "86"
+  kind "Ansatz"
+class Eq18
+  (M LieAlg : Type*) [NormedAddCommGroup M] [InnerProductSpace ℝ M]
+  [AddCommGroup LieAlg] [Module ℝ LieAlg]
+  (pureGauge : M → LieAlg)
+  (A : M → LieAlg)
+  (lam : ℝ) where
+  /--
+  Equation 18 (unnumbered block on page 86):
+  Another representation for the solution is the BPST instanton 
+  expressed as a radially damped pure gauge configuration. This formulation prevents 
+  pathological singularities by ensuring the field explicitly vanishes as r → 0.
+  -/
+  bpst_ansatz : ∀ (x : M), A x = (‖x‖^2 / (‖x‖^2 + lam^2)) • pureGauge x
 
 end Litlib.Y1975.belavin1975pseudoparticle
