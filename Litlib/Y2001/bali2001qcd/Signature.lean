@@ -3,6 +3,9 @@
 import Litlib.Core
 import Mathlib.Data.Real.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Topology.Basic
+
+open Filter
 
 namespace Litlib.Y2001.bali2001qcd
 
@@ -20,9 +23,9 @@ Litlib.paper "bali2001qcd"
 
 Litlib.equation "bali2001qcd"
   eq "2.3, 2.4"
-  page "Unknown"
-  kind "Unknown"
-class Eq2_3_and_2_4 where
+  page "9"
+  kind "equation"
+class StringMassAndAngMom where
   stringMassAndAngMom (d σ m J : ℝ) 
     (hD : d > 0) (hSigma : σ > 0)
     (hM : m = Real.pi * d * σ) 
@@ -31,9 +34,9 @@ class Eq2_3_and_2_4 where
 
 Litlib.equation "bali2001qcd"
   eq "4.40"
-  page "Unknown"
-  kind "Unknown"
-class Eq4_40 where
+  page "36"
+  kind "equation"
+class SingletOctetPotentials where
   singletOctetPotentials (N nA : ℝ) (g q : ℝ) (hN : N > 1) (hNa : nA = N^2 - 1) (hQ : q ≠ 0) :
     let cF := nA / (2 * N)
     let vS := - cF * g^2 * (1 / q^2)
@@ -42,9 +45,9 @@ class Eq4_40 where
 
 Litlib.equation "bali2001qcd"
   eq "5.11"
-  page "Unknown"
-  kind "Unknown"
-class Eq5_11 where
+  page "64"
+  kind "equation"
+class AdjointSelfEnergy where
   adjointSelfEnergy (N cA cF vSelf : ℝ) 
     (hN : N > 1)
     (hCa : cA = N) 
@@ -53,9 +56,9 @@ class Eq5_11 where
 
 Litlib.equation "bali2001qcd"
   eq "6.48-6.50"
-  page "Unknown"
-  kind "Unknown"
-class Eq6_48_to_6_50 where
+  page "91"
+  kind "equation"
+class GromesAndBbpRelations where
   gromesAndBbpRelations (e h σ vSelf cB cD : ℝ) :
     let v0 := fun (r : ℝ) => vSelf - e / r + σ * r
     let v1Prime := fun (r : ℝ) => - h / r^2 - σ
@@ -72,20 +75,24 @@ class Eq6_48_to_6_50 where
     (∀ r, r ≠ 0 → vC r + 2 * vE r = - (r / 2) * v0Prime r)
 
 Litlib.equation "bali2001qcd"
-  eq "Unknown"
-  page "Unknown"
-  kind "Unknown"
-class FluxTubeEnergyBounds 
+  eq "String Breaking"
+  page "45"
+  kind "phenomenology"
+class FluxTubeStringBreaking 
     (FluxTubeState : Type*)
     (spatialEnergy : FluxTubeState → ℝ)
     (intactFluxTube : ℝ → FluxTubeState)
     (snappedFluxTube : ℝ → FluxTubeState)
     (sigma M : ℝ) where
-  h_M_nonneg : M ≥ 0
-  intactEnergy (L : ℝ) (hL : L > 0) :
-    spatialEnergy (intactFluxTube L) = sigma * L
+  h_sigma_pos : sigma > 0
+  h_M_pos : M > 0
   
-  snappedEnergy (L : ℝ) (hL : L > 0) :
-    spatialEnergy (snappedFluxTube L) = 2 * M
+  intactEnergy : ∀ r > 0, spatialEnergy (intactFluxTube r) = sigma * r
+  snappedEnergy : ∀ r > 0, spatialEnergy (snappedFluxTube r) = 2 * M
+  
+  -- The physical ground state energy is the minimum of the available topological states.
+  -- The No-BS limit assertion requires this physical ground state to saturate at 2M as r → ∞.
+  ground_state_energy_limit : 
+    Tendsto (fun r => min (spatialEnergy (intactFluxTube r)) (spatialEnergy (snappedFluxTube r))) atTop (nhds (2 * M))
 
 end Litlib.Y2001.bali2001qcd
