@@ -99,6 +99,7 @@ Litlib.equation "belavin1975pseudoparticle"
   kind "Topological Degree"
 class Eq8
   (BoundaryManifold Group : Type*) [TopologicalSpace BoundaryManifold] [TopologicalSpace Group]
+  [Nonempty BoundaryManifold] [Nonempty Group]
   (isSmooth : (BoundaryManifold → Group) → Prop)
   (windingNumber : (BoundaryManifold → Group) → ℤ)
   (cartanMaurerIntegral : (BoundaryManifold → Group) → ℝ)
