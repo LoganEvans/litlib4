@@ -99,7 +99,7 @@ Litlib.equation "gielen2024unimodular"
   kind "equation"
 class PureConnectionEOM 
     (SpacetimePoint : Type*)
-    (covariantDeriv : (SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ) → (SpacetimePoint → ℂ) → SpacetimePoint → ℂ) where
+    (covariantDeriv : (SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ) → (SpacetimePoint → ℂ) → SpacetimePoint → Fin 4 → ℂ) where
   unimodular_eom
     (X_tilde : SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ)
     (X_tilde_inv_sqrt : SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ)
@@ -109,10 +109,10 @@ class PureConnectionEOM
     (hInvSqrt : ∀ x, X_tilde_inv_sqrt x * X_tilde_inv_sqrt x * X_tilde x = 1) : Prop
   unimodular_eom_iff : ∀ X_tilde X_tilde_inv_sqrt F A hN hI,
     unimodular_eom X_tilde X_tilde_inv_sqrt F A hN hI ↔ 
-    ∀ x, 
+    ∀ x μ, 
       let tr_sqrt_X p := Matrix.trace (X_tilde_inv_sqrt p * X_tilde p)
       let inner_term p j := tr_sqrt_X p * ∑ i, (X_tilde_inv_sqrt p) i j * F p j
-      -- Represents the covariant exterior derivative D_A evaluating to 0
-      covariantDeriv A (fun p => ∑ j, inner_term p j) x = 0
+      -- Represents the covariant exterior derivative D_A evaluating to 0 across all 4 spacetime dimensions
+      covariantDeriv A (fun p => ∑ j, inner_term p j) x μ = 0
 
 end Litlib.Y2024.gielen2024unimodular
