@@ -24,10 +24,10 @@ Litlib.paper "gielen2024unimodular"
 
 Litlib.equation "gielen2024unimodular"
   eq "3"
-  page "Unknown"
-  kind "Unknown"
-class Eq3 where
-  plebanskiTetradReconstruction
+  page "4"
+  kind "definition"
+class PlebanskiTetradReconstruction where
+  general_solution_tetrad
     (e0 : Fin 4 → ℂ)
     (eS : Fin 3 → Fin 4 → ℂ)
     (eps3 : Fin 3 → Fin 3 → Fin 3 → ℂ)
@@ -46,11 +46,28 @@ class Eq3 where
     ∀ i j : Fin 3, wedgeSigma i j = if i = j then ω else 0
 
 Litlib.equation "gielen2024unimodular"
+  eq "6"
+  page "4"
+  kind "identity"
+class UrbantkeMetricIdentity where
+  sigma_algebra 
+    (sigmaUp : Fin 3 → Fin 4 → Fin 4 → ℂ)
+    (sigmaDown : Fin 3 → Fin 4 → Fin 4 → ℂ)
+    (g : Fin 4 → Fin 4 → ℂ)
+    (eps3 : Fin 3 → Fin 3 → Fin 3 → ℂ) : Prop
+  sigma_algebra_iff : ∀ sigmaUp sigmaDown g eps3, 
+    sigma_algebra sigmaUp sigmaDown g eps3 ↔ 
+    ∀ i j μ ν, 
+      (∑ ρ : Fin 4, sigmaUp i μ ρ * sigmaDown j ρ ν) = 
+      -(if i = j then (1:ℂ) else 0) * g μ ν + 
+      ∑ k : Fin 3, eps3 i j k * sigmaDown k μ ν
+
+Litlib.equation "gielen2024unimodular"
   eq "7"
-  page "Unknown"
-  kind "Unknown"
-class Eq7 where
-  bianchiTraceIdentity 
+  page "5"
+  kind "equation"
+class BianchiTraceIdentity where
+  derive_trace_eom 
     (sigma : Fin 3 → Fin 4 → Fin 4 → ℂ)
     (v : Fin 3 → Fin 3 → Fin 4 → ℂ)
     (eps3 : Fin 3 → Fin 3 → Fin 3 → ℂ)
@@ -65,9 +82,9 @@ class Eq7 where
 
 Litlib.equation "gielen2024unimodular"
   eq "11"
-  page "Unknown"
-  kind "Unknown"
-class Eq11 where
+  page "6"
+  kind "equation"
+class PureConnectionMatrixSolution where
   pureConnectionMatrix 
     (M Minv X : Matrix (Fin 3) (Fin 3) ℂ)
     (hMSymm : ∀ i j, M i j = M j i)
@@ -77,31 +94,25 @@ class Eq11 where
     X = M * M
 
 Litlib.equation "gielen2024unimodular"
-  eq "12"
-  page "Unknown"
-  kind "Unknown"
-class Eq12 
+  eq "14"
+  page "6"
+  kind "equation"
+class PureConnectionEOM 
     (SpacetimePoint : Type*)
-    (partialDeriv : Fin 4 → (SpacetimePoint → ℂ) → SpacetimePoint → ℂ)
-    (urbantkeMetric : (Fin 4 → Fin 4 → Matrix (Fin 3) (Fin 3) ℂ) → Matrix (Fin 4) (Fin 4) ℂ) where
-  cdjImpliesConstantVolume
-    (A : Fin 4 → SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ)
-    (F : Fin 4 → Fin 4 → SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ)
-    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    (Λ : ℂ)
-    (hEpsilonAlt : ∀ α β γ δ, 
-      epsilon4 α β γ δ = -epsilon4 β α γ δ ∧ 
-      epsilon4 α β γ δ = -epsilon4 α γ β δ ∧ 
-      epsilon4 α β γ δ = -epsilon4 α β δ γ)
-    (hEpsilonNondeg : epsilon4 0 1 2 3 ≠ 0)
-    (hF_def : ∀ μ ν x i j, F μ ν x i j = 
-      partialDeriv μ (fun p => A ν p i j) x - 
-      partialDeriv ν (fun p => A μ p i j) x + 
-      (A μ x * A ν x - A ν x * A μ x) i j)
-    (hLambdaNz : Λ ≠ 0)
-    (hCdjConstraint : ∀ x, 
-      (∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4,
-        epsilon4 μ ν ρ σ • (F μ ν x * F ρ σ x)) = Λ • 1) :
-    ∃ (c : ℂ), c ≠ 0 ∧ ∀ x, Matrix.det (urbantkeMetric (fun m n => F m n x)) = c
+    (covariantDeriv : (SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ) → (SpacetimePoint → ℂ) → SpacetimePoint → ℂ) where
+  unimodular_eom
+    (X_tilde : SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ)
+    (X_tilde_inv_sqrt : SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ)
+    (F : SpacetimePoint → Fin 3 → ℂ)
+    (A : SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ)
+    (hNonDegenerate : ∀ x, Matrix.det (X_tilde x) ≠ 0)
+    (hInvSqrt : ∀ x, X_tilde_inv_sqrt x * X_tilde_inv_sqrt x * X_tilde x = 1) : Prop
+  unimodular_eom_iff : ∀ X_tilde X_tilde_inv_sqrt F A hN hI,
+    unimodular_eom X_tilde X_tilde_inv_sqrt F A hN hI ↔ 
+    ∀ x, 
+      let tr_sqrt_X p := Matrix.trace (X_tilde_inv_sqrt p * X_tilde p)
+      let inner_term p j := tr_sqrt_X p * ∑ i, (X_tilde_inv_sqrt p) i j * F p j
+      -- Represents the covariant exterior derivative D_A evaluating to 0
+      covariantDeriv A (fun p => ∑ j, inner_term p j) x = 0
 
 end Litlib.Y2024.gielen2024unimodular
