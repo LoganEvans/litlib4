@@ -74,6 +74,31 @@ class Eq2_9
       epsilon4 μ ν ρ σ * R x μ ν A B * R x ρ σ C D
 
 Litlib.equation "capovilla1991pure"
+  eq "Page 62"
+  page "62"
+  kind "Definition"
+class Page62_Psi3x3
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (Psi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
+    (Psi_3x3 : Spacetime → Fin 3 → Fin 3 → ℂ)
+    (clump : Fin 2 → Fin 2 → Fin 3)
+    (detPsi : Spacetime → ℂ) where
+  -- ANTI-BS: Psi is totally symmetric
+  hPsiSymm : ∀ x A B C D, 
+    Psi x A B C D = Psi x B A C D ∧ 
+    Psi x A B C D = Psi x A C B D ∧ 
+    Psi x A B C D = Psi x A B D C
+  -- ANTI-BS: The "clump" mapping must respect the symmetry of the index pair
+  h_clump_symm : ∀ A B, clump A B = clump B A
+  -- ANTI-BS: The mapping must be surjective onto Fin 3 to be a valid 3D basis projection
+  -- This prevents the 3x3 matrix from trivially having zero rows/columns.
+  h_clump_surj : Function.Surjective (fun (p : Fin 2 × Fin 2) => clump p.1 p.2)
+  -- Psi_3x3 is exactly the 4-index Psi evaluated via the clumped indices
+  h_Psi_3x3_iff : ∀ x A B C D, Psi_3x3 x (clump A B) (clump C D) = Psi x A B C D
+  -- detPsi, as used in Eq 2.21, is formally the 3x3 determinant of this matrix!
+  h_detPsi_iff : ∀ x, detPsi x = Matrix.det (Psi_3x3 x)
+
+Litlib.equation "capovilla1991pure"
   eq "2.18"
   page "63"
   kind "Action"
