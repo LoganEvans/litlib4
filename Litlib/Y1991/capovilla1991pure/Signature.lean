@@ -107,6 +107,137 @@ class Eq2_18
   )
 
 Litlib.equation "capovilla1991pure"
+  eq "2.19a"
+  page "64"
+  kind "Equation of Motion"
+class Eq2_19a
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (eps2_up : Fin 2 → Fin 2 → ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
+  -- ANTI-BS: R is a 2-form, antisymmetric in spacetime indices.
+  hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
+  hR_symm_spin : ∀ x μ ν A B, R x μ ν A B = R x μ ν B A
+  -- ANTI-BS: epsilon4 is totally antisymmetric
+  h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
+  h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
+  h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
+  h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
+  -- ANTI-BS: eps2_up is antisymmetric and non-degenerate
+  heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
+  heps2_up_nondeg : eps2_up 0 1 ≠ 0
+  eq2_19a_iff : ∀ x,
+    let R_up := fun ρ σ A B => sumFin2 fun A' => sumFin2 fun B' => eps2_up A A' * eps2_up B B' * R x ρ σ A' B';
+    let RR_up := fun A B C D => sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
+      epsilon4 μ ν ρ σ * R_up μ ν A C * R_up ρ σ B D;
+    let RR_down := fun A B C D => sumFin4 fun α => sumFin4 fun β => sumFin4 fun γ => sumFin4 fun δ =>
+      epsilon4 α β γ δ * R x α β A B * R x γ δ C D;
+    (sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D =>
+      RR_up A B C D * RR_down A B C D) = 0
+
+Litlib.equation "capovilla1991pure"
+  eq "2.19b"
+  page "64"
+  kind "Equation of Motion"
+class Eq2_19b
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (eta : Spacetime → ℂ)
+    (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (eps2_up : Fin 2 → Fin 2 → ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
+    (CovariantDerivative : (Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ) → (Spacetime → Fin 4 → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)) where
+  -- ANTI-BS: R is a 2-form
+  hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
+  hR_symm_spin : ∀ x μ ν A B, R x μ ν A B = R x μ ν B A
+  -- ANTI-BS: eta cannot be zero
+  heta_nondeg : ∀ x, eta x ≠ 0
+  -- ANTI-BS: epsilon4 is totally antisymmetric
+  h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
+  h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
+  h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
+  h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
+  -- ANTI-BS: eps2_up is antisymmetric and non-degenerate
+  heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
+  heps2_up_nondeg : eps2_up 0 1 ≠ 0
+  eq2_19b_iff :
+    let R_up := fun x ρ σ A B => sumFin2 fun A' => sumFin2 fun B' => eps2_up A A' * eps2_up B B' * R x ρ σ A' B';
+    let Bracket := fun x μ ν A B =>
+      eta x * sumFin2 fun C => sumFin2 fun D =>
+        (sumFin4 fun ρ => sumFin4 fun σ => sumFin4 fun α => sumFin4 fun β =>
+          epsilon4 ρ σ α β * R_up x ρ σ A C * R_up x α β B D) * R x μ ν C D;
+    CovariantDerivative Bracket = 0
+
+Litlib.equation "capovilla1991pure"
+  eq "2.20a"
+  page "64"
+  kind "Definition"
+class Eq2_20a
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (eta : Spacetime → ℂ)
+    (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (eps2_up : Fin 2 → Fin 2 → ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
+  -- ANTI-BS: Sigma and R are 2-forms
+  hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
+  hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
+  -- ANTI-BS: epsilon4 is totally antisymmetric
+  h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
+  h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
+  h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
+  h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
+  -- ANTI-BS: eps2_up is antisymmetric and non-degenerate
+  heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
+  heps2_up_nondeg : eps2_up 0 1 ≠ 0
+  eq2_20a_iff : ∀ x μ ν A B,
+    let R_up := fun ρ σ A_idx B_idx => sumFin2 fun A' => sumFin2 fun B' => eps2_up A_idx A' * eps2_up B_idx B' * R x ρ σ A' B';
+    Sigma x μ ν A B =
+      eta x * sumFin2 fun C => sumFin2 fun D =>
+        (sumFin4 fun ρ => sumFin4 fun σ => sumFin4 fun α => sumFin4 fun β =>
+          epsilon4 ρ σ α β * R_up ρ σ A C * R_up α β B D) * R x μ ν C D
+
+Litlib.equation "capovilla1991pure"
+  eq "2.20b"
+  page "64"
+  kind "Definition"
+class Eq2_20b
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (invPsi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
+    (eta : Spacetime → ℂ)
+    (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (eps2_up : Fin 2 → Fin 2 → ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
+  -- ANTI-BS: R is a 2-form
+  hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
+  -- ANTI-BS: epsilon4 is totally antisymmetric
+  h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
+  h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
+  h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
+  h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
+  -- ANTI-BS: eps2_up is antisymmetric and non-degenerate
+  heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
+  heps2_up_nondeg : eps2_up 0 1 ≠ 0
+  eq2_20b_iff : ∀ x A B C D,
+    let R_up := fun ρ σ A_idx B_idx => sumFin2 fun A' => sumFin2 fun B' => eps2_up A_idx A' * eps2_up B_idx B' * R x ρ σ A' B';
+    invPsi x A B C D =
+      eta x * sumFin4 fun ρ => sumFin4 fun σ => sumFin4 fun α => sumFin4 fun β =>
+        epsilon4 ρ σ α β * R_up ρ σ A B * R x α β C D
+
+Litlib.equation "capovilla1991pure"
+  eq "2.21"
+  page "64"
+  kind "Definition"
+class Eq2_21
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (eta : Spacetime → ℂ)
+    (sqrt_g : Spacetime → ℂ)
+    (detPsi : Spacetime → ℂ) where
+  -- ANTI-BS: Neither sqrt_g nor detPsi can be zero because they appear in a denominator.
+  h_sqrt_g_nondeg : ∀ x, sqrt_g x ≠ 0
+  h_detPsi_nondeg : ∀ x, detPsi x ≠ 0
+  eq2_21_iff : ∀ x, eta x = (sqrt_g x * detPsi x)⁻¹
+
+Litlib.equation "capovilla1991pure"
   eq "2.22"
   page "64"
   kind "Definition"
@@ -126,7 +257,6 @@ class Eq2_22
   -- ANTI-BS: R is symmetric in its chiral spinor indices.
   hR_symm_spin : ∀ x μ ν A B, R x μ ν A B = R x μ ν B A
   -- ANTI-BS: epsilon4 must be a totally antisymmetric, non-zero tensor (Levi-Civita).
-  -- These three adjacent swaps generate the full symmetric group S4.
   h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
   h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
   h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
