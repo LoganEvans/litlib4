@@ -296,6 +296,44 @@ class Eq2_22
         epsilon4 α β γ δ * R x μ α A B * eps2 B C * R x β γ C D * eps2 D E * R x δ ν E F * eps2 F A
 
 Litlib.equation "capovilla1991pure"
+  eq "2.21_2.22_Identity"
+  page "64"
+  kind "Theorem"
+class UrbantkeDeterminantIdentity
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
+    (eps2 : Fin 2 → Fin 2 → ℂ)
+    (eps2_up : Fin 2 → Fin 2 → ℂ) where
+  -- THE THEOREM: The 4x4 determinant of the metric g (Eq 2.22) is exactly 
+  -- algebraically determined by eta and the safe 3x3 determinant of Psi^{-1} (Eq 2.20b).
+  -- Eq 2.21 states \eta = (\sqrt{g} \det \Psi)^{-1}, which implies \det(g) * \eta^2 = (\det \Psi^{-1})^2.
+  determinant_identity : 
+    ∀ (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+      (g : Spacetime → Fin 4 → Fin 4 → ℂ)
+      (eta : Spacetime → ℂ)
+      (invPsi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
+      (invPsi_3x3 : Spacetime → Fin 3 → Fin 3 → ℂ)
+      (clump : Fin 2 → Fin 2 → Fin 3),
+      -- 1. clump is a symmetric surjection (protects against 0=1 exploits)
+      (∀ A B, clump A B = clump B A) →
+      Function.Surjective (fun (p : Fin 2 × Fin 2) => clump p.1 p.2) →
+      -- 2. g is explicitly defined by Eq 2.22
+      (∀ x μ ν, g x μ ν = (1 / 3 : ℂ) * eta x * 
+        sumFin4 fun α => sumFin4 fun β => sumFin4 fun γ => sumFin4 fun δ =>
+          sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D => sumFin2 fun E => sumFin2 fun F =>
+            epsilon4 α β γ δ * R x μ α A B * eps2 B C * R x β γ C D * eps2 D E * R x δ ν E F * eps2 F A) →
+      -- 3. invPsi is explicitly defined by Eq 2.20b
+      (∀ x A B C D,
+        let R_up := fun ρ σ A_idx B_idx => sumFin2 fun A' => sumFin2 fun B' => eps2_up A_idx A' * eps2_up B_idx B' * R x ρ σ A' B';
+        invPsi x A B C D =
+          eta x * sumFin4 fun ρ => sumFin4 fun σ => sumFin4 fun α => sumFin4 fun β =>
+            epsilon4 ρ σ α β * R_up ρ σ A B * R x α β C D) →
+      -- 4. invPsi_3x3 is exactly invPsi evaluated via the clumped indices (Page 62 mapping)
+      (∀ x A B C D, invPsi_3x3 x (clump A B) (clump C D) = invPsi x A B C D) →
+      -- 5. Conclusion:
+      ∀ x, Matrix.det (g x) * (eta x)^2 = (Matrix.det (invPsi_3x3 x))^2
+
+Litlib.equation "capovilla1991pure"
   eq "2.2c"
   page "61"
   kind "Equation of Motion"
