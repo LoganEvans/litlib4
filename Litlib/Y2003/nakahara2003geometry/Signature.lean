@@ -8,10 +8,19 @@ import Mathlib.Topology.Basic
 import Mathlib.Topology.ContinuousOn
 import Mathlib.Analysis.Calculus.Deriv.Basic
 
+-- Modular Chapter 10 Imports
+import Litlib.Y2003.nakahara2003geometry.Chapter10.Sec1_PrincipalBundles
+import Litlib.Y2003.nakahara2003geometry.Chapter10.Sec2_Holonomy
+import Litlib.Y2003.nakahara2003geometry.Chapter10.Sec3_Curvature
+import Litlib.Y2003.nakahara2003geometry.Chapter10.Sec4_AssociatedBundles
+import Litlib.Y2003.nakahara2003geometry.Chapter10.Sec5_GaugeTheories
+import Litlib.Y2003.nakahara2003geometry.Chapter10.Sec6_BerryPhase
+
 open BigOperators
 
 namespace Litlib.Y2003.nakahara2003geometry
 
+-- Master metadata block
 Litlib.paper "nakahara2003geometry"
   type "book"
   title "Geometry, Topology and Physics"
@@ -21,12 +30,14 @@ Litlib.paper "nakahara2003geometry"
   publisher "Institute of Physics Publishing"
   isbn "0750306068"
 
+-- CHAPTER 7 THEOREMS 
+
 Litlib.equation "nakahara2003geometry"
   eq "6.8"
   page "3"
   kind "theorem"
 class StokesTheorem 
-    (Chain Form : Type*) [Nonempty Chain] [Nonempty Form]
+    (Chain Form : Type _) [Nonempty Chain] [Nonempty Form]
     (integral : Chain → Form → ℝ)
     (exteriorDeriv : Form → Form)
     (boundary : Chain → Chain) where
@@ -36,11 +47,27 @@ class StokesTheorem
       integral c (exteriorDeriv omega) = integral (boundary c) omega
 
 Litlib.equation "nakahara2003geometry"
+  eq "7.1"
+  page "18"
+  kind "theorem"
+class FundamentalTheoremRiemannianGeometry
+    (Metric Connection : Type _) [Nonempty Metric] [Nonempty Connection]
+    (isSymmetric : Connection → Prop)
+    (isMetricCompatible : Connection → Metric → Prop)
+    (LeviCivita : Metric → Connection) where
+  h_nontrivial_metric : ∃ g, isMetricCompatible (LeviCivita g) g
+  fundamental_theorem :
+    ∀ (g : Metric),
+      isSymmetric (LeviCivita g) ∧
+      isMetricCompatible (LeviCivita g) g ∧
+      (∀ (nabla : Connection), isSymmetric nabla → isMetricCompatible nabla g → nabla = LeviCivita g)
+
+Litlib.equation "nakahara2003geometry"
   eq "7.85"
   page "27"
   kind "equation"
 class ContractedBianchiIdentity 
-    (Point Index : Type*) [Fintype Index] [DecidableEq Index] [Nonempty Index] [Nonempty Point]
+    (Point Index : Type _) [Fintype Index] [DecidableEq Index] [Nonempty Index] [Nonempty Point]
     (g g_inv : Index → Index → Point → ℂ)
     (christoffel : Index → Index → Index → Point → ℂ)
     (ricci : Index → Index → Point → ℂ)
@@ -87,65 +114,62 @@ Litlib.equation "nakahara2003geometry"
   page "42"
   kind "equation"
 class CartanStructureEquation 
-    (Form : Type*) [AddCommGroup Form] [Nonempty Form]
+    (Form : Type _) [AddCommGroup Form] [Nonempty Form]
     (exteriorDeriv : Form → Form)
-    (wedge : Form → Form → Form) where
+    (wedge : Form → Form → Form)
+    (curvature : Form → Form) where
   -- Anti-BS constraint: Prevent trivial zeros
-  h_nontrivial_curvature : ∃ (omega : Form), exteriorDeriv omega + wedge omega omega ≠ 0
+  h_nontrivial_curvature : ∃ (omega : Form), curvature omega ≠ 0
   cartanStructureEq
-    (omega Omega : Form) :
-    Omega = exteriorDeriv omega + wedge omega omega
+    (omega : Form) :
+    curvature omega = exteriorDeriv omega + wedge omega omega
 
 Litlib.equation "nakahara2003geometry"
   eq "7.147b"
   page "42"
   kind "equation"
 class BianchiIdentity 
-    (Form : Type*) [Zero Form] [Nonempty Form]
-    (covariantDeriv : Form → Form) where
-  h_nontrivial_form : ∃ (Omega : Form), Omega ≠ 0
+    (Form : Type _) [Zero Form] [Nonempty Form]
+    (covariantDeriv : Form → Form → Form)
+    (curvature : Form → Form) where
+  h_nontrivial_curvature : ∃ (omega : Form), curvature omega ≠ 0
   bianchiIdentity
-    (Omega : Form) :
-    covariantDeriv Omega = 0
+    (omega : Form) :
+    covariantDeriv omega (curvature omega) = 0
 
 Litlib.equation "nakahara2003geometry"
-  eq "10.128"
-  page "36"
+  eq "7.192a"
+  page "52"
   kind "theorem"
-class WindingNumberIntegral 
-    (Map : Type*) [Nonempty Map]
-    (isSmooth : Map → Prop)
-    (degree : Map → ℤ)
-    (cartanMaurerIntegral : Map → ℝ) where
-  -- Anti-BS constraint
-  h_nontrivial_map : ∃ g, isSmooth g ∧ degree g ≠ 0
-  windingNumberIntegral :
-    ∀ (g : Map), isSmooth g → (degree g : ℝ) = (1 / (24 * Real.pi^2)) * cartanMaurerIntegral g
+class HodgeDecompositionTheorem
+    (Form : Type _) [AddCommGroup Form] [Nonempty Form]
+    (d d_dagger : Form → Form)
+    (isHarmonic : Form → Prop)
+    (isExact : Form → Prop)
+    (isCoexact : Form → Prop) where
+  h_nontrivial : ∃ omega, omega ≠ 0
+  exact_def : ∀ w, isExact w ↔ ∃ alpha, w = d alpha
+  coexact_def : ∀ w, isCoexact w ↔ ∃ beta, w = d_dagger beta
+  
+  -- The fundamental decomposition into independent parts
+  hodge_decomp : ∀ omega, ∃ alpha beta gamma : Form,
+    isExact alpha ∧ isCoexact beta ∧ isHarmonic gamma ∧
+    omega = alpha + beta + gamma
+    
+  -- Uniqueness condition expanded to avoid `∃!` multi-binder Lean 4 error
+  hodge_decomp_unique : ∀ omega a1 b1 g1 a2 b2 g2,
+    isExact a1 → isCoexact b1 → isHarmonic g1 → omega = a1 + b1 + g1 →
+    isExact a2 → isCoexact b2 → isHarmonic g2 → omega = a2 + b2 + g2 →
+    a1 = a2 ∧ b1 = b2 ∧ g1 = g2
 
-Litlib.equation "nakahara2003geometry"
-  eq "10.128"
-  page "36"
-  kind "theorem"
-class CartanMaurerTopology 
-    (GroupMap : Type*) [TopologicalSpace GroupMap] [Nonempty GroupMap]
-    (isSmooth : GroupMap → Prop)
-    (windingNumber : GroupMap → ℤ)
-    (cartanMaurerIntegral : GroupMap → ℝ) where
-  -- Anti-BS constraint
-  h_nontrivial_map : ∃ g, isSmooth g ∧ windingNumber g ≠ 0
-  degreeTheorem :
-    ∀ g : GroupMap, isSmooth g → cartanMaurerIntegral g = (windingNumber g : ℝ)
-  homotopyInvariance
-    (H : ℝ → GroupMap)
-    (hCont : Continuous H) :
-    ∀ t1 t2 : ℝ, windingNumber (H t1) = windingNumber (H t2)
+-- CHAPTER 11 THEOREMS
 
 Litlib.equation "nakahara2003geometry"
   eq "11.22"
   page "7"
   kind "equation"
 class PontryaginActionVariation 
-    (Universe β : Type*) [NormedAddCommGroup β] [NormedSpace ℝ β] [Nonempty Universe]
+    (Universe β : Type _) [NormedAddCommGroup β] [NormedSpace ℝ β] [Nonempty Universe]
     (Action : Universe → β)
     (isValidVariation : (ℝ → Universe) → Prop) where
   -- Anti-BS constraint
