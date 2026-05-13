@@ -21,8 +21,12 @@ class MaxwellAction
     (wedgeStar : Form2 → Form2 → Space → ℝ)
     (integral : (Space → ℝ) → ℝ)
     (action : Form2 → ℝ) where
-  h_nontrivial : ∃ f, Continuous (wedgeStar f f) ∧ integral (wedgeStar f f) ≠ 0
-  maxwell_action : Continuous (wedgeStar F F) → action F = - (1/4) * integral (wedgeStar F F)
+  h_nontrivial : ∃ f, integral (wedgeStar f f) ≠ 0
+  
+  -- Anti-BS constraint: Fixed field F must be continuous
+  F_continuous : Continuous (wedgeStar F F)
+  
+  maxwell_action : action F = - (1/4) * integral (wedgeStar F F)
 
 Litlib.equation "nakahara2003geometry"
   eq "10.88a"
@@ -34,7 +38,11 @@ class VacuumMaxwellEquations
     (partialDeriv : Index → (Point → ℝ) → Point → ℝ)
     (isDifferentiable : (Point → ℝ) → Prop) where
   h_nontrivial : ∃ mu nu p, F mu nu p ≠ 0
-  maxwell_eq : ∀ nu p, isDifferentiable (fun x => F mu nu x) → (∑ mu, partialDeriv mu (fun x => F mu nu x) p) = 0
+  
+  -- Anti-BS constraint: Fixed field F must inherently be differentiable 
+  F_differentiable : ∀ mu nu, isDifferentiable (fun x => F mu nu x)
+  
+  maxwell_eq : ∀ nu p, (∑ mu, partialDeriv mu (fun x => F mu nu x) p) = 0
 
 Litlib.equation "nakahara2003geometry"
   eq "10.93"
@@ -69,8 +77,12 @@ class YangMillsAction
     (trace : ℝ → ℝ)
     (integral : (Space → ℝ) → ℝ)
     (action : Form2 → ℝ) where
-  h_nontrivial : ∃ f, Continuous (fun x => trace (wedgeStar f f x)) ∧ integral (fun x => trace (wedgeStar f f x)) ≠ 0
-  ym_action : Continuous (fun x => trace (wedgeStar F F x)) → action F = (1/2) * integral (fun x => trace (wedgeStar F F x))
+  h_nontrivial : ∃ f, integral (fun x => trace (wedgeStar f f x)) ≠ 0
+  
+  -- Anti-BS constraint: Fixed field F must be continuous
+  F_continuous : Continuous (fun x => trace (wedgeStar F F x))
+  
+  ym_action : action F = (1/2) * integral (fun x => trace (wedgeStar F F x))
 
 Litlib.equation "nakahara2003geometry"
   eq "10.111"
@@ -81,7 +93,10 @@ class InstantonCondition
     (F : Index → Index → Point → ℝ)
     (hodgeStarF : Index → Index → Point → ℝ)
     (isInstanton : Point → Prop) where
-  h_nontrivial : ∃ mu nu p, Continuous (fun p => F mu nu p) ∧ F mu nu p ≠ 0
+  -- Anti-BS constraint
+  F_continuous : ∀ mu nu, Continuous (fun p => F mu nu p)
+  h_nontrivial : ∃ mu nu p, F mu nu p ≠ 0
+  
   is_instanton_iff : 
     ∀ p, isInstanton p ↔ 
       (∀ mu nu, F mu nu p = hodgeStarF mu nu p) ∨ 
@@ -98,7 +113,11 @@ class PureGaugeAsymptotic
     (g : Point → GroupElement)
     (pureGauge : GroupElement → GaugePotential)
     (limit_at_inf : (Point → GaugePotential) → (Point → GaugePotential) → Prop) where
-  h_nontrivial : ∃ p, norm p > 0 ∧ Continuous A ∧ Continuous g
+  -- Anti-BS constraints: 
+  A_continuous : Continuous A
+  g_continuous : Continuous g
+  h_nontrivial : ∃ p, norm p > 0
+  
   asymptotic_condition : limit_at_inf A (fun x => pureGauge (g x))
 
 Litlib.equation "nakahara2003geometry"
@@ -113,7 +132,10 @@ class ChernSimonsThreeForm
     (trace : Form → Form)
     (K : Form)
     (scalarMult : ℝ → Form → Form) where
-  h_nontrivial : K ≠ 0 ∧ Continuous extDeriv
+  -- Anti-BS constraint
+  extDeriv_continuous : Continuous extDeriv
+  h_nontrivial : K ≠ 0
+  
   chern_simons : K = trace (wedge A (extDeriv A) + scalarMult (2/3) (wedge A (wedge A A)))
 
 Litlib.equation "nakahara2003geometry"

@@ -17,7 +17,11 @@ class CovariantDerivativePrincipal
     (extDeriv : Form → Form)
     (covDeriv : Form → Form) where
   -- Anti-BS constraint: Ensures the horizontal projection actually does something
-  h_nontrivial_proj : ∃ v : Vector, Continuous horizontalProj ∧ horizontalProj v ≠ v
+  h_nontrivial_proj : ∃ v : Vector, horizontalProj v ≠ v
+  
+  -- Anti-BS constraint: The projection must be inherently continuous
+  horizontalProj_continuous : Continuous horizontalProj
+  
   cov_deriv_def : ∀ phi : Form, covDeriv phi = evalForm (extDeriv phi) horizontalProj
 
 Litlib.equation "nakahara2003geometry"
@@ -30,8 +34,12 @@ class CartanStructureEquationPrincipal
     (wedge : Form → Form → Form)
     (curvature : Form → Form) where
   -- Anti-BS Constraint
-  h_nontrivial : ∃ omega, Continuous extDeriv ∧ curvature omega ≠ 0
-  cartan_eq : ∀ omega, Continuous extDeriv → curvature omega = extDeriv omega + wedge omega omega
+  h_nontrivial : ∃ omega, curvature omega ≠ 0
+  
+  -- Anti-BS constraint: Exterior derivative must be inherently continuous
+  extDeriv_continuous : Continuous extDeriv
+  
+  cartan_eq : ∀ omega, curvature omega = extDeriv omega + wedge omega omega
 
 Litlib.equation "nakahara2003geometry"
   eq "10.36"
@@ -63,7 +71,10 @@ class LocalFieldStrength
     (wedge : Form → Form → Form)
     (fieldStrength : Form → Form) where
   h_nontrivial : ∃ A, fieldStrength A ≠ 0
-  local_field_strength : ∀ A, Continuous extDeriv → fieldStrength A = extDeriv A + wedge A A
+  
+  extDeriv_continuous : Continuous extDeriv
+  
+  local_field_strength : ∀ A, fieldStrength A = extDeriv A + wedge A A
 
 Litlib.equation "nakahara2003geometry"
   eq "10.45"
@@ -74,6 +85,9 @@ class PrincipalBianchiIdentity
     (covExtDeriv : Form → Form)
     (Curvature : Form) where
   h_nontrivial : Curvature ≠ 0
-  bianchi : Continuous covExtDeriv → covExtDeriv Curvature = 0
+  
+  covExtDeriv_continuous : Continuous covExtDeriv
+  
+  bianchi : covExtDeriv Curvature = 0
 
 end Litlib.Y2003.nakahara2003geometry

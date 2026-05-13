@@ -22,8 +22,11 @@ class BerryPhase
     (innerProd : State → State → ℂ)
     (eigenstate : Param → State)
     (phase : Curve → ℂ) where
-  h_nontrivial : ∃ c, Continuous eigenstate ∧ phase c ≠ 0
-  berry_phase_def : ∀ c, Continuous eigenstate → phase c = Complex.I * integral c (fun R => innerProd (eigenstate R) (nabla R (eigenstate R)))
+  -- Anti-BS constraint: Fixed eigenstate must inherently be continuous
+  eigenstate_continuous : Continuous eigenstate
+  
+  h_nontrivial : ∃ c, phase c ≠ 0
+  berry_phase_def : ∀ c, phase c = Complex.I * integral c (fun R => innerProd (eigenstate R) (nabla R (eigenstate R)))
 
 Litlib.equation "nakahara2003geometry"
   eq "10.140"
@@ -36,8 +39,11 @@ class BerrysConnection
     (eigenstate : ParameterSpace → State)
     (berryConnection : Index → ParameterSpace → ℂ)
     (isDifferentiable : (ParameterSpace → State) → Prop) where
+  -- Anti-BS constraint: Fixed eigenstate must inherently be differentiable
+  eigenstate_differentiable : isDifferentiable eigenstate
+  
   h_nontrivial : ∃ mu R, berryConnection mu R ≠ 0
-  connection_def : ∀ mu R, isDifferentiable eigenstate → berryConnection mu R = innerProduct (eigenstate R) (partialDeriv mu eigenstate R)
+  connection_def : ∀ mu R, berryConnection mu R = innerProduct (eigenstate R) (partialDeriv mu eigenstate R)
 
 Litlib.equation "nakahara2003geometry"
   eq "10.142"
@@ -48,8 +54,11 @@ class BerryCurvature
     (berryConnection : Form)
     (extDeriv : Form → Form)
     (berryCurvature : Form) where
-  h_nontrivial : Continuous extDeriv ∧ berryCurvature ≠ 0
-  curvature_def : Continuous extDeriv → berryCurvature = extDeriv berryConnection
+  -- Anti-BS constraint: Fixed derivative must inherently be continuous
+  extDeriv_continuous : Continuous extDeriv
+  
+  h_nontrivial : berryCurvature ≠ 0
+  curvature_def : berryCurvature = extDeriv berryConnection
 
 Litlib.equation "nakahara2003geometry"
   eq "10.149"
@@ -61,8 +70,11 @@ class EffectiveBornOppenheimerHamiltonian
     (operatorSquared : Index → (Param → ℂ) → Param → ℂ)
     (energy : Param → ℝ)
     (Heff : (Param → ℂ) → Param → ℂ) where
-  h_nontrivial : mass > 0 ∧ Continuous energy
-  heff_def : ∀ psi R, Continuous energy → Heff psi R = 
+  -- Anti-BS constraint: Fixed energy must inherently be continuous
+  energy_continuous : Continuous energy
+  
+  h_nontrivial : mass > 0
+  heff_def : ∀ psi R, Heff psi R = 
     (- 1 / (2 * mass)) * (∑ mu, operatorSquared mu psi R) + energy R * psi R
 
 end Litlib.Y2003.nakahara2003geometry

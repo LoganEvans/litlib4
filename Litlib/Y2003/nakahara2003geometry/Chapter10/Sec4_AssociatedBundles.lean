@@ -13,7 +13,10 @@ Litlib.equation "nakahara2003geometry"
 class AssociatedCovariantDerivative
     (VecType SecType : Type _) [TopologicalSpace VecType] [TopologicalSpace SecType] [Nonempty VecType] [Nonempty SecType]
     (covDeriv : VecType → SecType → SecType) where
-  h_nontrivial : ∃ X s, Continuous (covDeriv X) ∧ covDeriv X s ≠ s
+  -- Anti-BS constraint: Derivative operator must inherently be continuous for all vector directions
+  covDeriv_continuous : ∀ X, Continuous (covDeriv X)
+  
+  h_nontrivial : ∃ X s, covDeriv X s ≠ s
 
 Litlib.equation "nakahara2003geometry"
   eq "10.73"
