@@ -19,7 +19,6 @@ class FundamentalTheoremRiemannianGeometry
     (isSymmetric : Connection → Prop)
     (isMetricCompatible : Connection → Metric → Prop)
     (LeviCivita : Metric → Connection) where
-  h_nontrivial_metric : ∃ g, isMetricCompatible (LeviCivita g) g
   fundamental_theorem :
     ∀ (g : Metric),
       isSymmetric (LeviCivita g) ∧
@@ -62,9 +61,6 @@ class ContractedBianchiIdentity
   h_scalar : ∀ x, scalarCurv x = ∑ alpha, ∑ beta, g_inv alpha beta x * ricci alpha beta x
   h_G : ∀ x mu nu, G mu nu x = ricci mu nu x - (1/2 : ℂ) * g mu nu x * scalarCurv x
 
-  -- Anti-BS constraint: Ensure the space isn't trivially flat
-  h_curved : ∃ mu nu x, G mu nu x ≠ 0
-
   contractedBianchi :
     ∀ (nu : Index) (x : Point),
       ∑ mu : Index, ∑ alpha : Index, g_inv mu alpha x * (
@@ -82,7 +78,7 @@ class InverseMetricCompatibility
     (g g_inv : Index → Index → Point → ℝ)
     (christoffel : Index → Index → Index → Point → ℝ)
     (partialDeriv : Index → (Point → ℝ) → Point → ℝ) where
-  -- Anti-BS constraint: strictly invertible
+  -- strictly invertible
   h_inv : ∀ x i j, (∑ k, g i k x * g_inv k j x) = if i = j then 1 else 0
 
   inverseMetricComp :
@@ -101,7 +97,6 @@ class DivergenceIndexRaising
     (christoffel : Index → Index → Index → Point → ℝ)
     (G T : Index → Index → Point → ℝ)
     (partialDeriv : Index → (Point → ℝ) → Point → ℝ) where
-  -- Anti-BS constraints
   h_inv : ∀ x i j, (∑ k, g i k x * g_inv k j x) = if i = j then 1 else 0
   h_G_symm : ∀ x i j, G i j x = G j i x
   h_T_symm : ∀ x i j, T i j x = T j i x

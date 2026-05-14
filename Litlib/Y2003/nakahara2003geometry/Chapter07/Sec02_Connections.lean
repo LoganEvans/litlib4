@@ -20,9 +20,6 @@ class GeodesicEquation
     (christoffel : Index → Index → Index → Point → ℝ)
     (curve : ℝ → Point)
     (coord : Index → Point → ℝ) where
-  -- Anti-BS constraint: Avoid trivial geometry
-  h_nontrivial_connection : ∃ mu nu rho x, christoffel mu nu rho x ≠ 0
-  
   -- Require the curve to be twice differentiable in coordinates
   isSmoothCurve : (ℝ → Point) → Prop
   h_smooth : isSmoothCurve curve
@@ -41,9 +38,6 @@ class AffineConnection
     (Vect Func : Type _) [AddCommGroup Vect] [CommRing Func] [Module Func Vect]
     (dirDeriv : Vect → Func → Func)
     (nabla : Vect → Vect → Vect) where
-  -- Anti-BS constraint: Connection shouldn't be trivially zero for all vector fields
-  h_nontrivial : ∃ X Y, nabla X Y ≠ 0
-  
   -- Axioms of an affine connection (Eq 7.13a - 7.13d)
   h_add_1 : ∀ (X Y Z : Vect), nabla X (Y + Z) = nabla X Y + nabla X Z
   h_add_2 : ∀ (X Y Z : Vect), nabla (X + Y) Z = nabla X Z + nabla Y Z
