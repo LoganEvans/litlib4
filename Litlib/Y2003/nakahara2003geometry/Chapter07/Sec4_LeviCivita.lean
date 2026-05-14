@@ -1,6 +1,7 @@
 -- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter07/Sec4_LeviCivita.lean
 
 import Litlib.Core
+import Mathlib.Data.Real.Basic
 import Mathlib.Data.Complex.Basic
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Data.Fintype.Basic
@@ -70,6 +71,61 @@ class ContractedBianchiIdentity
         partialDeriv alpha (fun p => G mu nu p) x -
         ∑ lambda : Index, (christoffel lambda alpha mu x * G lambda nu x + 
                            christoffel lambda alpha nu x * G mu lambda x)
+      ) = 0
+
+Litlib.equation "nakahara2003geometry"
+  eq "7.30b"
+  page "10"
+  kind "equation"
+class InverseMetricCompatibility
+    (Point Index : Type _) [Fintype Index] [DecidableEq Index] [Nonempty Index] [Nonempty Point]
+    (g g_inv : Index → Index → Point → ℝ)
+    (christoffel : Index → Index → Index → Point → ℝ)
+    (partialDeriv : Index → (Point → ℝ) → Point → ℝ) where
+  -- Anti-BS constraint: strictly invertible
+  h_inv : ∀ x i j, (∑ k, g i k x * g_inv k j x) = if i = j then 1 else 0
+
+  inverseMetricComp :
+    ∀ (mu nu lambda : Index) (x : Point),
+      partialDeriv mu (fun p => g_inv nu lambda p) x + 
+      ∑ rho, (christoffel nu mu rho x * g_inv rho lambda x + 
+              christoffel lambda mu rho x * g_inv nu rho x) = 0
+
+Litlib.equation "nakahara2003geometry"
+  eq "7.85"
+  page "27"
+  kind "theorem"
+class DivergenceIndexRaising
+    (Point Index : Type _) [Fintype Index] [DecidableEq Index] [Nonempty Index] [Nonempty Point]
+    (g g_inv : Index → Index → Point → ℝ)
+    (christoffel : Index → Index → Index → Point → ℝ)
+    (G T : Index → Index → Point → ℝ)
+    (partialDeriv : Index → (Point → ℝ) → Point → ℝ) where
+  -- Anti-BS constraints
+  h_inv : ∀ x i j, (∑ k, g i k x * g_inv k j x) = if i = j then 1 else 0
+  h_G_symm : ∀ x i j, G i j x = G j i x
+  h_T_symm : ∀ x i j, T i j x = T j i x
+
+  -- Hypothesis 1: G satisfies the covariant divergence sum equating to 0.
+  covDivG : 
+    ∀ (nu : Index) (x : Point),
+      ∑ mu, ∑ alpha, g_inv mu alpha x * (
+        partialDeriv alpha (fun p => G mu nu p) x -
+        ∑ lambda, (christoffel lambda alpha mu x * G lambda nu x + 
+                   christoffel lambda alpha nu x * G mu lambda x)
+      ) = 0
+
+  -- Hypothesis 2: T is G with indices raised.
+  h_T_def : 
+    ∀ (a b : Index) (x : Point), 
+      T a b x = ∑ mu, ∑ nu, g_inv a mu x * g_inv b nu x * G mu nu x
+
+  -- Conclusion: T satisfies the contravariant divergence sum equating to 0.
+  contraDivT : 
+    ∀ (b : Index) (x : Point),
+      ∑ a, (
+        partialDeriv a (fun p => T a b p) x + 
+        ∑ c, (christoffel a a c x * T c b x + christoffel b a c x * T a c x)
       ) = 0
 
 end Litlib.Y2003.nakahara2003geometry
