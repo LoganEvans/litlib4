@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter10/Sec1_PrincipalBundles.lean
+-- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter10/Sec01_PrincipalBundles.lean
 
 import Litlib.Core
 import Mathlib.Topology.Basic

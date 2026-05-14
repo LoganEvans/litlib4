@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter10/Sec6_BerryPhase.lean
+-- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter10/Sec06_BerryPhase.lean
 
 import Litlib.Core
 import Mathlib.Data.Real.Basic

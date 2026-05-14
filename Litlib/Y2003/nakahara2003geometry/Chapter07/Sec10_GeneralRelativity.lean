@@ -8,6 +8,39 @@ import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 namespace Litlib.Y2003.nakahara2003geometry
 
 Litlib.equation "nakahara2003geometry"
+  eq "7.205"
+  page "55"
+  kind "theorem"
+class PalatiniIdentity
+    (Tensor1 Tensor2 : Type _) [AddCommGroup Tensor2]
+    (deltaRicci : Tensor2)
+    (deltaGamma : Tensor1)
+    (covDeriv : Tensor1 → Tensor2)
+    (contract1 contract2 : Tensor2 → Tensor2) where
+  -- Anti-BS
+  h_nontrivial : deltaRicci ≠ 0
+  
+  palatiniEq :
+    deltaRicci = contract1 (covDeriv deltaGamma) - contract2 (covDeriv deltaGamma)
+
+Litlib.equation "nakahara2003geometry"
+  eq "7.208"
+  page "56"
+  kind "equation"
+class VacuumEinsteinEquation
+    (Point Index : Type _) [Fintype Index] [Nonempty Index] [Nonempty Point]
+    (Metric Ricci : Index → Index → Point → ℝ)
+    (ScalarCurv : Point → ℝ)
+    (EinsteinTensor : Index → Index → Point → ℝ) where
+  -- Anti-BS
+  h_nontrivial : ∃ mu nu x, EinsteinTensor mu nu x ≠ 0
+  
+  einstein_tensor_def : ∀ mu nu x,
+    EinsteinTensor mu nu x = Ricci mu nu x - (1/2 : ℝ) * Metric mu nu x * ScalarCurv x
+    
+  vacuum_eq : ∀ mu nu x, EinsteinTensor mu nu x = 0
+
+Litlib.equation "nakahara2003geometry"
   eq "7.214"
   page "57"
   kind "equation"

@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter10/Sec3_Curvature.lean
+-- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter10/Sec03_Curvature.lean
 
 import Litlib.Core
 import Mathlib.Topology.Basic

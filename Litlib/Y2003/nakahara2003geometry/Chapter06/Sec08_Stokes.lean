@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter06/Sec8_Stokes.lean
+-- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter06/Sec08_Stokes.lean
 
 import Litlib.Core
 import Mathlib.Data.Real.Basic

@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter10/Sec2_Holonomy.lean
+-- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter10/Sec02_Holonomy.lean
 
 import Litlib.Core
 import Mathlib.Topology.Basic
