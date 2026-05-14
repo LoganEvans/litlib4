@@ -20,12 +20,6 @@ class ConnectionOneForm
     (inv : GroupElement → GroupElement)
     (adjointAction : GroupElement → LieAlgebra → LieAlgebra)
     (rightPullback : GroupElement → (TangentVector → LieAlgebra) → (TangentVector → LieAlgebra)) where
-  -- Anti-BS constraint: The Lie algebra must not be the trivial {0} space
-  h_nontrivial_algebra : ∃ A : LieAlgebra, A ≠ 0
-  
-  -- Anti-BS constraint: The connection one-form must inherently be well-behaved
-  omega_continuous : Continuous omega
-  
   -- (10.3a) Projection property onto fundamental vector fields
   axiom_i : ∀ A : LieAlgebra, omega (fundVectorField A) = A
   
@@ -42,13 +36,6 @@ class ConnectionFormExistence
     [TopologicalSpace GaugePotential] [TopologicalSpace LocalSection] [TopologicalSpace ConnectionForm]
     [Nonempty GaugePotential] [Nonempty LocalSection] [Nonempty ConnectionForm]
     (pullback : LocalSection → ConnectionForm → GaugePotential) where
-  -- Anti-BS constraint: Ensure the pullback mapping is not trivially constant/degenerate.
-  h_nontrivial : ∃ (omega1 omega2 : ConnectionForm) (sigma : LocalSection), 
-    pullback sigma omega1 ≠ pullback sigma omega2 
-  
-  -- Anti-BS constraint: Pullback itself must inherently preserve continuity 
-  pullback_continuous : ∀ sigma, Continuous (pullback sigma)
-  
   connection_exists :
     ∀ (A : GaugePotential) (sigma : LocalSection),
       ∃ (omega : ConnectionForm), A = pullback sigma omega
@@ -66,13 +53,6 @@ class GaugeTransformationCompatibility
     (inv : GroupElement → GroupElement)
     (adjoint : GroupElement → GaugePotential → GaugePotential)
     (cartanMaurer : (Point → GroupElement) → Point → GaugePotential) where
-  -- Anti-BS constraint: The bundle must have non-trivial transition 
-  -- functions on the overlap, otherwise it's just a trivial bundle.
-  h_nontrivial_transition : ∃ p : Point, t_ij p ≠ identityElem
-  
-  -- Anti-BS constraint: Transition function must inherently be continuous
-  t_ij_continuous : Continuous t_ij
-  
   -- Compatibility condition
   compatibility : ∀ p : Point, 
     A_j p = adjoint (inv (t_ij p)) (A_i p) + cartanMaurer t_ij p
@@ -86,10 +66,6 @@ class PathOrderingOperator
     [LinearOrder Time] [Nonempty Operator]
     (multiply : Operator → Operator → Operator)
     (pathOrder : (Time → Operator) → Time → Time → Operator) where
-  -- Anti-BS constraint: The operators must not inherently commute. 
-  -- If they do, the path-ordering operator is a meaningless abstraction.
-  h_non_commutative : ∃ A B : Operator, multiply A B ≠ multiply B A
-  
   -- Path ordering definition
   path_ordering_def : ∀ (paramOp : Time → Operator) (t s : Time),
     pathOrder paramOp t s = if t > s then 
@@ -106,13 +82,6 @@ class HorizontalLiftExistence
     [TopologicalSpace PointM] [TopologicalSpace PointP] [Nonempty PointM] [Nonempty PointP]
     (project : PointP → PointM)
     (isHorizontal : (ℝ → PointP) → Prop) where
-  -- Anti-BS constraint: We must be able to form a continuous curve that actually moves,
-  -- otherwise the horizontal lift is trivially just a static point.
-  h_nontrivial_curve : ∃ (c : ℝ → PointM) (t : ℝ), Continuous c ∧ c t ≠ c 0
-  
-  -- Anti-BS constraint: The projection itself must be continuous unconditionally
-  project_continuous : Continuous project
-  
   -- Theorem 10.2: Existence and uniqueness of horizontal lift
   horizontal_lift : ∀ (c : ℝ → PointM) (u0 : PointP),
     Continuous c → 

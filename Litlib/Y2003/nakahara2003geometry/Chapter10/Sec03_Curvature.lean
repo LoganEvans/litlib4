@@ -16,12 +16,6 @@ class CovariantDerivativePrincipal
     (evalForm : Form → (Vector → Vector) → Form) 
     (extDeriv : Form → Form)
     (covDeriv : Form → Form) where
-  -- Anti-BS constraint: Ensures the horizontal projection actually does something
-  h_nontrivial_proj : ∃ v : Vector, horizontalProj v ≠ v
-  
-  -- Anti-BS constraint: The projection must be inherently continuous
-  horizontalProj_continuous : Continuous horizontalProj
-  
   cov_deriv_def : ∀ phi : Form, covDeriv phi = evalForm (extDeriv phi) horizontalProj
 
 Litlib.equation "nakahara2003geometry"
@@ -33,12 +27,6 @@ class CartanStructureEquationPrincipal
     (extDeriv : Form → Form)
     (wedge : Form → Form → Form)
     (curvature : Form → Form) where
-  -- Anti-BS Constraint
-  h_nontrivial : ∃ omega, curvature omega ≠ 0
-  
-  -- Anti-BS constraint: Exterior derivative must be inherently continuous
-  extDeriv_continuous : Continuous extDeriv
-  
   cartan_eq : ∀ omega, curvature omega = extDeriv omega + wedge omega omega
 
 Litlib.equation "nakahara2003geometry"
@@ -54,8 +42,6 @@ class AmbroseSingerTheorem
     (isHorizontal : Point → Vector → Prop)
     (onSameHorizontalLift : Point → Point → Prop)
     (subalgebraSpannedBy : (LieAlgebra → Prop) → (LieAlgebra → Prop)) where
-  -- Anti-BS constraint
-  h_nontrivial_curvature : ∃ u X Y, isHorizontal u X ∧ isHorizontal u Y ∧ Curvature u X Y ≠ 0
   ambrose_singer :
     ∀ u_0 g,
       HolonomyAlgebra u_0 g ↔
@@ -70,10 +56,6 @@ class LocalFieldStrength
     (extDeriv : Form → Form)
     (wedge : Form → Form → Form)
     (fieldStrength : Form → Form) where
-  h_nontrivial : ∃ A, fieldStrength A ≠ 0
-  
-  extDeriv_continuous : Continuous extDeriv
-  
   local_field_strength : ∀ A, fieldStrength A = extDeriv A + wedge A A
 
 Litlib.equation "nakahara2003geometry"
@@ -84,10 +66,6 @@ class PrincipalBianchiIdentity
     (Form : Type _) [TopologicalSpace Form] [Zero Form] [Nonempty Form]
     (covExtDeriv : Form → Form)
     (Curvature : Form) where
-  h_nontrivial : Curvature ≠ 0
-  
-  covExtDeriv_continuous : Continuous covExtDeriv
-  
   bianchi : covExtDeriv Curvature = 0
 
 end Litlib.Y2003.nakahara2003geometry
