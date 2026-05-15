@@ -82,69 +82,86 @@ private def extractSourceCode (env : Environment) (n : Name) : CoreM (Option Str
     return some code
   return none
 
-/-- Safely strips the `:= ...` proof block from theorems while respecting brackets and strings. -/
-private def stripProofToSignature (s : String) : String := Id.run do
+/-- Safely strips the `:= ...` or `where ...` proof block from theorems and instances. -/
+private def stripProofToSignature (s : String) (isInst : Bool) : String := Id.run do
   let chars := s.toList.toArray
   let mut level := 0
-  let mut out : Array Char := #[]
-  let mut i := 0
   let mut inString := false
   let mut inLineComment := false
   let mut blockCommentDepth := 0
+  
+  let mut validAssigns : Array Nat := #[]
+  let mut validWheres : Array Nat := #[]
 
+  let mut i := 0
   while i < chars.size do
     let c := chars[i]!
     let nextC := if i + 1 < chars.size then chars[i+1]! else ' '
 
     if inLineComment then
       if c == '\n' then inLineComment := false
-      out := out.push c
       i := i + 1
       continue
 
     if blockCommentDepth > 0 then
       if c == '/' && nextC == '-' then
         blockCommentDepth := blockCommentDepth + 1
-        out := out.push c; out := out.push nextC; i := i + 2
+        i := i + 2
         continue
       else if c == '-' && nextC == '/' then
         blockCommentDepth := blockCommentDepth - 1
-        out := out.push c; out := out.push nextC; i := i + 2
+        i := i + 2
         continue
-      out := out.push c
       i := i + 1
       continue
 
     if inString then
       if c == '"' && (i == 0 || chars[i-1]! != '\\') then
         inString := false
-      out := out.push c
       i := i + 1
       continue
 
     if c == '"' then
       inString := true
-      out := out.push c
       i := i + 1
       continue
     if c == '-' && nextC == '-' then
       inLineComment := true
-      out := out.push c; out := out.push nextC; i := i + 2
+      i := i + 2
       continue
     if c == '/' && nextC == '-' then
       blockCommentDepth := 1
-      out := out.push c; out := out.push nextC; i := i + 2
+      i := i + 2
       continue
 
     if c == '(' || c == '[' || c == '{' || c == '⦃' || c == '⟨' then level := level + 1
     else if c == ')' || c == ']' || c == '}' || c == '⦄' || c == '⟩' then level := level - 1
 
-    -- When we hit the top-level assignment operator for the proof block, truncate.
     if level == 0 && c == ':' && nextC == '=' then
-      return String.ofList out.toList
+      validAssigns := validAssigns.push i
 
-    out := out.push c
+    if level == 0 && c == 'w' && i + 4 < chars.size && chars[i+1]! == 'h' && chars[i+2]! == 'e' && chars[i+3]! == 'r' && chars[i+4]! == 'e' then
+      let prevC := if i > 0 then chars[i-1]! else ' '
+      let nextW := if i + 5 < chars.size then chars[i+5]! else ' '
+      if prevC.isWhitespace && (nextW.isWhitespace || nextW == '\n') then
+        validWheres := validWheres.push i
+
     i := i + 1
+
+  if isInst then
+    if let some wIdx := validWheres.back? then
+      return String.ofList (chars.extract 0 wIdx).toList
+
+  -- Parse backwards through valid level-0 assignments to find the proof start
+  for idx in validAssigns.reverse do
+    let mut j := idx + 2
+    while j < chars.size && chars[j]!.isWhitespace do j := j + 1
+    if j + 1 < chars.size && chars[j]! == 'b' && chars[j+1]! == 'y' then
+      return String.ofList (chars.extract 0 idx).toList
+      
+  -- Fallback: If no `:= by` is found, take the absolute last `:=` as the term proof assignment
+  if let some lastIdx := validAssigns.back? then
+    return String.ofList (chars.extract 0 lastIdx).toList
 
   return s
 
@@ -161,39 +178,39 @@ def withPPOptions {α} (x : MetaM α) : MetaM α := do
     |>.setBool `pp.rawOnError true
   withOptions (fun _ => opts) x
 
-partial def collectLocalDepsRec (env : Environment) (rootModule : Name) (q : List Name) (v : NameSet) : NameSet :=
+partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet) : CoreM NameSet := do
   match q with
-  | [] => v
+  | [] => return v
   | curr :: rest =>
+    let env ← getEnv
     if let some info := env.find? curr then
-      Id.run do
-        let mut consts : NameSet := {}
-        consts := info.type.foldConsts consts (fun c acc => acc.insert c)
-        if let some val := info.value? then
-          consts := val.foldConsts consts (fun c acc => acc.insert c)
+      let mut consts : NameSet := {}
+      consts := info.type.foldConsts consts (fun c acc => acc.insert c)
 
-        let mut newQ := rest
-        let mut newV := v
-        for c in consts.toList do
-          let isLocalMod := match env.getModuleIdxFor? c with
-            | some idx =>
-              let modName := env.header.moduleNames[idx.toNat]!
-              let mStr := modName.toString
-              mStr.startsWith "Litlib" || mStr.startsWith rootModule.toString
-            | none => false
-          
-          let isAuto := c.isInternal || 
-            (match c with 
-            | .str _ s => s == "mk" || s == "rec" || s == "casesOn" || s == "recOn" || s.startsWith "match_" || s.startsWith "proof_" || s.startsWith "eq_" 
-            | _ => false)
-
-          if !newV.contains c && isLocalMod && !isAuto && c != curr then
-            newV := newV.insert c
-            newQ := c :: newQ
+      let mut newQ := rest
+      let mut newV := v
+      for c in consts.toList do
+        let isLocalMod := match env.getModuleIdxFor? c with
+          | some idx =>
+            let modName := env.header.moduleNames[idx.toNat]!
+            let mStr := modName.toString
+            mStr.startsWith "Litlib" || mStr.startsWith rootModule.toString
+          | none => false
         
-        return collectLocalDepsRec env rootModule newQ newV
+        let isAuto := c.isInternal || 
+          (match c with 
+          | .str _ s => s == "mk" || s == "rec" || s == "casesOn" || s == "recOn" || s.startsWith "match_" || s.startsWith "proof_" || s.startsWith "eq_" 
+          | _ => false)
+
+        let isProj := (← Lean.getProjectionFnInfo? c).isSome
+
+        if !newV.contains c && isLocalMod && !isAuto && !isProj && c != curr then
+          newV := newV.insert c
+          newQ := c :: newQ
+      
+      collectLocalDepsRec rootModule newQ newV
     else
-      collectLocalDepsRec env rootModule rest v
+      collectLocalDepsRec rootModule rest v
 
 def ppDecl (env : Environment) (name : Name) : IO String := do
   let ctx : Core.Context := { fileName := "<litlib>", fileMap := default }
@@ -202,8 +219,9 @@ def ppDecl (env : Environment) (name : Name) : IO String := do
     let isThm := match env.find? name with | some (ConstantInfo.thmInfo _) => true | _ => false
     
     if let some src ← extractSourceCode env name then
-      if isThm then
-        return (stripProofToSignature src).trimAsciiEnd.toString
+      let isInst := src.trimAscii.toString.startsWith "instance"
+      if isThm || isInst then
+        return (stripProofToSignature src isInst).trimAsciiEnd.toString
       else
         return src.trimAsciiEnd.toString
     else if let some info := env.find? name then
@@ -251,7 +269,9 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
     roots := roots.insert thm.declName
 
   -- 2. Traverse AST
-  let allLocalConsts := collectLocalDepsRec env rootModule roots.toList roots
+  let ctx : Core.Context := { fileName := "<litlib>", fileMap := default }
+  let state : Core.State := { env := env }
+  let (allLocalConsts, _) ← (collectLocalDepsRec rootModule roots.toList roots).toIO ctx state
 
   -- 3. Group by Module
   let mut byModule : NameMap (Array Name) := {}
