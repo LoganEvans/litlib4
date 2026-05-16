@@ -8,6 +8,7 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Analysis.Calculus.ContDiff.Basic
 import Mathlib.Data.Nat.Factorial.Basic
 import Mathlib.Analysis.Matrix.Normed
 
@@ -33,6 +34,24 @@ class CommutingExponential
   hIsExp : ∀ X, Tendsto (fun m : ℕ => ∑ k ∈ Finset.range m, (1 / (Nat.factorial k : ℂ)) • X^k) atTop (𝓝 (exp X))
   commutingExp :
     ∀ X Y : Matrix n n ℂ, X * Y = Y * X → exp (X + Y) = exp X * exp Y
+
+Litlib.equation "hall2000elementary"
+  eq "Prop 3.4"
+  page "29"
+  kind "Proposition"
+class DerivativeExponential 
+    (n : Type*) [Fintype n] [DecidableEq n]
+    [NormedAddCommGroup (Matrix n n ℂ)] [NormedSpace ℝ (Matrix n n ℂ)]
+    (exp : Matrix n n ℂ → Matrix n n ℂ) where
+  hIsExp : ∀ X, Tendsto (fun m : ℕ => ∑ k ∈ Finset.range m, (1 / (Nat.factorial k : ℂ)) • X^k) atTop (𝓝 (exp X))
+  smooth_exp : 
+    ∀ X : Matrix n n ℂ, ContDiff ℝ ⊤ (fun (t : ℝ) => exp ((t : ℂ) • X))
+  deriv_exp : 
+    ∀ (X : Matrix n n ℂ) (t : ℝ), 
+      deriv (fun (s : ℝ) => exp ((s : ℂ) • X)) t = X * exp ((t : ℂ) • X) ∧ 
+      deriv (fun (s : ℝ) => exp ((s : ℂ) • X)) t = exp ((t : ℂ) • X) * X
+  deriv_exp_zero : 
+    ∀ X : Matrix n n ℂ, deriv (fun (s : ℝ) => exp ((s : ℂ) • X)) 0 = X
 
 Litlib.equation "hall2000elementary"
   eq "Thm 3.9"
