@@ -82,30 +82,29 @@ class CDJSigmaDef
       (η x * wedgeContract (F x a) (F x b) epsilon4) * 
       F x c μ ν
 
-Litlib.equation "capovilla1989general"
-  eq "Theorem"
-  page "2326"
-  kind "Theorem"
-class CDJImpliesRicciFlat
-    (Spacetime : Type*)
-    (urbantkeMetric : (Spacetime → Fin 3 → Fin 4 → Fin 4 → ℂ) → Spacetime → Fin 4 → Fin 4 → ℂ)
-    (ricciTensor : (Spacetime → Fin 4 → Fin 4 → ℂ) → Spacetime → Fin 4 → Fin 4 → ℂ) where
-  cdj_implies_ricci_flat 
-    (F : Spacetime → Fin 3 → Fin 4 → Fin 4 → ℂ)
-    (α β : ℂ)
-    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    (hEpsilonAlt : ∀ μ ν ρ σ, 
-      epsilon4 μ ν ρ σ = -epsilon4 ν μ ρ σ ∧ 
-      epsilon4 μ ν ρ σ = -epsilon4 μ ρ ν σ ∧ 
-      epsilon4 μ ν ρ σ = -epsilon4 μ ν σ ρ)
-    (hEpsilonNondeg : epsilon4 0 1 2 3 ≠ 0)
-    (h_coupling : α = -β)
-    (h_alpha_nz : α ≠ 0)
-    (h_non_degenerate : ∀ x, Matrix.det (Matrix.of (urbantkeMetric F x)) ≠ 0)
-    (h_6a : ∀ x, (∑ a, ∑ b, ∑ c, ∑ d,
-      capovillaMetric α β a b c d * 
-      wedgeContract (F x a) (F x b) epsilon4 * 
-      wedgeContract (F x c) (F x d) epsilon4) = 0) :
-    ∀ x μ ν, ricciTensor (urbantkeMetric F) x μ ν = 0
+/- 
+ERRATA:
+========================================================================================
+The theorem `CDJImpliesRicciFlat` originally transcribed from Capovilla 1989 has been 
+removed. The 1989 paper erroneously claimed that the purely algebraic constraint 
+(Eq 6a: F ∧ F ~ δ) was mathematically sufficient to derive Ricci flatness for an 
+arbitrary 2-form F. 
+
+This is mathematically false. Ricci flatness requires the 2-form F to also satisfy 
+the differential Bianchi identity (dF + A ∧ F = 0). Omitting this differential 
+constraint creates a loop-hole where the theorem is trivially impossible to satisfy 
+or vacuous.
+
+For the correct, rigorous derivation of Ricci flatness from the Capovilla equations, 
+do NOT use the 1989 classes. Instead, use the 1991 formalisms in:
+`Litlib.Y1991.capovilla1991pure.Signature`
+
+Specifically, the 1991 theorem chain requires:
+1. Eq2_19a (Algebraic trace-free constraint)
+2. Eq2_19b (Differential Bianchi constraint)
+3. Theorem_Eq2_19_Equivalent_To_Eq2_2 (Mapping to symmetric Weyl spinors)
+4. Theorem_Eq2_2c_RicciFlat (Deriving Ricci flatness from the Weyl components)
+========================================================================================
+-/
 
 end Litlib.Y1989.capovilla1989general
