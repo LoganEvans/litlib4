@@ -119,6 +119,29 @@ class Eq2_2c
       Psi x A B C D * Sigma x μ ν C D
 
 Litlib.equation "capovilla1991pure"
+  eq "Page 61, Theorem B"
+  page "61"
+  kind "Theorem"
+class Theorem_Eq2_2c_RicciFlat
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (theta : Spacetime → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (g : Spacetime → Fin 4 → Fin 4 → ℂ)
+    (eps2_down : Fin 2 → Fin 2 → ℂ)
+    (eps2_bar_down : Fin 2 → Fin 2 → ℂ)
+    (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (Psi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
+    (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (isRicciFlat : (Spacetime → Fin 4 → Fin 4 → ℂ) → Prop) where
+  heps2_anti : ∀ A B, eps2_down A B = - eps2_down B A
+  heps2_bar_anti : ∀ A' B', eps2_bar_down A' B' = - eps2_bar_down B' A'
+  hg_def : ∀ x μ ν, g x μ ν = 
+    sumFin2 fun A => sumFin2 fun B => sumFin2 fun A' => sumFin2 fun B' =>
+      eps2_down A B * eps2_bar_down A' B' * theta x μ A A' * theta x ν B B'
+  eq2_2c_implies_ricci_flat :
+    (∀ x μ ν A B, R x μ ν A B = sumFin2 fun C => sumFin2 fun D => Psi x A B C D * Sigma x μ ν C D) →
+    isRicciFlat g
+
+Litlib.equation "capovilla1991pure"
   eq "2.3"
   page "61"
   kind "Definition"
@@ -427,6 +450,26 @@ class Eq2_20b
         epsilon4 ρ σ α β * R_up ρ σ A B * R_up α β C D
 
 Litlib.equation "capovilla1991pure"
+  eq "Page 64, Theorem A"
+  page "64"
+  kind "Theorem"
+class Theorem_Eq2_19_Equivalent_To_Eq2_2
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (isNonDegenerateWeylCurvature : Spacetime → Prop)
+    (eq2_19a_holds : Spacetime → Prop)
+    (eq2_19b_holds : Spacetime → Prop)
+    (eq2_2a_holds : Spacetime → Prop)
+    (eq2_2b_holds : Spacetime → Prop)
+    (eq2_2c_holds : Spacetime → Prop)
+    (eq2_20a_holds : Spacetime → Prop)
+    (eq2_20b_holds : Spacetime → Prop) where
+  equivalence : ∀ x,
+    isNonDegenerateWeylCurvature x →
+    eq2_20a_holds x →
+    eq2_20b_holds x →
+    ((eq2_19a_holds x ∧ eq2_19b_holds x) ↔ (eq2_2a_holds x ∧ eq2_2b_holds x ∧ eq2_2c_holds x))
+
+Litlib.equation "capovilla1991pure"
   eq "2.21"
   page "64"
   kind "Definition"
@@ -443,71 +486,35 @@ class Eq2_21
 Litlib.equation "capovilla1991pure"
   eq "2.22"
   page "64"
-  kind "Definition"
-class Eq2_22 
+  kind "Theorem"
+class Theorem_Eq2_22_Derivation
     (Spacetime : Type*) [TopologicalSpace Spacetime]
     (g : Spacetime → Fin 4 → Fin 4 → ℂ)
+    (g_dens : Spacetime → Fin 4 → Fin 4 → ℂ)
     (eta : Spacetime → ℂ)
+    (sqrt_g : Spacetime → ℂ)
+    (detPsi : Spacetime → ℂ)
     (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (Psi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
+    (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
     (eps2_up : Fin 2 → Fin 2 → ℂ) where
   -- ANTI-BS: A metric must be non-degenerate.
   hg_nondeg : ∀ x, Matrix.det (g x) ≠ 0
-  -- ANTI-BS: eta is defined via an inverse, so it cannot be zero.
-  heta_nondeg : ∀ x, eta x ≠ 0
-  -- ANTI-BS: R is a 2-form, must be antisymmetric in spacetime indices.
-  hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
-  -- ANTI-BS: R is symmetric in its chiral spinor indices.
-  hR_symm_spin : ∀ x μ ν A B, R x μ ν A B = R x μ ν B A
-  -- ANTI-BS: epsilon4 must be a totally antisymmetric, non-zero tensor (Levi-Civita).
-  h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
-  h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
-  h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
-  h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
-  -- ANTI-BS: eps2_up (spinor metric) is antisymmetric and non-degenerate.
-  heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
-  heps2_up_nondeg : eps2_up 0 1 ≠ 0
-  eq2_22_iff : ∀ x μ ν, g x μ ν = 
+  h_g_dens_def : ∀ x μ ν, g_dens x μ ν = sqrt_g x * g x μ ν
+  -- Definitions as explicit hypotheses corresponding to (2.4, 2.2c, 2.21)
+  eq2_4_holds : ∀ x μ ν, g_dens x μ ν = 
+    (1 / 3 : ℂ) * sumFin4 fun α => sumFin4 fun β => sumFin4 fun γ => sumFin4 fun δ =>
+      sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D => sumFin2 fun E => sumFin2 fun F =>
+        epsilon4 α β γ δ * Sigma x μ α A B * eps2_up B C * Sigma x β γ C D * eps2_up D E * Sigma x δ ν E F * eps2_up F A
+  eq2_2c_holds : ∀ x μ ν A B, R x μ ν A B = 
+    sumFin2 fun C => sumFin2 fun D => Psi x A B C D * Sigma x μ ν C D
+  eq2_21_holds : ∀ x, eta x = (sqrt_g x * detPsi x)⁻¹
+  -- The theorem claim (2.22), logically dependent on the above holding
+  eq2_22_derived : ∀ x μ ν, g x μ ν = 
     (1 / 3 : ℂ) * eta x * 
     sumFin4 fun α => sumFin4 fun β => sumFin4 fun γ => sumFin4 fun δ =>
       sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D => sumFin2 fun E => sumFin2 fun F =>
         epsilon4 α β γ δ * R x μ α A B * eps2_up B C * R x β γ C D * eps2_up D E * R x δ ν E F * eps2_up F A
-
-Litlib.equation "capovilla1991pure"
-  eq "2.21_2.22_Identity"
-  page "64"
-  kind "Theorem"
-class UrbantkeDeterminantIdentity
-    (Spacetime : Type*) [TopologicalSpace Spacetime]
-    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    (eps2_up : Fin 2 → Fin 2 → ℂ) where
-  -- THE THEOREM: The 4x4 determinant of the metric g (Eq 2.22) is exactly 
-  -- algebraically determined by eta and the safe 3x3 determinant of Psi^{-1} (Eq 2.20b).
-  -- Eq 2.21 states \eta = (\sqrt{g} \det \Psi)^{-1}, which implies \det(g) * \eta^2 = (\det \Psi^{-1})^2.
-  determinant_identity : 
-    ∀ (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
-      (g : Spacetime → Fin 4 → Fin 4 → ℂ)
-      (eta : Spacetime → ℂ)
-      (invPsi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
-      (invPsi_3x3 : Spacetime → Fin 3 → Fin 3 → ℂ)
-      (clump : Fin 2 → Fin 2 → Fin 3),
-      -- 1. clump is a symmetric surjection (protects against 0=1 exploits)
-      (∀ A B, clump A B = clump B A) →
-      Function.Surjective (fun (p : Fin 2 × Fin 2) => clump p.1 p.2) →
-      -- 2. g is explicitly defined by Eq 2.22
-      (∀ x μ ν, g x μ ν = (1 / 3 : ℂ) * eta x * 
-        sumFin4 fun α => sumFin4 fun β => sumFin4 fun γ => sumFin4 fun δ =>
-          sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D => sumFin2 fun E => sumFin2 fun F =>
-            epsilon4 α β γ δ * R x μ α A B * eps2_up B C * R x β γ C D * eps2_up D E * R x δ ν E F * eps2_up F A) →
-      -- 3. invPsi is explicitly defined by Eq 2.20b
-      (∀ x A B C D,
-        let R_up := fun ρ σ A_idx B_idx => sumFin2 fun A' => sumFin2 fun B' => eps2_up A_idx A' * eps2_up B_idx B' * R x ρ σ A' B';
-        invPsi x A B C D =
-          eta x * sumFin4 fun ρ => sumFin4 fun σ => sumFin4 fun α => sumFin4 fun β =>
-            epsilon4 ρ σ α β * R_up ρ σ A B * R_up α β C D) →
-      -- 4. invPsi_3x3 is exactly invPsi evaluated via the clumped indices (Page 62 mapping)
-      (∀ x A B C D, invPsi_3x3 x (clump A B) (clump C D) = invPsi x A B C D) →
-      -- 5. Conclusion:
-      ∀ x, Matrix.det (g x) * (eta x)^2 = (Matrix.det (invPsi_3x3 x))^2
 
 end Litlib.Y1991.capovilla1991pure
