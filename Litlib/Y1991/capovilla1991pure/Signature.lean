@@ -28,6 +28,112 @@ Litlib.paper "capovilla1991pure"
   doi "10.1088/0264-9381/8/1/01"
 
 Litlib.equation "capovilla1991pure"
+  eq "2.1"
+  page "61"
+  kind "Action"
+class Eq2_1
+    (Spacetime : Type*) [TopologicalSpace Spacetime] [MeasureTheory.MeasureSpace Spacetime]
+    (S : ℂ)
+    (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (Psi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
+  -- ANTI-BS: Fields must be measurable to prevent meaningless integrals
+  hSigma_meas : ∀ μ ν A B, MeasureTheory.AEStronglyMeasurable (fun x => Sigma x μ ν A B) volume
+  hR_meas : ∀ μ ν A B, MeasureTheory.AEStronglyMeasurable (fun x => R x μ ν A B) volume
+  hPsi_meas : ∀ A B C D, MeasureTheory.AEStronglyMeasurable (fun x => Psi x A B C D) volume
+  -- ANTI-BS: epsilon4 is non-zero and totally antisymmetric
+  h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
+  h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
+  h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
+  eq2_1_iff : S = MeasureTheory.integral volume (fun x =>
+    let term1 := sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
+      epsilon4 μ ν ρ σ * sumFin2 fun A => sumFin2 fun B =>
+        Sigma x μ ν A B * R x ρ σ A B;
+    let term2 := sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
+      epsilon4 μ ν ρ σ * sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D =>
+        Psi x A B C D * Sigma x μ ν A B * Sigma x ρ σ C D;
+    term1 - (1/2 : ℂ) * term2
+  )
+
+Litlib.equation "capovilla1991pure"
+  eq "2.2a"
+  page "61"
+  kind "Equation of Motion"
+class Eq2_2a
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
+  -- ANTI-BS checks
+  hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
+  hSigma_symm : ∀ x μ ν A B, Sigma x μ ν A B = Sigma x μ ν B A
+  h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
+  eq2_2a_iff : ∀ x A B C D,
+    let w := fun A' B' C' D' => sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
+      epsilon4 μ ν ρ σ * Sigma x μ ν A' B' * Sigma x ρ σ C' D';
+    -- Total symmetrization over A,B,C,D (since pairs AB and CD are already symmetric)
+    w A B C D + w A C B D + w A D B C = 0
+
+Litlib.equation "capovilla1991pure"
+  eq "2.2b"
+  page "61"
+  kind "Equation of Motion"
+class Eq2_2b
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (dSigma : Spacetime → Fin 4 → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ) -- 3-form
+    (omega : Spacetime → Fin 4 → Fin 2 → Fin 2 → ℂ) -- 1-form connection
+    (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ) -- 2-form
+    (eps2_up : Fin 2 → Fin 2 → ℂ) where
+  -- ANTI-BS: Enforce symmetries
+  hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
+  homega_symm : ∀ x μ A B, omega x μ A B = omega x μ B A
+  eq2_2b_iff : ∀ x μ ν ρ A B,
+    let omega_up := fun lam A' C' => sumFin2 fun E => eps2_up A' E * omega x lam E C';
+    let term := fun m n r => dSigma x m n r A B + 
+      sumFin2 (fun C => omega_up m A C * Sigma x n r B C + omega_up m B C * Sigma x n r A C);
+    -- The total antisymmetrization of this 3-form term must be 0 (enforcing the \wedge product structure)
+    term μ ν ρ + term ν ρ μ + term ρ μ ν - term ν μ ρ - term μ ρ ν - term ρ ν μ = 0
+
+Litlib.equation "capovilla1991pure"
+  eq "2.2c"
+  page "61"
+  kind "Equation of Motion"
+class Eq2_2c 
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (Psi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
+    (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ) where
+  -- ANTI-BS: R and Sigma are 2-forms, strictly antisymmetric in spacetime indices
+  hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
+  hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
+  -- ANTI-BS: R and Sigma are symmetric in chiral spinor indices
+  hR_symm_spin : ∀ x μ ν A B, R x μ ν A B = R x μ ν B A
+  hSigma_symm_spin : ∀ x μ ν A B, Sigma x μ ν A B = Sigma x μ ν B A
+  -- Psi is a totally symmetric Lagrange multiplier field. 
+  hPsiSymm : ∀ x A B C D, 
+    Psi x A B C D = Psi x B A C D ∧ 
+    Psi x A B C D = Psi x A C B D ∧ 
+    Psi x A B C D = Psi x A B D C
+  eq2_2c_iff : ∀ x μ ν A B, R x μ ν A B = 
+    sumFin2 fun C => sumFin2 fun D => 
+      Psi x A B C D * Sigma x μ ν C D
+
+Litlib.equation "capovilla1991pure"
+  eq "2.3"
+  page "61"
+  kind "Definition"
+class Eq2_3
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (theta : Spacetime → Fin 4 → Fin 2 → Fin 2 → ℂ) -- Tetrad fields
+    (eps2_right : Fin 2 → Fin 2 → ℂ) where
+  hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
+  heps2_right_anti : ∀ A' B', eps2_right A' B' = - eps2_right B' A'
+  eq2_3_iff : ∀ x μ ν A B,
+    Sigma x μ ν A B = (1/2 : ℂ) * sumFin2 fun A' => sumFin2 fun B' =>
+      eps2_right A' B' * (theta x μ A A' * theta x ν B B' - theta x ν A A' * theta x μ B B')
+
+Litlib.equation "capovilla1991pure"
   eq "2.4"
   page "61"
   kind "Definition"
@@ -36,7 +142,7 @@ class Eq2_4
     (g_dens : Spacetime → Fin 4 → Fin 4 → ℂ) -- Represents \sqrt{g} g_{\mu\nu}
     (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    (eps2 : Fin 2 → Fin 2 → ℂ) where
+    (eps2_up : Fin 2 → Fin 2 → ℂ) where
   -- ANTI-BS: The metric density must be non-degenerate.
   hg_dens_nondeg : ∀ x, Matrix.det (g_dens x) ≠ 0
   -- ANTI-BS: Sigma is a 2-form, antisymmetric in spacetime indices.
@@ -48,13 +154,84 @@ class Eq2_4
   h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
   h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
   h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
-  -- ANTI-BS: eps2 (spinor metric) is antisymmetric and non-degenerate.
-  heps2_anti : ∀ A B, eps2 A B = - eps2 B A
-  heps2_nondeg : eps2 0 1 ≠ 0
+  -- ANTI-BS: eps2_up (spinor metric) is antisymmetric and non-degenerate.
+  heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
+  heps2_up_nondeg : eps2_up 0 1 ≠ 0
   eq2_4_iff : ∀ x μ ν, g_dens x μ ν = 
     (1 / 3 : ℂ) * sumFin4 fun α => sumFin4 fun β => sumFin4 fun γ => sumFin4 fun δ =>
       sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D => sumFin2 fun E => sumFin2 fun F =>
-        epsilon4 α β γ δ * Sigma x μ α A B * eps2 B C * Sigma x β γ C D * eps2 D E * Sigma x δ ν E F * eps2 F A
+        epsilon4 α β γ δ * Sigma x μ α A B * eps2_up B C * Sigma x β γ C D * eps2_up D E * Sigma x δ ν E F * eps2_up F A
+
+Litlib.equation "capovilla1991pure"
+  eq "2.5a"
+  page "62"
+  kind "Constraint"
+class Eq2_5a
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (Sigma_bar : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
+  h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
+  eq2_5a_iff : ∀ x A B A' B',
+    (sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
+      epsilon4 μ ν ρ σ * Sigma x μ ν A B * Sigma_bar x ρ σ A' B') = 0
+
+Litlib.equation "capovilla1991pure"
+  eq "2.5b"
+  page "62"
+  kind "Constraint"
+class Eq2_5b
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (Sigma_down : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (Sigma_bar : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (Sigma_bar_down : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
+  h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
+  eq2_5b_iff : ∀ x,
+    let term1 := sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
+      epsilon4 μ ν ρ σ * sumFin2 fun M => sumFin2 fun N =>
+        Sigma x μ ν M N * Sigma_down x ρ σ M N;
+    let term2 := sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
+      epsilon4 μ ν ρ σ * sumFin2 fun M_prime => sumFin2 fun N_prime =>
+        Sigma_bar x μ ν M_prime N_prime * Sigma_bar_down x ρ σ M_prime N_prime;
+    term1 + term2 = 0
+
+Litlib.equation "capovilla1991pure"
+  eq "2.6"
+  page "62"
+  kind "Definition"
+class Eq2_6
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (invPsi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
+    (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ) where
+  hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
+  hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
+  eq2_6_iff : ∀ x μ ν A B,
+    Sigma x μ ν A B = sumFin2 fun C => sumFin2 fun D =>
+      invPsi x A B C D * R x μ ν C D
+
+Litlib.equation "capovilla1991pure"
+  eq "2.7"
+  page "62"
+  kind "Action"
+class Eq2_7
+    (Spacetime : Type*) [TopologicalSpace Spacetime] [MeasureTheory.MeasureSpace Spacetime]
+    (S : ℂ)
+    (invPsi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
+    (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
+  hinvPsi_meas : ∀ A B C D, MeasureTheory.AEStronglyMeasurable (fun x => invPsi x A B C D) volume
+  hR_meas : ∀ μ ν A B, MeasureTheory.AEStronglyMeasurable (fun x => R x μ ν A B) volume
+  h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
+  eq2_7_iff : S = (1/2 : ℂ) * MeasureTheory.integral volume (fun x =>
+    sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
+      epsilon4 μ ν ρ σ * (
+        sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D =>
+          invPsi x A B C D * R x μ ν A B * R x ρ σ C D
+      )
+  )
 
 Litlib.equation "capovilla1991pure"
   eq "2.9"
@@ -64,14 +241,17 @@ class Eq2_9
     (Spacetime : Type*) [TopologicalSpace Spacetime]
     (M : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
     (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
-    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
+    (eps2_up : Fin 2 → Fin 2 → ℂ) where
   -- ANTI-BS: R is a 2-form, antisymmetric in spacetime indices.
   hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
   -- ANTI-BS: R is symmetric in its chiral spinor indices.
   hR_symm_spin : ∀ x μ ν A B, R x μ ν A B = R x μ ν B A
-  eq2_9_iff : ∀ x A B C D, M x A B C D = 
-    sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
-      epsilon4 μ ν ρ σ * R x μ ν A B * R x ρ σ C D
+  eq2_9_iff : ∀ x A B C D, 
+    let R_up := fun ρ σ C_idx D_idx => sumFin2 fun C' => sumFin2 fun D' => eps2_up C_idx C' * eps2_up D_idx D' * R x ρ σ C' D';
+    M x A B C D = 
+      sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
+        epsilon4 μ ν ρ σ * R x μ ν A B * R_up ρ σ C D
 
 Litlib.equation "capovilla1991pure"
   eq "Page 62"
@@ -108,7 +288,7 @@ class Eq2_18
     (eta : Spacetime → ℂ)
     (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    (eps2 : Fin 2 → Fin 2 → ℂ) where
+    (eps2_up : Fin 2 → Fin 2 → ℂ) where
   -- ANTI-BS: Fields must be measurable/integrable to prevent meaningless integrals
   heta_meas : MeasureTheory.AEStronglyMeasurable eta volume
   hR_meas : ∀ μ ν A B, MeasureTheory.AEStronglyMeasurable (fun x => R x μ ν A B) volume
@@ -117,18 +297,16 @@ class Eq2_18
   h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
   h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
   h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
-  -- ANTI-BS: eps2 (spinor metric) is antisymmetric and non-degenerate.
-  heps2_anti : ∀ A B, eps2 A B = - eps2 B A
-  heps2_nondeg : eps2 0 1 ≠ 0
+  -- ANTI-BS: eps2_up (spinor metric) is antisymmetric and non-degenerate.
+  heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
+  heps2_up_nondeg : eps2_up 0 1 ≠ 0
   eq2_18_iff : S = MeasureTheory.integral volume (fun x => 
-    eta x * 
-    sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D => 
-    sumFin2 fun A' => sumFin2 fun B' => sumFin2 fun C' => sumFin2 fun D' =>
+    let R_up := fun μ ν A B => sumFin2 fun A' => sumFin2 fun B' => eps2_up A A' * eps2_up B B' * R x μ ν A' B';
+    eta x * sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D => 
       (sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
-        epsilon4 μ ν ρ σ * R x μ ν A' C' * R x ρ σ B' D') *
+        epsilon4 μ ν ρ σ * R_up μ ν A C * R_up ρ σ B D) *
       (sumFin4 fun α => sumFin4 fun β => sumFin4 fun γ => sumFin4 fun δ =>
-        epsilon4 α β γ δ * R x α β A B * R x γ δ C D) *
-      (eps2 A A' * eps2 C C' * eps2 B B' * eps2 D D')
+        epsilon4 α β γ δ * R x α β A B * R x γ δ C D)
   )
 
 Litlib.equation "capovilla1991pure"
@@ -246,7 +424,7 @@ class Eq2_20b
     let R_up := fun ρ σ A_idx B_idx => sumFin2 fun A' => sumFin2 fun B' => eps2_up A_idx A' * eps2_up B_idx B' * R x ρ σ A' B';
     invPsi x A B C D =
       eta x * sumFin4 fun ρ => sumFin4 fun σ => sumFin4 fun α => sumFin4 fun β =>
-        epsilon4 ρ σ α β * R_up ρ σ A B * R x α β C D
+        epsilon4 ρ σ α β * R_up ρ σ A B * R_up α β C D
 
 Litlib.equation "capovilla1991pure"
   eq "2.21"
@@ -272,7 +450,7 @@ class Eq2_22
     (eta : Spacetime → ℂ)
     (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    (eps2 : Fin 2 → Fin 2 → ℂ) where
+    (eps2_up : Fin 2 → Fin 2 → ℂ) where
   -- ANTI-BS: A metric must be non-degenerate.
   hg_nondeg : ∀ x, Matrix.det (g x) ≠ 0
   -- ANTI-BS: eta is defined via an inverse, so it cannot be zero.
@@ -286,14 +464,14 @@ class Eq2_22
   h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
   h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
   h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
-  -- ANTI-BS: eps2 (spinor metric) is antisymmetric and non-degenerate.
-  heps2_anti : ∀ A B, eps2 A B = - eps2 B A
-  heps2_nondeg : eps2 0 1 ≠ 0
+  -- ANTI-BS: eps2_up (spinor metric) is antisymmetric and non-degenerate.
+  heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
+  heps2_up_nondeg : eps2_up 0 1 ≠ 0
   eq2_22_iff : ∀ x μ ν, g x μ ν = 
     (1 / 3 : ℂ) * eta x * 
     sumFin4 fun α => sumFin4 fun β => sumFin4 fun γ => sumFin4 fun δ =>
       sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D => sumFin2 fun E => sumFin2 fun F =>
-        epsilon4 α β γ δ * R x μ α A B * eps2 B C * R x β γ C D * eps2 D E * R x δ ν E F * eps2 F A
+        epsilon4 α β γ δ * R x μ α A B * eps2_up B C * R x β γ C D * eps2_up D E * R x δ ν E F * eps2_up F A
 
 Litlib.equation "capovilla1991pure"
   eq "2.21_2.22_Identity"
@@ -302,7 +480,6 @@ Litlib.equation "capovilla1991pure"
 class UrbantkeDeterminantIdentity
     (Spacetime : Type*) [TopologicalSpace Spacetime]
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    (eps2 : Fin 2 → Fin 2 → ℂ)
     (eps2_up : Fin 2 → Fin 2 → ℂ) where
   -- THE THEOREM: The 4x4 determinant of the metric g (Eq 2.22) is exactly 
   -- algebraically determined by eta and the safe 3x3 determinant of Psi^{-1} (Eq 2.20b).
@@ -321,44 +498,16 @@ class UrbantkeDeterminantIdentity
       (∀ x μ ν, g x μ ν = (1 / 3 : ℂ) * eta x * 
         sumFin4 fun α => sumFin4 fun β => sumFin4 fun γ => sumFin4 fun δ =>
           sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D => sumFin2 fun E => sumFin2 fun F =>
-            epsilon4 α β γ δ * R x μ α A B * eps2 B C * R x β γ C D * eps2 D E * R x δ ν E F * eps2 F A) →
+            epsilon4 α β γ δ * R x μ α A B * eps2_up B C * R x β γ C D * eps2_up D E * R x δ ν E F * eps2_up F A) →
       -- 3. invPsi is explicitly defined by Eq 2.20b
       (∀ x A B C D,
         let R_up := fun ρ σ A_idx B_idx => sumFin2 fun A' => sumFin2 fun B' => eps2_up A_idx A' * eps2_up B_idx B' * R x ρ σ A' B';
         invPsi x A B C D =
           eta x * sumFin4 fun ρ => sumFin4 fun σ => sumFin4 fun α => sumFin4 fun β =>
-            epsilon4 ρ σ α β * R_up ρ σ A B * R x α β C D) →
+            epsilon4 ρ σ α β * R_up ρ σ A B * R_up α β C D) →
       -- 4. invPsi_3x3 is exactly invPsi evaluated via the clumped indices (Page 62 mapping)
       (∀ x A B C D, invPsi_3x3 x (clump A B) (clump C D) = invPsi x A B C D) →
       -- 5. Conclusion:
       ∀ x, Matrix.det (g x) * (eta x)^2 = (Matrix.det (invPsi_3x3 x))^2
-
-Litlib.equation "capovilla1991pure"
-  eq "2.2c"
-  page "61"
-  kind "Equation of Motion"
-class Eq2_2c 
-    (Spacetime : Type*) [TopologicalSpace Spacetime]
-    (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
-    (Psi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
-    (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
-    (eps2 : Fin 2 → Fin 2 → ℂ) where
-  -- ANTI-BS: R and Sigma are 2-forms, strictly antisymmetric in spacetime indices
-  hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
-  hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
-  -- ANTI-BS: R and Sigma are symmetric in chiral spinor indices
-  hR_symm_spin : ∀ x μ ν A B, R x μ ν A B = R x μ ν B A
-  hSigma_symm_spin : ∀ x μ ν A B, Sigma x μ ν A B = Sigma x μ ν B A
-  -- ANTI-BS: eps2 (spinor metric) is antisymmetric and non-degenerate.
-  heps2_anti : ∀ A B, eps2 A B = - eps2 B A
-  heps2_nondeg : eps2 0 1 ≠ 0
-  -- Psi is a totally symmetric Lagrange multiplier field. 
-  hPsiSymm : ∀ x A B C D, 
-    Psi x A B C D = Psi x B A C D ∧ 
-    Psi x A B C D = Psi x A C B D ∧ 
-    Psi x A B C D = Psi x A B D C
-  eq2_2c_iff : ∀ x μ ν A B, R x μ ν A B = 
-    sumFin2 fun C => sumFin2 fun D => sumFin2 fun C' => sumFin2 fun D' => 
-      Psi x A B C D * eps2 C C' * eps2 D D' * Sigma x μ ν C' D'
 
 end Litlib.Y1991.capovilla1991pure
