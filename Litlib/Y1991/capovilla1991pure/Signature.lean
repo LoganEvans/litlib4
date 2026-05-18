@@ -128,17 +128,36 @@ class Theorem_Eq2_2c_RicciFlat
     (g : Spacetime → Fin 4 → Fin 4 → ℂ)
     (eps2_down : Fin 2 → Fin 2 → ℂ)
     (eps2_bar_down : Fin 2 → Fin 2 → ℂ)
+    (eps2_right : Fin 2 → Fin 2 → ℂ)
+    (eps2_up : Fin 2 → Fin 2 → ℂ)
     (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (Psi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
     (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (dSigma : Spacetime → Fin 4 → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
+    (omega : Spacetime → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (isRicciFlat : (Spacetime → Fin 4 → Fin 4 → ℂ) → Prop) where
   heps2_anti : ∀ A B, eps2_down A B = - eps2_down B A
   heps2_bar_anti : ∀ A' B', eps2_bar_down A' B' = - eps2_bar_down B' A'
+  heps2_right_anti : ∀ A' B', eps2_right A' B' = - eps2_right B' A'
+  heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
+  hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
+  homega_symm : ∀ x μ A B, omega x μ A B = omega x μ B A
   hg_def : ∀ x μ ν, g x μ ν = 
     sumFin2 fun A => sumFin2 fun B => sumFin2 fun A' => sumFin2 fun B' =>
       eps2_down A B * eps2_bar_down A' B' * theta x μ A A' * theta x ν B B'
   eq2_2c_implies_ricci_flat :
+    -- Hypothesis 1: Sigma is derived from the tetrad (Eq 2.3)
+    (∀ x μ ν A B, Sigma x μ ν A B = (1/2 : ℂ) * sumFin2 fun A' => sumFin2 fun B' =>
+      eps2_right A' B' * (theta x μ A A' * theta x ν B B' - theta x ν A A' * theta x μ B B')) →
+    -- Hypothesis 2: Zero Torsion (Eq 2.2b) guarantees curvature is the Riemann curvature
+    (∀ x μ ν ρ A B,
+      let omega_up := fun lam A' C' => sumFin2 fun E => eps2_up A' E * omega x lam E C';
+      let term := fun m n r => dSigma x m n r A B + 
+        sumFin2 (fun C => omega_up m A C * Sigma x n r B C + omega_up m B C * Sigma x n r A C);
+      term μ ν ρ + term ν ρ μ + term ρ μ ν - term ν μ ρ - term μ ρ ν - term ρ ν μ = 0) →
+    -- Hypothesis 3: Curvature constraints (Eq 2.2c)
     (∀ x μ ν A B, R x μ ν A B = sumFin2 fun C => sumFin2 fun D => Psi x A B C D * Sigma x μ ν C D) →
+    -- Conclusion: Metric is Ricci flat
     isRicciFlat g
 
 Litlib.equation "capovilla1991pure"
