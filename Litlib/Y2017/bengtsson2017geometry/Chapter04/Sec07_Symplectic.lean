@@ -4,6 +4,7 @@ import Litlib.Core
 import Mathlib.Data.Real.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Data.Nat.Factorial.Basic
+import Mathlib.MeasureTheory.Measure.MeasureSpace
 import Litlib.Y2017.bengtsson2017geometry.Paper
 
 namespace Litlib.Y2017.bengtsson2017geometry
@@ -13,7 +14,10 @@ Litlib.equation "bengtsson2017geometry"
   page "119"
   kind "theorem"
 class Eq4_88
-    (volCP : ℕ → ℝ) where
-  volCP_def : ∀ n, volCP n = (Real.pi ^ n) / (Nat.factorial n : ℝ)
+    (CP : ℕ → Type)
+    [∀ n, MeasureTheory.MeasureSpace (CP n)] where
+  volCP_def : ∀ n, 
+    MeasureTheory.volume (Set.univ : Set (CP n)) = 
+    ENNReal.ofReal ((Real.pi ^ n) / (Nat.factorial n : ℝ))
 
 end Litlib.Y2017.bengtsson2017geometry
