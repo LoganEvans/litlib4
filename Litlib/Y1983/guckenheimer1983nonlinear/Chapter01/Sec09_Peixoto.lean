@@ -13,6 +13,9 @@ class Theorem1_9_1
   (M : Type*) [TopologicalSpace M] [CompactSpace M]
   (V : Type*)
   (is_structurally_stable : V → Prop)
+  (is_topologically_equivalent : V → V → Prop)
+  (is_close : V → V → Prop)
+  (is_structurally_stable_iff : ∀ v, is_structurally_stable v ↔ ∃ u_set : Set V, (∀ u ∈ u_set, is_topologically_equivalent u v) ∧ (∀ u, is_close u v → u ∈ u_set))
   (has_finite_fixed_points_and_closed_orbits : V → Prop)
   (all_fixed_and_closed_are_hyperbolic : V → Prop)
   (has_saddle_connections : V → Prop)

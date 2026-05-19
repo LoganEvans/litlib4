@@ -3,6 +3,8 @@
 import Litlib.Core
 import Mathlib.Topology.Basic
 import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Basic
+import Mathlib.Analysis.Calculus.ContDiff.Basic
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.SpecialFunctions.Exponential
 
@@ -16,8 +18,7 @@ class Theorem1_0_1
   (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E]
   (U : Set E) (_hU : IsOpen U)
   (f : E → E)
-  (is_C1 : (E → E) → Set E → Prop)
-  (_hf : is_C1 f U)
+  (_hf : ContDiffOn ℝ 1 f U)
   (x0 : E)
   (_hx0 : x0 ∈ U)
   where
@@ -45,29 +46,35 @@ class Theorem1_0_2
   (_hx_bar : f x_bar = 0)
   (W : Set E) (_hW : W ⊆ U) (_hW_open : IsOpen W) (_hx_bar_in_W : x_bar ∈ W)
   (V : E → ℝ)
-  (is_differentiable_on : (E → ℝ) → Set E → Prop)
-  (_hV_diff : is_differentiable_on V W)
+  (_hV_diff : DifferentiableOn ℝ V W)
   (_hV_pos : ∀ x ∈ W, x ≠ x_bar → V x > 0)
   (_hV_zero : V x_bar = 0)
-  (V_dot : E → ℝ)
   (is_stable : E → Prop)
+  (is_stable_iff : ∀ x_b, is_stable x_b ↔ 
+    ∀ V_nhd ∈ nhds x_b, ∃ V1 ∈ nhds x_b, V1 ⊆ V_nhd ∧ 
+      ∀ x0 ∈ V1, ∃ φ : ℝ → E, φ 0 = x0 ∧ (∀ t ≥ 0, HasDerivAt φ (f (φ t)) t) ∧ (∀ t ≥ 0, φ t ∈ V_nhd))
   (is_asymptotically_stable : E → Prop)
+  (is_asymptotically_stable_iff : ∀ x_b, is_asymptotically_stable x_b ↔ 
+    is_stable x_b ∧ 
+    ∃ V1 ∈ nhds x_b, ∀ x0 ∈ V1, ∀ φ : ℝ → E, 
+      (φ 0 = x0 ∧ ∀ t ≥ 0, HasDerivAt φ (f (φ t)) t) → Filter.Tendsto φ Filter.atTop (nhds x_b))
   where
-  stable_if : (∀ x ∈ W, x ≠ x_bar → V_dot x ≤ 0) → is_stable x_bar
-  asymptotically_stable_if : (∀ x ∈ W, x ≠ x_bar → V_dot x < 0) → is_asymptotically_stable x_bar
+  stable_if : (∀ x ∈ W, x ≠ x_bar → (fderiv ℝ V x : E →L[ℝ] ℝ) (f x) ≤ 0) → is_stable x_bar
+  asymptotically_stable_if : (∀ x ∈ W, x ≠ x_bar → (fderiv ℝ V x : E →L[ℝ] ℝ) (f x) < 0) → is_asymptotically_stable x_bar
 
 Litlib.equation "guckenheimer1983nonlinear"
   eq "Theorem 1.0.3"
   page "7"
   kind "theorem"
 class Theorem1_0_3
-  (M : Type*) [TopologicalSpace M] [CompactSpace M]
-  (f : M → M) 
-  (is_C1 : (M → M) → Prop)
-  (is_solution : (ℝ → M) → (M → M) → Prop) 
-  (_hC1 : is_C1 f)
+  (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E]
+  (f : E → E) 
+  (_hC1 : ContDiff ℝ 1 f)
+  (M : Set E)
+  (_hM_compact : IsCompact M)
+  (_h_support : ∀ x ∉ M, f x = 0)
   where
-  global_existence : ∀ x0 : M, ∃ c : ℝ → M, c 0 = x0 ∧ is_solution c f
+  global_existence : ∀ x0 : E, ∃ c : ℝ → E, c 0 = x0 ∧ ∀ t, HasDerivAt c (f (c t)) t
 
 Litlib.equation "guckenheimer1983nonlinear"
   eq "Theorem 1.0.4"

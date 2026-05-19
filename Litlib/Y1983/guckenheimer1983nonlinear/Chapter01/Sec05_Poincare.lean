@@ -10,8 +10,11 @@ Litlib.equation "guckenheimer1983nonlinear"
   page "32"
   kind "proposition"
 class Proposition1_5_1
+  (mathieu_trace : ℝ → ℝ → ℝ)
   (is_neutrally_stable : ℝ → ℝ → Prop)
+  (is_neutrally_stable_iff : ∀ α β, is_neutrally_stable α β ↔ abs (mathieu_trace α β) < 2)
   (is_saddle_type : ℝ → ℝ → Prop)
+  (is_saddle_type_iff : ∀ α β, is_saddle_type α β ↔ abs (mathieu_trace α β) > 2)
   where
   neutrally_stable_0 : ∀ α, (∀ n : ℤ, α ≠ (n : ℝ) / 2) → 
     ∃ β_max > 0, ∀ β, 0 < abs β → abs β < β_max → is_neutrally_stable α β

@@ -3,9 +3,15 @@
 import Litlib.Core
 import Mathlib.Topology.Basic
 import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Analysis.Calculus.FDeriv.Basic
+import Mathlib.Analysis.InnerProductSpace.Basic
+import Mathlib.Data.Set.Finite.Basic
 import Litlib.Y1983.guckenheimer1983nonlinear.Chapter01.Sec06_Asymptotic
 
 namespace Litlib.Y1983.guckenheimer1983nonlinear
+
+def alpha_limit_set {E : Type*} [TopologicalSpace E] (flow : ℝ → E → E) (x : E) : Set E :=
+  { y | ∃ (t : ℕ → ℝ), Filter.Tendsto t Filter.atTop Filter.atBot ∧ Filter.Tendsto (fun n => flow (t n) x) Filter.atTop (nhds y) }
 
 def is_separatrix {E : Type*} [TopologicalSpace E] (flow : ℝ → E → E) (S A B : Set E) : Prop :=
   S ⊆ frontier (basin_of_attraction flow A) ∧ 
@@ -19,15 +25,13 @@ Litlib.equation "guckenheimer1983nonlinear"
 class Theorem1_8_1
   (Flow : ℝ → (ℝ × ℝ) → (ℝ × ℝ))
   (LimitSet : Set (ℝ × ℝ))
-  (is_omega_or_alpha_limit_set : Set (ℝ × ℝ) → Prop)
-  (is_closed_orbit : Set (ℝ × ℝ) → Prop)
-  (has_fixed_points : Set (ℝ × ℝ) → Prop)
-  (_h_limit : is_omega_or_alpha_limit_set LimitSet)
+  (p : ℝ × ℝ)
+  (_h_limit : LimitSet = omega_limit_set Flow p ∨ LimitSet = alpha_limit_set Flow p)
   (_h_compact : IsCompact LimitSet)
   (_h_nonempty : LimitSet.Nonempty)
-  (_h_no_fixed : ¬ has_fixed_points LimitSet)
+  (_h_no_fixed : ¬ ∃ x ∈ LimitSet, ∀ t, Flow t x = x)
   where
-  is_closed : is_closed_orbit LimitSet
+  is_closed : ∃ x ∈ LimitSet, ∃ T > 0, (∀ t, Flow t x = Flow (t + T) x) ∧ LimitSet = {Flow t x | t ∈ Set.univ}
 
 Litlib.equation "guckenheimer1983nonlinear"
   eq "Theorem 1.8.2"
@@ -35,24 +39,32 @@ Litlib.equation "guckenheimer1983nonlinear"
   kind "theorem"
 class Theorem1_8_2
   (D : Set (ℝ × ℝ))
-  (is_simply_connected : Set (ℝ × ℝ) → Prop)
-  (_h_simply_connected : is_simply_connected D)
+  (_h_simply_connected : ∀ (c : ℝ → ℝ × ℝ), ContinuousOn c (Set.Icc 0 1) → c 0 = c 1 → (∀ s ∈ Set.Icc 0 1, c s ∈ D) → 
+    ∃ (H : ℝ → ℝ → ℝ × ℝ), Continuous (fun p : ℝ × ℝ => H p.1 p.2) ∧ 
+      (∀ s, H 0 s = c s) ∧ (∀ s, H 1 s = c 0) ∧ (∀ t, H t 0 = H t 1) ∧ (∀ s t, H t s ∈ D))
   (f g : ℝ × ℝ → ℝ)
   (div : ℝ × ℝ → ℝ)
-  (_h_div : ∀ p, div p = (deriv (fun x => f (x, p.2)) p.1) + (deriv (fun y => g (p.1, y)) p.2))
+  (_h_div : ∀ p ∈ D, HasDerivAt (fun x => f (x, p.2)) (div p - deriv (fun y => g (p.1, y)) p.2) p.1)
   (_h_not_identically_zero : ∃ p ∈ D, div p ≠ 0)
   (_h_does_not_change_sign : (∀ p ∈ D, div p ≥ 0) ∨ (∀ p ∈ D, div p ≤ 0))
-  (has_closed_orbit_in : Set (ℝ × ℝ) → Prop)
+  (Flow : ℝ → (ℝ × ℝ) → (ℝ × ℝ))
+  (_h_flow : ∀ x t, HasDerivAt (fun t' => Flow t' x) (f (Flow t x), g (Flow t x)) t)
   where
-  no_closed_orbits : ¬ has_closed_orbit_in D
+  no_closed_orbits : ¬ ∃ x ∈ D, ∃ T > 0, (∀ t, Flow t x = Flow (t + T) x) ∧ (∃ t, Flow t x ≠ x) ∧ {Flow t x | t ∈ Set.univ} ⊆ D
 
 Litlib.equation "guckenheimer1983nonlinear"
   eq "Theorem 1.8.3"
   page "49"
   kind "theorem"
 class Theorem1_8_3
+  (E : Type*) [NormedAddCommGroup E] [InnerProductSpace ℝ E]
   (V : Type*)
   (is_gradient_system : V → Prop)
+  (eval_V : V → E → E)
+  (is_gradient_system_iff : ∀ v, is_gradient_system v ↔ 
+    ∃ (F : E → ℝ) (F_deriv : E → (E →L[ℝ] ℝ)), 
+      (∀ x, HasFDerivAt F (F_deriv x) x) ∧ 
+      (∀ x y, F_deriv x y = inner ℝ (eval_V v x) y))
   (all_fixed_points_hyperbolic : V → Prop)
   (all_manifold_intersections_transversal : V → Prop)
   (is_structurally_stable : V → Prop)
@@ -100,16 +112,18 @@ class Corollary1_8_5
   (is_sink_or_source : V → Point → Prop)
   (is_hyperbolic : V → Point → Prop)
   (is_saddle : V → Point → Prop)
-  (count_set : Set Point → ℕ)
   where
   at_least_one : ∀ v γ, is_closed_orbit v γ → ∃ p ∈ points_within γ, is_fixed_point v p
-  if_one_then_sink_source : ∀ v γ, is_closed_orbit v γ → count_set (points_within γ) = 1 → 
+  if_one_then_sink_source : ∀ v γ, is_closed_orbit v γ → (∃! p, p ∈ points_within γ) → 
     ∀ p ∈ points_within γ, is_fixed_point v p → is_sink_or_source v p
   if_all_hyperbolic : ∀ v γ, is_closed_orbit v γ → 
     (∀ p ∈ points_within γ, is_hyperbolic v p) → 
     ∃ n : ℕ, 
-      count_set (points_within γ) = 2 * n + 1 ∧
-      count_set {p ∈ points_within γ | is_saddle v p} = n ∧
-      count_set {p ∈ points_within γ | is_sink_or_source v p} = n + 1
+      Set.Finite (points_within γ) ∧
+      Set.ncard (points_within γ) = 2 * n + 1 ∧
+      Set.Finite {p ∈ points_within γ | is_saddle v p} ∧
+      Set.ncard {p ∈ points_within γ | is_saddle v p} = n ∧
+      Set.Finite {p ∈ points_within γ | is_sink_or_source v p} ∧
+      Set.ncard {p ∈ points_within γ | is_sink_or_source v p} = n + 1
 
 end Litlib.Y1983.guckenheimer1983nonlinear
