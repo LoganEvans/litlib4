@@ -1,0 +1,7 @@
+-- FILENAME: Litlib/Y1989/arnold1989mathematical/Signature.lean
+
+import Litlib.Y1989.arnold1989mathematical.Paper
+import Litlib.Y1989.arnold1989mathematical.Chapter02.Sec04_OneDegreeOfFreedom
+import Litlib.Y1989.arnold1989mathematical.Chapter02.Sec07_AngularMomentum
+import Litlib.Y1989.arnold1989mathematical.Chapter02.Sec10_MotionsOfNPoints
+import Litlib.Y1989.arnold1989mathematical.Chapter03.Sec16_Liouville
