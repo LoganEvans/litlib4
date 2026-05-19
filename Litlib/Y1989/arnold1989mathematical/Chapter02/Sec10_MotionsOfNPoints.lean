@@ -18,20 +18,20 @@ Litlib.equation "arnold1989mathematical"
 class MomentumConservationNBody
     {I : Type} [Fintype I]
     (m : I → ℝ)
-    (r₁ r₂ r₃ : I → ℝ → ℝ)
     (F_int₁ F_int₂ F_int₃ : I → I → ℝ → ℝ) where
-  r_diff : ∀ i, Differentiable ℝ (r₁ i) ∧ Differentiable ℝ (r₂ i) ∧ Differentiable ℝ (r₃ i)
-  dr_diff : ∀ i, Differentiable ℝ (deriv (r₁ i)) ∧ Differentiable ℝ (deriv (r₂ i)) ∧ Differentiable ℝ (deriv (r₃ i))
-  newton₁ : ∀ i t, m i * deriv (deriv (r₁ i)) t = ∑ j, F_int₁ i j t
-  newton₂ : ∀ i t, m i * deriv (deriv (r₂ i)) t = ∑ j, F_int₂ i j t
-  newton₃ : ∀ i t, m i * deriv (deriv (r₃ i)) t = ∑ j, F_int₃ i j t
   third_law : ∀ i j t, 
     F_int₁ i j t = - F_int₁ j i t ∧ 
     F_int₂ i j t = - F_int₂ j i t ∧ 
     F_int₃ i j t = - F_int₃ j i t
-  momentum_conserved : ∀ t₁ t₂,
-    (∑ i, m i * deriv (r₁ i) t₁) = (∑ i, m i * deriv (r₁ i) t₂) ∧
-    (∑ i, m i * deriv (r₂ i) t₁) = (∑ i, m i * deriv (r₂ i) t₂) ∧
-    (∑ i, m i * deriv (r₃ i) t₁) = (∑ i, m i * deriv (r₃ i) t₂)
+  momentum_conserved : ∀ (r₁ r₂ r₃ : I → ℝ → ℝ),
+    (∀ i, Differentiable ℝ (r₁ i) ∧ Differentiable ℝ (r₂ i) ∧ Differentiable ℝ (r₃ i)) →
+    (∀ i, Differentiable ℝ (deriv (r₁ i)) ∧ Differentiable ℝ (deriv (r₂ i)) ∧ Differentiable ℝ (deriv (r₃ i))) →
+    (∀ i t, m i * deriv (deriv (r₁ i)) t = ∑ j, F_int₁ i j t) →
+    (∀ i t, m i * deriv (deriv (r₂ i)) t = ∑ j, F_int₂ i j t) →
+    (∀ i t, m i * deriv (deriv (r₃ i)) t = ∑ j, F_int₃ i j t) →
+    ∀ t₁ t₂,
+      (∑ i, m i * deriv (r₁ i) t₁) = (∑ i, m i * deriv (r₁ i) t₂) ∧
+      (∑ i, m i * deriv (r₂ i) t₁) = (∑ i, m i * deriv (r₂ i) t₂) ∧
+      (∑ i, m i * deriv (r₃ i) t₁) = (∑ i, m i * deriv (r₃ i) t₂)
 
 end Litlib.Y1989.arnold1989mathematical
