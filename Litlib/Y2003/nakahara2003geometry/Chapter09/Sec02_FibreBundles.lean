@@ -35,31 +35,41 @@ Litlib.equation "nakahara2003geometry"
   page "10"
   kind "theorem"
 class HomotopyPullbackEquivalence
-    (ManifoldM ManifoldN BundleE : Type _) 
-    [TopologicalSpace ManifoldM] [TopologicalSpace ManifoldN] [TopologicalSpace BundleE]
-    (isFibreBundle : Type _ → Type _ → Prop)
+    (ManifoldM ManifoldN BundleE F : Type _) 
+    [TopologicalSpace ManifoldM] [TopologicalSpace ManifoldN] [TopologicalSpace BundleE] [TopologicalSpace F]
+    (p : BundleE → ManifoldM)
+    (isFibreBundle : (BundleE → ManifoldM) → Prop)
     (isHomotopic : (ManifoldN → ManifoldM) → (ManifoldN → ManifoldM) → Prop)
     (PullbackBundle : (ManifoldN → ManifoldM) → Type _)
-    (areEquivalentBundles : Type _ → Type _ → Prop) where
+    [∀ f, TopologicalSpace (PullbackBundle f)]
+    (pullback_p : ∀ f, PullbackBundle f → ManifoldN)
+    (isPullback : ∀ f, (PullbackBundle f → ManifoldN) → Prop)
+    where
   homotopy_pullback_equiv :
     ∀ (f g : ManifoldN → ManifoldM),
-      isFibreBundle BundleE ManifoldM →
+      isFibreBundle p →
       Continuous f → Continuous g →
       isHomotopic f g →
-      areEquivalentBundles (PullbackBundle f) (PullbackBundle g)
+      isPullback f (pullback_p f) →
+      isPullback g (pullback_p g) →
+      -- Rigorous anti-BS equivalency: A bijection exists that is continuous, has a continuous inverse, and commutes with the projections
+      ∃ (h : PullbackBundle f ≃ PullbackBundle g), Continuous h ∧ Continuous h.symm ∧ ∀ x, pullback_p g (h x) = pullback_p f x
 
 Litlib.equation "nakahara2003geometry"
   eq "9.1"
   page "10"
   kind "corollary"
 class ContractibleBaseTrivialBundle
-    (Manifold Bundle : Type _) [TopologicalSpace Manifold] [TopologicalSpace Bundle]
-    (isFibreBundle : Type _ → Type _ → Prop)
+    (Manifold Bundle F : Type _) [TopologicalSpace Manifold] [TopologicalSpace Bundle] [TopologicalSpace F]
+    [TopologicalSpace (Manifold × F)]
+    (p : Bundle → Manifold)
+    (isFibreBundle : (Bundle → Manifold) → Prop)
     (isContractible : Type _ → Prop)
-    (isTrivialBundle : Type _ → Prop) where
+    where
   h_contractible_implies_trivial : 
-    isFibreBundle Bundle Manifold →
+    isFibreBundle p →
     isContractible Manifold →
-    isTrivialBundle Bundle
+    -- Rigorous anti-BS triviality: Homeomorphic (via continuous Equiv) to Base x Fibre mapping points via projection.
+    ∃ (h : Bundle ≃ Manifold × F), Continuous h ∧ Continuous h.symm ∧ ∀ x, (h x).1 = p x
 
 end Litlib.Y2003.nakahara2003geometry

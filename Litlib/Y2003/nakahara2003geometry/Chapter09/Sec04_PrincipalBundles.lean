@@ -13,33 +13,40 @@ Litlib.equation "nakahara2003geometry"
   page "25"
   kind "theorem"
 class PrincipalBundleTriviality
-    (Bundle Base GroupType : Type _) [TopologicalSpace Bundle] [TopologicalSpace Base] [Group GroupType]
-    (isPrincipalBundle : Type _ → Type _ → Type _ → Prop)
-    (admitsGlobalSection : Type _ → Type _ → Prop)
-    (isTrivialBundle : Type _ → Prop) where
+    (Bundle Base GroupType : Type _) [TopologicalSpace Bundle] [TopologicalSpace Base] [TopologicalSpace GroupType] [Group GroupType]
+    [TopologicalSpace (Base × GroupType)]
+    (p : Bundle → Base)
+    (isPrincipalBundle : (Bundle → Base) → Prop)
+    where
   
-  h_principal : isPrincipalBundle Bundle Base GroupType
+  h_principal : isPrincipalBundle p
   
+  -- Rigorous anti-BS lock: No opaque properties allowed. 
+  -- Triviality (LHS) iff admits global continuous section (RHS).
   trivial_iff_global_section :
-    isTrivialBundle Bundle ↔ admitsGlobalSection Bundle Base
+    (∃ (h : Bundle ≃ Base × GroupType), Continuous h ∧ Continuous h.symm ∧ ∀ x, (h x).1 = p x) ↔ 
+    (∃ s : Base → Bundle, Continuous s ∧ ∀ x, p (s x) = x)
 
 Litlib.equation "nakahara2003geometry"
   eq "9.2"
   page "25"
   kind "corollary"
 class VectorBundleTriviality
-    (Bundle PrincipalBundle Base : Type _) 
-    [TopologicalSpace Bundle] [TopologicalSpace PrincipalBundle] [TopologicalSpace Base]
-    (isVectorBundle : Type _ → Type _ → Prop)
-    (associatedPrincipalBundle : Type _ → Type _)
-    (admitsGlobalSection : Type _ → Type _ → Prop)
-    (isTrivialBundle : Type _ → Prop) where
+    (Bundle PrincipalBundle Base F : Type _) 
+    [TopologicalSpace Bundle] [TopologicalSpace PrincipalBundle] [TopologicalSpace Base] [TopologicalSpace F]
+    [TopologicalSpace (Base × F)]
+    (p_vec : Bundle → Base)
+    (p_prin : PrincipalBundle → Base)
+    (isVectorBundle : (Bundle → Base) → Prop)
+    (isAssociatedPrincipalBundle : (PrincipalBundle → Base) → (Bundle → Base) → Prop)
+    where
   
-  h_vector : isVectorBundle Bundle Base
+  h_vector : isVectorBundle p_vec
+  h_associated : isAssociatedPrincipalBundle p_prin p_vec
   
   trivial_iff_associated_global_section :
-    isTrivialBundle Bundle ↔ 
-    admitsGlobalSection (associatedPrincipalBundle Bundle) Base
+    (∃ (h : Bundle ≃ Base × F), Continuous h ∧ Continuous h.symm ∧ ∀ x, (h x).1 = p_vec x) ↔ 
+    (∃ s : Base → PrincipalBundle, Continuous s ∧ ∀ x, p_prin (s x) = x)
 
 Litlib.equation "nakahara2003geometry"
   eq "9.53a-c"
@@ -53,7 +60,6 @@ class HopfMap
        2 * (x2 * x3 - x1 * x4),
        x1^2 + x2^2 - x3^2 - x4^2)
   
-  -- Nakahara immediately notes that this algebraically maps S^3 to S^2
   maps_S3_to_S2 : ∀ x1 x2 x3 x4,
     x1^2 + x2^2 + x3^2 + x4^2 = 1 →
     let (xi1, xi2, xi3) := hopf (x1, x2, x3, x4)
