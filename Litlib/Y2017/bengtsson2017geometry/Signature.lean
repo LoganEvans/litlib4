@@ -5,3 +5,7 @@ import Litlib.Y2017.bengtsson2017geometry.Chapter03.Sec01_Spheres
 import Litlib.Y2017.bengtsson2017geometry.Chapter03.Sec05_HopfFibration
 import Litlib.Y2017.bengtsson2017geometry.Chapter03.Sec06_FibreBundles
 import Litlib.Y2017.bengtsson2017geometry.Chapter03.Sec08_Cosets
+import Litlib.Y2017.bengtsson2017geometry.Chapter04.Sec02_ComplexProjective
+import Litlib.Y2017.bengtsson2017geometry.Chapter04.Sec05_FubiniStudy
+import Litlib.Y2017.bengtsson2017geometry.Chapter04.Sec06_CPIllustrated
+import Litlib.Y2017.bengtsson2017geometry.Chapter04.Sec07_Symplectic
