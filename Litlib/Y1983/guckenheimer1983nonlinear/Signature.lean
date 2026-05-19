@@ -1,0 +1,10 @@
+-- FILENAME: Litlib/Y1983/guckenheimer1983nonlinear/Signature.lean
+
+import Litlib.Y1983.guckenheimer1983nonlinear.Paper
+import Litlib.Y1983.guckenheimer1983nonlinear.Chapter01.Sec00_Existence
+import Litlib.Y1983.guckenheimer1983nonlinear.Chapter01.Sec03_Nonlinear
+import Litlib.Y1983.guckenheimer1983nonlinear.Chapter01.Sec04_Maps
+import Litlib.Y1983.guckenheimer1983nonlinear.Chapter01.Sec05_Poincare
+import Litlib.Y1983.guckenheimer1983nonlinear.Chapter01.Sec06_Asymptotic
+import Litlib.Y1983.guckenheimer1983nonlinear.Chapter01.Sec08_TwoDim
+import Litlib.Y1983.guckenheimer1983nonlinear.Chapter01.Sec09_Peixoto
