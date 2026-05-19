@@ -1,6 +1,7 @@
 -- FILENAME: Litlib/Y2003/nakahara2003geometry/Signature.lean
 
 import Litlib.Core
+import Litlib.Y2003.nakahara2003geometry.Paper
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Complex.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
@@ -17,6 +18,12 @@ import Litlib.Y2003.nakahara2003geometry.Chapter07.Sec04_LeviCivita
 import Litlib.Y2003.nakahara2003geometry.Chapter07.Sec08_NonCoordinateBases
 import Litlib.Y2003.nakahara2003geometry.Chapter07.Sec09_HodgeTheory
 import Litlib.Y2003.nakahara2003geometry.Chapter07.Sec10_GeneralRelativity
+import Litlib.Y2003.nakahara2003geometry.Chapter07.Sec11_StringTheory
+
+-- Chapter 9
+import Litlib.Y2003.nakahara2003geometry.Chapter09.Sec02_FibreBundles
+import Litlib.Y2003.nakahara2003geometry.Chapter09.Sec03_VectorBundles
+import Litlib.Y2003.nakahara2003geometry.Chapter09.Sec04_PrincipalBundles
 
 -- Chapter 10
 import Litlib.Y2003.nakahara2003geometry.Chapter10.Sec01_PrincipalBundles
@@ -28,17 +35,3 @@ import Litlib.Y2003.nakahara2003geometry.Chapter10.Sec06_BerryPhase
 
 -- Chapter 11
 import Litlib.Y2003.nakahara2003geometry.Chapter11.Sec01_Pontryagin
-
-namespace Litlib.Y2003.nakahara2003geometry
-
--- Master metadata block
-Litlib.paper "nakahara2003geometry"
-  type "book"
-  title "Geometry, Topology and Physics"
-  authors ["Nakahara, Mikio"]
-  edition "2nd"
-  year "2003"
-  publisher "Institute of Physics Publishing"
-  isbn "0750306068"
-
-end Litlib.Y2003.nakahara2003geometry
