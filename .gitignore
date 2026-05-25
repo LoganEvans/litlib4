@@ -9,3 +9,4 @@ untracked/
 quarantine/
 .github/
 .lake/
+.elan/

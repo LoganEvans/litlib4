@@ -31,17 +31,23 @@
         litlib-shell = pkgs.mkShell {
           buildInputs = [
             pkgs.git
-            pkgs.lean4
+            pkgs.elan # Replaces pkgs.lean4
+            pkgs.zstd # Required for Mathlib cache decompression
           ];
 
           shellHook = ''
-            export LAKE_NO_ELAN=1
+            # Force Elan to install toolchains locally in the repository
+            export ELAN_HOME="$PWD/.elan"
 
             if [ ! -d ".lake/packages/mathlib" ]; then
               echo "======================================================="
-              echo "🚀 Initializing litlib4 Nix Lean environment..."
+              echo "🚀 Initializing litlib4 Lean environment..."
               echo "-> Running 'lake update' to fetch mathlib4..."
               lake update || true
+              
+              echo "-> Fetching Mathlib cache..."
+              lake exe cache get || echo "⚠️ Cache fetch failed or incomplete."
+              
               echo "✅ Dependencies fetched! Run 'lake build'."
               echo "======================================================="
             fi
@@ -58,11 +64,9 @@
           version = "0.1.0";
           src = ./.;
 
-          buildInputs = [ pkgs.lean4 pkgs.git ];
+          buildInputs = [ pkgs.git ];
 
           buildPhase = ''
-            export LAKE_NO_ELAN=1
-            # In a pure Nix build, we bypass Lake fetching and rely on LEAN_PATH
             # For now, this is a placeholder that exposes the source tree to the Nix store.
             # Downstream Lakefiles can reference this exact path via `require litlib4 from "path"`
           '';

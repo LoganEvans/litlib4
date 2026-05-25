@@ -167,15 +167,15 @@ private def stripProofToSignature (s : String) (isInst : Bool) : String := Id.ru
 
 def withPPOptions {α} (x : MetaM α) : MetaM α := do
   let opts := (← getOptions)
-    |>.setNat `maxHeartbeats 5000000
-    |>.setNat `maxRecDepth 10000
-    |>.setNat `pp.maxDepth 1000
-    |>.setNat `pp.maxSteps 1000000
-    |>.setBool `pp.deepTerms true
-    |>.setBool `pp.notation true
-    |>.setBool `pp.fullNames false
-    |>.setBool `pp.proofs false
-    |>.setBool `pp.rawOnError true
+    |>.insert `maxHeartbeats (Lean.DataValue.ofNat 5000000)
+    |>.insert `maxRecDepth (Lean.DataValue.ofNat 10000)
+    |>.insert `pp.maxDepth (Lean.DataValue.ofNat 1000)
+    |>.insert `pp.maxSteps (Lean.DataValue.ofNat 1000000)
+    |>.insert `pp.deepTerms (Lean.DataValue.ofBool true)
+    |>.insert `pp.notation (Lean.DataValue.ofBool true)
+    |>.insert `pp.fullNames (Lean.DataValue.ofBool false)
+    |>.insert `pp.proofs (Lean.DataValue.ofBool false)
+    |>.insert `pp.rawOnError (Lean.DataValue.ofBool true)
   withOptions (fun _ => opts) x
 
 partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet) : CoreM NameSet := do

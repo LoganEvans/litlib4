@@ -43,7 +43,8 @@ lemma partialDeriv_add (f g : SpacetimePoint → ℂ)
   partialDeriv mu (fun p => f p + g p) x = partialDeriv mu f x + partialDeriv mu g x := by
   unfold partialDeriv
   have heq : (fun p => f p + g p) = f + g := by funext p; rfl
-  rw [heq, fderiv_add hf hg]
+  rw [heq]
+  erw [fderiv_add hf hg]
   rfl
 
 lemma partialDeriv_sub (f g : SpacetimePoint → ℂ)
@@ -52,7 +53,8 @@ lemma partialDeriv_sub (f g : SpacetimePoint → ℂ)
   partialDeriv mu (fun p => f p - g p) x = partialDeriv mu f x - partialDeriv mu g x := by
   unfold partialDeriv
   have heq : (fun p => f p - g p) = f - g := by funext p; rfl
-  rw [heq, fderiv_sub hf hg]
+  rw [heq]
+  erw [fderiv_sub hf hg]
   rfl
 
 lemma partialDeriv_mul (f g : SpacetimePoint → ℂ)
@@ -61,9 +63,21 @@ lemma partialDeriv_mul (f g : SpacetimePoint → ℂ)
   partialDeriv mu (fun p => f p * g p) x = partialDeriv mu f x * g x + f x * partialDeriv mu g x := by
   unfold partialDeriv
   have heq : (fun p => f p * g p) = f * g := by funext p; rfl
-  rw [heq, fderiv_mul hf hg]
-  simp [smul_eq_mul]
-  ring
+  rw [heq]
+  erw [fderiv_mul hf hg]
+  -- 1. Distribute the vector evaluation over the addition of the continuous linear maps
+  erw [ContinuousLinearMap.add_apply]
+  -- 2. Distribute the vector evaluation over the scalar multiplication
+  erw [ContinuousLinearMap.smul_apply, ContinuousLinearMap.smul_apply]
+  -- 3. Convert • to *
+  simp only [smul_eq_mul]
+  -- LHS: f x * (fderiv ℝ g x (Pi.single mu 1)) + g x * (fderiv ℝ f x (Pi.single mu 1))
+  -- RHS: (fderiv ℝ f x (Pi.single mu 1)) * g x + f x * (fderiv ℝ g x (Pi.single mu 1))
+  
+  -- 4. Rearrange the RHS to exactly match the LHS without relying on `ring`
+  rw [mul_comm ((fderiv ℝ f x) (Pi.single mu 1)) (g x)]
+  rw [add_comm (g x * (fderiv ℝ f x) (Pi.single mu 1)) (f x * (fderiv ℝ g x) (Pi.single mu 1))]
+  rfl
 
 -- ============================================================================
 -- 3. SCALAR & SUM LINEARITY LEMMAS
@@ -86,9 +100,13 @@ lemma partialDeriv_smul (c : ℂ) (f : SpacetimePoint → ℂ)
   rw [partialDeriv_mul (fun _ => c) f x hc hf mu]
   have hz : partialDeriv mu (fun _ => c) x = 0 := by
     unfold partialDeriv
-    simp
+    -- Bridge the lambda to the expected Function.const pattern
+    have h_const : (fun _ : SpacetimePoint => c) = Function.const SpacetimePoint c := rfl
+    rw [h_const]
+    rw [fderiv_const]
+    rfl
   rw [hz]
-  ring
+  rw [zero_mul, zero_add]
 
 lemma partialDerivMat_smul (c : ℂ) (f : SpacetimePoint → Matrix (Fin 2) (Fin 2) ℂ)
   (x : SpacetimePoint) (hf : ∀ i j, DifferentiableAt ℝ (fun p => (f p) i j) x) (mu : Fin 4) :
@@ -106,7 +124,7 @@ lemma partialDeriv_sum {ι : Type} (s : Finset ι) (f : ι → SpacetimePoint �
     ext p
     exact (map_sum (eval_pt p) (fun k => f k) s).symm
   rw [heq]
-  rw [fderiv_sum hf]
+  erw [fderiv_sum hf]
   let ev := ContinuousLinearMap.apply ℝ ℂ (Pi.single mu 1 : Fin 4 → ℝ)
   exact map_sum ev (fun k => fderiv ℝ (f k) x) s
 
@@ -227,7 +245,7 @@ lemma schwarz_commute_mat (U : SpacetimePoint → Matrix (Fin 2) (Fin 2) ℂ)
   have h_fderiv_L_beta : fderiv ℝ (fun p => L_beta (fderiv ℝ f p)) x = L_beta.comp (fderiv ℝ (fderiv ℝ f) x) := (L_beta.hasFDerivAt.comp x hf'').fderiv
   have h_fderiv_L_alpha : fderiv ℝ (fun p => L_alpha (fderiv ℝ f p)) x = L_alpha.comp (fderiv ℝ (fderiv ℝ f) x) := (L_alpha.hasFDerivAt.comp x hf'').fderiv
   change (fderiv ℝ (fun p => L_beta (fderiv ℝ f p)) x) (Pi.single α 1 : Fin 4 → ℝ) = (fderiv ℝ (fun p => L_alpha (fderiv ℝ f p)) x) (Pi.single β 1 : Fin 4 → ℝ)
-  rw [h_fderiv_L_beta, h_fderiv_L_alpha]
+  erw [h_fderiv_L_beta, h_fderiv_L_alpha]
   exact h_symm.symm
 
 end Litlib.Math.MatrixCalculus
