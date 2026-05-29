@@ -149,17 +149,22 @@ private def stripProofToSignature (s : String) (isInst : Bool) : String := Id.ru
     i := i + 1
 
   if isInst then
-    if let some wIdx := validWheres.back? then
-      return String.ofList (chars.extract 0 wIdx).toList
+    if validWheres.size > 0 then
+      return String.ofList (chars.extract 0 validWheres[0]!).toList
 
-  -- Parse backwards through valid level-0 assignments to find the proof start
-  for idx in validAssigns.reverse do
+  -- Parse FORWARDS through valid level-0 assignments to find the proof start.
+  -- This reliably intercepts the first `:= by` while naturally skipping 
+  -- any `let ... := ...` variables in the type signature.
+  for idx in validAssigns do
     let mut j := idx + 2
     while j < chars.size && chars[j]!.isWhitespace do j := j + 1
     if j + 1 < chars.size && chars[j]! == 'b' && chars[j+1]! == 'y' then
-      return String.ofList (chars.extract 0 idx).toList
+      let nextW := if j + 2 < chars.size then chars[j+2]! else ' '
+      if nextW.isWhitespace || nextW == '\n' || j + 2 == chars.size then
+        return String.ofList (chars.extract 0 idx).toList
       
-  -- Fallback: If no `:= by` is found, take the absolute last `:=` as the term proof assignment
+  -- Fallback: If no `:= by` is found (e.g. simple term proof without tactics),
+  -- take the absolute last `:=` as the term proof assignment
   if let some lastIdx := validAssigns.back? then
     return String.ofList (chars.extract 0 lastIdx).toList
 
