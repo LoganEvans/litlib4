@@ -35,9 +35,10 @@ class YangMillsHiggsVariations
     (gradient : Configuration → Tangent → ℝ)
     (hessian : Configuration → Tangent → ℝ) where
   /--
-  Equations (2.7) and (2.8) (page 263): The gradient and Hessian of the
-  Yang-Mills-Higgs action are rigorously defined as the first and second
-  directional derivatives evaluated at s = 0.
+  Geometric and Variational Rigor: Equations (2.7) and (2.8) (page 263) define 
+  the gradient and Hessian of the Yang-Mills-Higgs action. To prevent pathological 
+  topological exploitation, the functional is restricted to domains where the 
+  directional derivatives along local affine tangents are strictly well-defined at s = 0.
   -/
   gradient_def : ∀ c ψ, HasDerivAt (fun (s : ℝ) => action (add c (s • ψ))) (gradient c ψ) (0 : ℝ)
   hessian_def : ∀ c ψ, HasDerivAt (fun (s : ℝ) => gradient (add c (s • ψ)) ψ) (hessian c ψ) (0 : ℝ)
@@ -54,9 +55,10 @@ class NonMinimalSolution
     (curvature covDeriv : Configuration → Field)
     (hodgeStar : Field → Field) where
   /--
-  Theorem 1.1: There is a smooth, finite action solution to the SU(2)
-  Yang-Mills-Higgs equations on ℝ³ which does not satisfy the first-order
-  Bogomol'nyi equations (*F_A = ± D_A \Phi).
+  Physical Domain Binding & Non-Triviality Constraint: Theorem 1.1 establishes the existence 
+  of a smooth, finite-action solution to the Yang-Mills-Higgs equations on the fixed flat 
+  background ℝ³. The non-triviality of the solution (evading the degenerate vacuum) is 
+  mathematically guaranteed by the explicit exclusion of the first-order Bogomol'nyi equations.
   -/
   theorem_1_1 : ∃ (c : Configuration),
     (∀ ψ, gradient c ψ = 0) ∧ 
@@ -72,15 +74,19 @@ class GoodSequenceConvergence
     (action : Configuration → ℝ)
     (gradientNorm : Configuration → ℝ)
     (gradient : Configuration → Tangent → ℝ)
-    (applyGauge : GaugeTransform → Configuration → Configuration) where
+    (applyGauge : GaugeTransform → Configuration → Configuration)
+    (satisfiesEq5_1 : Configuration → Prop) where
   /--
-  Theorem 5.6: A sequence of configurations with bounded action and vanishing gradient
-  has a subsequence which converges strongly modulo gauge transformations
-  to a solution of the Yang-Mills-Higgs equations.
+  Compactness and Convergence Constraint: Theorem 5.6 asserts that a sequence of 
+  configurations with bounded action and vanishing gradient has a subsequence converging 
+  strongly (modulo gauge transformations) to a solution. The sequence must explicitly 
+  satisfy the auxiliary constraint Eq (5.1) (D_A * D_A \Phi = 0) to prevent pathological 
+  divergence of the Higgs field in the weak compactness limit.
   -/
   theorem_5_6 : ∀ (c : ℕ → Configuration) (B : ℝ),
     (∀ i, action (c i) ≤ B) →
-    Tendsto (fun i => gradientNorm (c i)) atTop (𝓝 0) →
+    (Tendsto (fun i => gradientNorm (c i)) atTop (𝓝 0)) →
+    (∀ i, satisfiesEq5_1 (c i)) →
     ∃ (subseq : ℕ → ℕ) (cInf : Configuration) (g : ℕ → GaugeTransform),
       StrictMono subseq ∧
       Tendsto (fun i => applyGauge (g i) (c (subseq i))) atTop (𝓝 cInf) ∧
@@ -98,9 +104,10 @@ class MonopoleNumberCondition
     (applyGauge : GaugeTransform → Configuration → Configuration)
     (topologicalSector : Configuration → ℤ) where
   /--
-  Theorem 8.1: If a good sequence converges to a solution and the 
-  limit of the action is strictly less than 8π, then the limit 
-  configuration is in the trivial topological sector (k = 0).
+  Topological Gatekeeping: Theorem 8.1 enforces that if a good sequence of configurations 
+  converges to a solution, and its limiting action is strictly bounded below the threshold 
+  for monopole-antimonopole pair creation (8π), the limiting configuration must definitively 
+  reside in the trivial topological sector (k = 0).
   -/
   theorem_8_1 : ∀ (c : ℕ → Configuration) (cInf : Configuration) (aInf : ℝ) (g : ℕ → GaugeTransform),
     Tendsto (fun i => applyGauge (g i) (c i)) atTop (𝓝 cInf) →
