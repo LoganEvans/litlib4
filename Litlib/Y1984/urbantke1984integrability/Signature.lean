@@ -26,8 +26,11 @@ Litlib.equation "urbantke1984integrability"
   kind "identity"
 class Eq2_and_6 where
   /-- 
-  Equations (2) and (6) (page 2321): A simple bivector p^μν = u^[μ v^ν] 
-  annihilates the YM field strength if and only if F^a_μν u^μ v^ν = 0.
+  Kinematic Bivector Constraint: Equations (2) and (6) (page 2321).
+  Establishes the algebraic condition for a simple bivector (constructed from 
+  two linearly independent vectors u and v) to annihilate the Yang-Mills field strength.
+  The antisymmetry of the field strength F is explicitly enforced in the hypothesis 
+  to mathematically guarantee the equivalence holds.
   -/
   simpleBivectorAnnihilation
     (F : Fin 3 → Fin 4 → Fin 4 → ℂ) :
@@ -42,8 +45,10 @@ Litlib.equation "urbantke1984integrability"
   kind "definition"
 class Eq4 where
   /-- 
-  Equation (4) (page 2321): Definition of the dual tensor.
-  p_dual_μν := (1/2) * ε_μναβ * p^αβ
+  Hodge Dual Tensor Definition: Equation (4) (page 2321).
+  Rigorously defines the dual tensor in the complexified tangent space via the 
+  totally antisymmetric Levi-Civita symbol. The logic is bound by an equivalence 
+  to prevent overriding the definition at instantiation.
   -/
   dualTensor
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
@@ -60,8 +65,9 @@ Litlib.equation "urbantke1984integrability"
   kind "definition"
 class Eq10 where
   /-- 
-  Equation (10) (page 2322): The definition of the Urbantke metric.
-  g_μν := (-1/3!) ε_acb F^a_μα F_dual^cαβ F^b_βν
+  Urbantke Quasimetric Definition: Equation (10) (page 2322).
+  Defines the macroscopic geometric tensor induced naturally by the SU(2) Yang-Mills 
+  field strengths, coupling the field to its dual via the gauge structure constants.
   -/
   quasimetricDef
     (F : Fin 3 → Fin 4 → Fin 4 → ℂ)
@@ -81,8 +87,10 @@ Litlib.equation "urbantke1984integrability"
   kind "theorem"
 class Eq11 where
   /--
-  Equation (11) (page 2322): If the metric evaluated on any vector in the plane 
-  spanned by u and v vanishes, then u and v are totally null with respect to g_μν.
+  Totally Null Subspace Condition: Equation (11) (page 2322).
+  Proves that if the symmetric quasimetric evaluated on an arbitrary vector 
+  spanning the 2-plane (u, v) vanishes, then the basis vectors u and v must be 
+  totally null with respect to the metric. 
   -/
   totallyNull
     (g : Fin 4 → Fin 4 → ℂ) :
@@ -101,8 +109,9 @@ Litlib.equation "urbantke1984integrability"
   kind "definition"
 class Eq12 where
   /--
-  Equation (12) (page 2322): The definition of the 3x3 M matrix.
-  M^ab := F_dual^aμν F^b_μν
+  Gauge Trace Matrix Definition: Equation (12) (page 2322).
+  Defines the 3x3 scalar matrix M^ab constructed from the contraction of the 
+  field strength with its dual.
   -/
   mMatrixDef
     (F : Fin 3 → Fin 4 → Fin 4 → ℂ)
@@ -119,15 +128,24 @@ Litlib.equation "urbantke1984integrability"
   kind "classification"
 class Case1_1 where
   /--
-  Case 1.1 (page 2322): The generic classification. The 3x3 matrix M^ab has full rank 
-  (m = 3) if and only if the induced Urbantke quasimetric g_μν is non-degenerate.
+  Algebraic Non-Degeneracy Classification: Case 1.1 (page 2322).
+  The generic integrability classification proves that the 3x3 matrix M^ab has 
+  full rank if and only if the induced Urbantke quasimetric g_μν is non-degenerate 
+  (det g ≠ 0). To prevent topological and algebraic exploits, the theorem is strictly 
+  bound to domains where F is explicitly antisymmetric, the Hodge dual is correctly 
+  constructed via the Levi-Civita symbol, and the SU(2) gauge structure constants 
+  are totally antisymmetric.
   -/
   generic_rank_iff
     (F : Fin 3 → Fin 4 → Fin 4 → ℂ)
     (F_dual : Fin 3 → Fin 4 → Fin 4 → ℂ)
     (epsilon3 : Fin 3 → Fin 3 → Fin 3 → ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
     (g : Fin 4 → Fin 4 → ℂ)
     (M : Fin 3 → Fin 3 → ℂ)
+    (hF_anti : ∀ a μ ν, F a μ ν = - F a ν μ)
+    (hepsilon3_anti : ∀ a b c, epsilon3 a b c = - epsilon3 b a c ∧ epsilon3 a b c = - epsilon3 a c b)
+    (h_dual : ∀ a μ ν, F_dual a μ ν = (1 / 2 : ℂ) * Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β => epsilon4 μ ν α β * F a α β)))
     (hG : ∀ μ ν, g μ ν = (-1 / 6 : ℂ) * Finset.sum Finset.univ (fun a => Finset.sum Finset.univ (fun b => Finset.sum Finset.univ (fun c => 
       Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β => 
         epsilon3 a c b * F a μ α * F_dual c α β * F b β ν))))))
