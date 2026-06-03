@@ -16,11 +16,11 @@ class SchwarzTheorem where
   /--
   Theorem 9.41 (page 235): Equality of mixed partial derivatives (Schwarz's / Clairaut's theorem).
   
-  ANTI-BS PROVISIONS:
-  Instead of postulating the existence of global partial derivative operators which
-  could be trivialized, we strictly enforce local existence via Mathlib's `HasDerivAt`
-  on the 1D slice mappings `(fun t => f (t, y))` and `(fun t => f (x, t))`. 
-  The conclusion `HasDerivAt` directly bounds `D12f` to exist and equal `D21f`.
+  Differential Well-Posedness: Instead of postulating the existence of global partial 
+  derivative operators which could be mathematically ill-posed, this theorem rigorously 
+  enforces local existence via Mathlib's `HasDerivAt` on the 1D slice mappings 
+  `(fun t => f (t, y))` and `(fun t => f (x, t))`. The conclusion mathematically bounds 
+  `D12f` to exist and equal `D21f`.
   -/
   schwarz_mixed_partials
     (E : Set (ℝ × ℝ)) (hOpen : IsOpen E)
@@ -40,13 +40,13 @@ class ClairautTheoremNDimensional where
   /--
   Exercise 29 (page 243): The n-dimensional, k-th order generalization of Clairaut's theorem.
   
-  ANTI-BS PROVISIONS:
-  We use Mathlib's `ContDiffOn` to rigorously assert that the function is k-times 
-  continuously differentiable. Instead of defining string-based or index-based partial 
-  derivatives (which can hide topological explosions), we use Mathlib's `iteratedFDeriv`, 
-  evaluating it on a tuple of vectors `v`. The theorem asserts that permuting the order 
-  of these vectors (via `fun i => v (σ i)`) does not change the result, which is the 
-  rigorous, coordinate-free equivalent of permuting partial derivative indices.
+  Rigorous Formalization Constraint: We employ Mathlib's `ContDiffOn` to assert that 
+  the function is k-times continuously differentiable. Instead of defining ad-hoc 
+  index-based partial derivatives (which can obscure topological boundaries), we utilize 
+  Mathlib's `iteratedFDeriv`, evaluating it on a tuple of vectors `v`. The theorem 
+  establishes that permuting the order of these vectors (via `fun i => v (σ i)`) 
+  leaves the result invariant, serving as the rigorous, coordinate-free equivalent 
+  of permuting partial derivative indices.
   -/
   symmetry_of_higher_partials
     (n m : ℕ)

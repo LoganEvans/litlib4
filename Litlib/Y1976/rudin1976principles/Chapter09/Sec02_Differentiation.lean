@@ -35,11 +35,10 @@ class MeanValueTheorem where
   /-- 
   Theorem 9.19 (page 218): The Mean Value Theorem for functions of several variables. 
   
-  ANTI-BS PROVISIONS:
-  Upgraded from the previous translation to explicitly enforce the domain `E` as a 
-  convex, open set. This correctly forces the line segment between `a` and `b` to exist 
-  entirely within the domain of differentiability, eliminating the Garbage-In exploit 
-  where non-convex domains could cross singularities.
+  Topological Well-Posedness: To ensure well-posedness and prevent pathological evaluations, 
+  the domain `E` is explicitly enforced as a convex, open set. This mathematically 
+  guarantees that the line segment connecting `a` and `b` is entirely contained 
+  within the domain of differentiability, avoiding boundaries or singularities.
   -/
   multidimensionalMvt
     (V W : Type*) [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup W] [NormedSpace ℝ W]
