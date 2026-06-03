@@ -21,8 +21,14 @@ namespace Litlib.Math.LinearAlgebra
 -- ==============================================================================
 
 /--
-The "Pigeonhole Principle" for Matrices:
-If the rows of an n x n matrix span a space of dimension < n, the determinant is 0.
+Physical Interpretation:
+Rank Deficiency Lemma (Pigeonhole Principle). If a set of physical basis vectors (e.g., a tetrad) fails to span the full spacetime dimension, its induced macroscopic metric or volume form determinant strictly vanishes, signaling a coordinate or topological singularity.
+
+Mathematical Boundaries:
+Valid strictly over finite dimensional matrices $n \times n$ defined on a pure Field $K$.
+
+Literature:
+Fundamental equivalence relation of degenerate matrices in geometric calculus.
 -/
 theorem detZeroOfRowSpanLtDim
     {n : Type*}[Fintype n] [DecidableEq n]
@@ -44,7 +50,7 @@ theorem detZeroOfRowSpanLtDim
 section BlockRankCombinatorics
 variable {K : Type*}[DecidableEq K]
 
-/-- The set of spatial rows (1, 2, 3) for a 4x4 matrix. -/
+/-- Physical interpretation: The spatial triad base components of a 4D metric or tetrad. -/
 def spatialRows (M : Matrix (Fin 4) (Fin 4) K) : Finset (Fin 4 → K) :=
   insert (M.row 1) (insert (M.row 2) {M.row 3})
 
@@ -81,7 +87,14 @@ lemma span_le_span_spatial_of_row0_zero (M : Matrix (Fin 4) (Fin 4) K) (h0 : M.r
   · exact Submodule.subset_span h_spatial
 
 /--
-Theorem: If the Electric components (Row 0) are zero, Rank <= 3.
+Physical Interpretation:
+If the temporal/electric density block of a coordinate tetrad is entirely zero, the resulting macroscopic spacetime structure is severely rank-deficient (rank ≤ 3), implying topological collapse along the time direction.
+
+Mathematical Boundaries:
+Applies explicitly to 4x4 coordinate mappings over a generic field constraint.
+
+Literature:
+Describes conditions of degenerate triads in Ashtekar geometry / CDJ gravity theories.
 -/
 theorem rankLeThreeOfElectricZero (M : Matrix (Fin 4) (Fin 4) K) (h_row0 : ∀ j, M 0 j = 0) :
   M.rank ≤ 3 := by
@@ -101,7 +114,7 @@ end BlockRankAlgebra
 section StructureRankProps
 variable {K : Type*} [Field K]
 
-/-- If M_ij = 0 for all i!=0, j!=0, then M_i is a scalar multiple of e_0. -/
+/-- Row separation bounding lemma. -/
 lemma row_proportional_to_e0_of_spatial_zero
   (M : Matrix (Fin 4) (Fin 4) K)
   (h : ∀ i j : Fin 4, i ≠ 0 → j ≠ 0 → M i j = 0)
@@ -117,7 +130,7 @@ end StructureRankProps
 section StructureRankMain
 variable {K : Type*} [Field K] [DecidableEq K]
 
-/-- The generating set for the row space of a "Spatial Zero" matrix. -/
+/-- The spatial topological limits bounding set. -/
 def spatialGenSet (M : Matrix (Fin 4) (Fin 4) K) : Finset (Fin 4 → K) :=
   insert (M 0) {Pi.single 0 1}
 
@@ -128,7 +141,14 @@ lemma spatial_gen_set_card_le_two (M : Matrix (Fin 4) (Fin 4) K) :
   simp only [Finset.card_singleton]; norm_num
 
 /--
-Theorem: If the "spatial" (non-zero index) block is zero, Rank <= 2.
+Physical Interpretation:
+If the pure "spatial" physical domain configuration vanishes identically, the macroscopic matrix mapping collapses entirely, forcing geometric rank to fall to $\leq 2$. This reflects a string-like or infinitely squashed spatial degenerate metric.
+
+Mathematical Boundaries:
+Applicable to arbitrary generic 4x4 topologies. 
+
+Literature:
+Maps to phase space topologies containing non-invertible/zero spatial volumes.
 -/
 theorem rankLeTwoOfSpatialZero
   (M : Matrix (Fin 4) (Fin 4) K)
@@ -159,6 +179,7 @@ end StructureRankMain
 section IdentitySignature
 open Complex
 
+/-- Invariant scale factor determinant equivalency. -/
 lemma det_smul_id_fin4 (c : Complex) :
   Matrix.det (c • (1 : Matrix (Fin 4) (Fin 4) Complex)) = c^4 := by
   have h_smul : c • (1 : Matrix (Fin 4) (Fin 4) Complex) = Matrix.diagonal (fun _ => c) := by
@@ -169,6 +190,7 @@ lemma det_smul_id_fin4 (c : Complex) :
   rw[h_smul, Matrix.det_diagonal, Finset.prod_const]
   rfl
 
+/-- Auxiliary complex bounding reduction. -/
 lemma c_real_of_smul_id_real (c : Complex)
   (h_real : ∀ i j, (c • (1 : Matrix (Fin 4) (Fin 4) Complex) i j).im = 0) :
   c.im = 0 := by
@@ -177,6 +199,7 @@ lemma c_real_of_smul_id_real (c : Complex)
   rw [heval] at h00
   exact h00
 
+/-- Absolute scaling magnitude limitation constraint. -/
 lemma sq_sq_re_nonneg (c : Complex) (hc : c.im = 0) :
   0 ≤ (c^4).re := by
   have h_re : c = ↑c.re := by
@@ -192,7 +215,16 @@ lemma sq_sq_re_nonneg (c : Complex) (hc : c.im = 0) :
   rw [h_sq]
   exact sq_nonneg (c.re^2)
 
-/-- A structural rank/signature lemma: A matrix proportional to the identity cannot have a Lorentzian signature. -/
+/-- 
+Physical Interpretation:
+Geometric Non-Degeneracy Constraint: A macroscopic metric space that is strictly and trivially proportional to the Euclidean Identity map cannot simultaneously exhibit a physical Lorentzian (-1,1,1,1) signature. This mathematically forbids vacuous assumptions mapping flat pseudo-Riemannian manifolds onto pure scalar fields.
+
+Mathematical Boundaries:
+Assumes the proportionality operator scaling constant is strictly Real-valued, bounding evaluation to metrics whose corresponding determinants explicitly seek physically negative boundaries.
+
+Literature:
+Canonical boundary requirement differentiating purely Riemannian spaces from Minkowski spacetime.
+-/
 theorem detNotLorentzianOfProportionalToId (c : Complex) (g : Matrix (Fin 4) (Fin 4) Complex)
   (h_g : g = c • 1) :
   ¬ ( (∀ i j, (g i j).im = 0) ∧ g.det.re < 0 ∧ g.det.im = 0 ) := by

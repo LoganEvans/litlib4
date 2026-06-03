@@ -10,8 +10,14 @@ import Mathlib.Analysis.Matrix.Normed
 namespace Litlib.Math.CalculusBridges
 
 /-- 
-Universal math theorem projecting n-dimensional Fréchet derivatives along 
-basis vectors to 1D scalar limits. Evaluated over generic `Fin n → ℝ`.
+Physical Interpretation:
+Universal mathematical bridge projecting n-dimensional Fréchet variations along physical basis vectors to 1D scalar limits. This allows multidimensional field variations (such as the variation of a metric or action) to be rigorously evaluated as 1D parameterized paths without loss of generality.
+
+Mathematical Boundaries:
+Evaluated over generic `Fin n → ℝ` topological spaces. Requires the function `f` to be Fréchet differentiable at the base coordinate `x`.
+
+Literature:
+Standard calculus of variations technique used in establishing the Euler-Lagrange equations (e.g., Nakahara, Geometry, Topology and Physics).
 -/
 lemma fderiv_basis_eq_deriv {n : ℕ} {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] 
   (μ : Fin n) (f : (Fin n → ℝ) → E) (x : Fin n → ℝ)

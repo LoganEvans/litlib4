@@ -45,9 +45,14 @@ open Matrix
 -- ============================================================================
 
 /--
-Explicitly expands a 4x4 matrix determinant into its 24 algebraic terms.
-Bypasses the timeout-prone `O(N!)` combinatorial search.
-Works universally for any commutative ring.
+Physical Interpretation:
+Direct explicit polynomial equivalent representation of a generic 4x4 determinant. Bypasses the $O(N!)$ combinatorial recursion timeouts typically induced by strict topological matrix computations in Lean's geometric frameworks.
+
+Mathematical Boundaries:
+Functionally universal to any topological space strictly resolving as a Commutative Ring.
+
+Literature:
+Analogue of standard Laplace permutation matrix formulations.
 -/
 lemma expand_det_4 {R : Type*} [CommRing R] (M : Matrix (Fin 4) (Fin 4) R) :
   M.det =

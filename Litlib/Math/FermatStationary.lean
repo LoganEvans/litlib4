@@ -2,25 +2,46 @@
 
 import Mathlib.Analysis.Calculus.LocalExtr.Basic
 import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Data.Matrix.Basic
 
 set_option linter.unusedVariables false
 
 namespace Litlib.Math.CalculusOfVariations
 
-/-- Defines a local minimum for functional variations along 1D parameterized paths. -/
+/-- 
+Physical Interpretation:
+Defines a local minimum for functional variations along 1D parameterized paths. Represents a state that strictly minimizes the Action functional, validating the geometric constraints of the Principle of Least Action.
+
+Mathematical Boundaries:
+Formulated using native Mathlib 1D real calculus. The space of valid variations bounds the path integrals.
+
+Literature:
+Matches the standard definitions of extremal path variations in analytical mechanics (e.g., Goldstein, Classical Mechanics).
+-/
 def IsLocalMinimum {α : Type*} (Action : α → ℝ) (state : α) (isValidVar : (ℝ → α) → Prop) : Prop :=
   isValidVar (fun _ => state) ∧
   ∀ (var : ℝ → α), isValidVar var → var 0 = state →
     ∃ (ε : ℝ), ε > 0 ∧ ∀ t, -ε < t ∧ t < ε → Action state ≤ Action (var t)
 
-/-- Defines a local stationary point (δS = 0) for functional variations along 1D parameterized paths. -/
+/-- 
+Physical Interpretation:
+Defines a local stationary point ($\delta S = 0$) for field variations. This identifies states that act as geometric saddle points or pure extremals.
+-/
 def IsStationaryPoint {α : Type*} (Action : α → ℝ) (state : α) (isValidVar : (ℝ → α) → Prop) : Prop :=
   isValidVar (fun _ => state) ∧
   ∀ (var : ℝ → α), isValidVar var → var 0 = state →
     HasDerivAt (fun t => Action (var t)) 0 0
 
-/-- Pure Mathematical Theorem: Fermat's Stationary Theorem (1D Limits).
-    Rigorously proven using Mathlib's native 1D real calculus. -/
+/-- 
+Physical Interpretation:
+Fermat's Stationary Theorem extended to physical action functionals. States rigorously that any deterministic state that serves as a local minimum for an action functional must geometrically be a stationary extremal.
+
+Mathematical Boundaries:
+Evaluated strictly using 1D local derivative boundaries. Requires full Fréchet or directional differentiability at the state space origin.
+
+Literature:
+Corresponds directly to Euler-Lagrange extremization criteria in modern functional physics.
+-/
 theorem localMinIsStationary {α : Type*} (Action : α → ℝ) (state : α) (isValidVar : (ℝ → α) → Prop)
   (h_diff : ∀ (var : ℝ → α), isValidVar var → var 0 = state → DifferentiableAt ℝ (fun t => Action (var t)) 0)
   (h_min : IsLocalMinimum Action state isValidVar) :

@@ -11,11 +11,21 @@ open Matrix BigOperators
 
 namespace Litlib.Math.Leverrier
 
+/-- Auxiliary sum unwrapping to bypass combinatorial explosion in proofs. -/
 lemma sum_fin_4 {α} [AddCommMonoid α] (f : Fin 4 → α) :
   (∑ i : Fin 4, f i) = f 0 + f 1 + f 2 + f 3 := by
   simp[Fin.sum_univ_succ, Fin.sum_univ_zero, add_assoc]
 
-/-- 🔵 ALGEBRAIC: Newton's Identities for 4x4 Matrices (Leverrier's Algorithm) -/
+/-- 
+Physical Interpretation:
+Newton's Identities / Leverrier's Algorithm applied to 4x4 matrix traces. Converts full macroscopic spacetime volume invariants (determinants) into pure trace traces (scalar curvature components), allowing geometric forms to be calculated without matrix inversion.
+
+Mathematical Boundaries:
+Evaluated universally for 4x4 matrices over a field of characteristic zero, which intrinsically bounds the constant 24 away from zero.
+
+Literature:
+Standard mathematical identity widely leveraged in numerical and analytical General Relativity for curvature scalar derivations.
+-/
 theorem newtons_identities_det {K : Type*} [Field K] [CharZero K] (M : Matrix (Fin 4) (Fin 4) K) :
   M.det = (1 / 24 : K) * (
     (Matrix.trace M)^4

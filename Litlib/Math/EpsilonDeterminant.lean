@@ -15,6 +15,7 @@ open Litlib.Math.LeviCivita
 
 namespace Litlib.Math.EpsilonDeterminant
 
+/-- Flattens a 4-term sum to bypass combinatorial kernel explosion. -/
 lemma sum_fin_4 {α} [AddCommMonoid α] (f : Fin 4 → α) :
   (∑ i : Fin 4, f i) = f 0 + f 1 + f 2 + f 3 := by
   simp [Fin.sum_univ_succ, add_assoc]
@@ -25,7 +26,6 @@ lemma fin4_cases (x : Fin 4) : x = 0 ∨ x = 1 ∨ x = 2 ∨ x = 3 := by
 
 -- ============================================================================
 -- THE LOOKUP TABLE
--- Using exact_mod_cast ensures we get exactly `0 : Complex` and not `↑0`.
 -- ============================================================================
 
 lemma eps_val_0 (i j k l : Fin 4) (h : epsilon4 i j k l = 0) : 
@@ -298,6 +298,7 @@ lemma e3333 : (epsilon4 3 3 3 3 : Complex) = 0 := eps_val_0 3 3 3 3 (by decide)
 -- MAIN THEOREMS
 -- ============================================================================
 
+/-- Distributes and expands complex 4D epsilon contractions. -/
 lemma expand_epsilon_complex (f : Fin 4 → Fin 4 → Fin 4 → Fin 4 → Complex) :
   (∑ α : Fin 4, ∑ β : Fin 4, ∑ γ : Fin 4, ∑ δ : Fin 4, (epsilon4 α β γ δ : Complex) * f α β γ δ) =
     f 0 1 2 3 - f 0 1 3 2 - f 0 2 1 3 + f 0 2 3 1 + f 0 3 1 2 - f 0 3 2 1
@@ -326,6 +327,7 @@ lemma expand_epsilon_complex (f : Fin 4 → Fin 4 → Fin 4 → Fin 4 → Comple
   ]
   ring
 
+/-- Core internal equivalence lemma proving Levi-Civita matrix contractions evaluate to determinants. -/
 lemma epsilon_det_inner (M : Matrix (Fin 4) (Fin 4) Complex) (μ ν ρ σ : Fin 4) :
   (∑ α : Fin 4, ∑ β : Fin 4, ∑ γ : Fin 4, ∑ δ : Fin 4,
     (epsilon4 α β γ δ : Complex) * M μ α * M ν β * M ρ γ * M σ δ) =
@@ -362,7 +364,16 @@ lemma epsilon_det_inner (M : Matrix (Fin 4) (Fin 4) Complex) (μ ν ρ σ : Fin 
     ] <;> try ring
   }
 
-/-- 🔵 ALGEBRAIC: Epsilon-Determinant Theorem -/
+/--
+Physical Interpretation:
+The Levi-Civita Epsilon Determinant Formula. Relates the fully antisymmetric contraction of two Levi-Civita volume forms with a matrix to its macroscopic determinant. Represents the volume-form equivalence in general relativity and principal bundle metrics.
+
+Mathematical Boundaries:
+Evaluated strictly over 4x4 complex matrices. 
+
+Literature:
+Standard multi-linear algebra result used heavily in Capovilla-Dell-Jacobson (CDJ) formalisms of General Relativity and tetrad representations.
+-/
 theorem epsilon_det_formula (M : Matrix (Fin 4) (Fin 4) Complex) :
   M.det = (1 / 24 : Complex) * ∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4,
     ∑ α : Fin 4, ∑ β : Fin 4, ∑ γ : Fin 4, ∑ δ : Fin 4,
