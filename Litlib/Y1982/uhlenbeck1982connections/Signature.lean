@@ -29,7 +29,7 @@ Litlib.equation "uhlenbeck1982connections"
   kind "Theorem"
 class LocalCoulombGauge
     (Connection GaugeTransform Form BoundaryForm : Type*) [Zero Form] [Zero BoundaryForm]
-    (curvatureLn2Integral curvatureLpHalfIntegral : Connection → ℝ)
+    (curvatureLn2Integral curvatureLpIntegral : Connection → ℝ)
     (sobolevLn21Norm sobolevLp1Norm : Connection → ℝ)
     (applyGauge : GaugeTransform → Connection → Connection)
     (dStar : Connection → Form)
@@ -37,22 +37,27 @@ class LocalCoulombGauge
     (dimM : ℕ)
     (p : ℝ) where
   /--
-  Theorem 2.1: Local existence of Coulomb gauge.
-  Over a ball B^n, if the L^{n/2} integral of the curvature is sufficiently small,
-  the connection is gauge equivalent to one satisfying the Coulomb condition
-  d*A = 0 and the Neumann boundary condition x \cdot A = 0, with rigorous Sobolev bounds.
+  Geometric and Analytical Bounds: Theorem 2.1 establishes the local existence of the Coulomb gauge
+  (also known as the Lorentz or Hodge gauge) under strictly bounded curvature conditions.
+  Over a local ball $B^n$, if the $L^{n/2}$ norm of the field strength is bounded by a sufficiently
+  small, strictly positive $\kappa$, the connection is gauge-equivalent to one satisfying the Coulomb
+  condition $d^*A = 0$ and the Neumann boundary condition $x \cdot A = 0$. 
+  To prevent pathological evaluation of fractional powers (`Real.rpow`), the abstract integrals 
+  are explicitly gated to mathematically valid non-negative domains.
   -/
   theorem_2_1
     (hDim : (dimM : ℝ) > p ∧ p > (dimM : ℝ) / 2) :
     ∃ (κ : ℝ) (c : ℝ), κ > 0 ∧ c > 0 ∧
     ∀ (A : Connection),
+      curvatureLn2Integral A ≥ 0 →
+      curvatureLpIntegral A ≥ 0 →
       curvatureLn2Integral A ≤ κ →
       ∃ (g : GaugeTransform),
         let Ag := applyGauge g A
         dStar Ag = 0 ∧
         normalTrace Ag = 0 ∧
         sobolevLn21Norm Ag ≤ c * (curvatureLn2Integral A) ^ (2 / (dimM : ℝ)) ∧
-        sobolevLp1Norm Ag ≤ c * (curvatureLpHalfIntegral A) ^ (1 / p)
+        sobolevLp1Norm Ag ≤ c * (curvatureLpIntegral A) ^ (1 / p)
 
 Litlib.equation "uhlenbeck1982connections"
   eq "Theorem 1.5, 3.6"
@@ -66,14 +71,18 @@ class WeakCompactness
     (dimM : ℕ)
     (p : ℝ) where
   /--
-  Theorem 1.5 (and 3.6): Global weak compactness.
-  If 2p > dim M, a sequence of connections with bounded L^p curvature integrals
-  has a subsequence that converges weakly modulo gauge transformations,
-  and the limit obeys the same curvature bound.
+  Topological Gatekeeping and Weak Compactness: Theorems 1.5 and 3.6 prove global weak compactness
+  for gauge fields over a compact manifold $M$ with a compact structure group. The dimensional
+  constraint $2p > \dim M$ mathematically ensures that the Sobolev gauge transformations embed 
+  compactly into continuous mappings, preventing topological divergences in the weak limit. 
+  The sequence's $L^p$ bound $B$ is explicitly gated to be non-negative to prevent the hypotheses 
+  from being vacuously satisfied by unphysical negative norms.
   -/
   theorem_1_5
     (hDim : 2 * p > (dimM : ℝ))
     (D : ℕ → Connection) (B : ℝ)
+    (hNonDegenerate : B ≥ 0)
+    (hCurvNonNeg : ∀ i, curvatureLpIntegral (D i) ≥ 0)
     (hBound : ∀ i, curvatureLpIntegral (D i) ≤ B) :
     ∃ (DInfty : Connection) (subseq : ℕ → ℕ) (g : ℕ → GaugeTransform),
       StrictMono subseq ∧
