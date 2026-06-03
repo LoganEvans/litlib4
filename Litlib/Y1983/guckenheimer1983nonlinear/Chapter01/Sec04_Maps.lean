@@ -14,7 +14,7 @@ Litlib.equation "guckenheimer1983nonlinear"
   page "18"
   kind "theorem"
 class Theorem1_4_1
-  (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E]
+  (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
   (G : E → E)
   (is_C1_diffeomorphism : (E → E) → Prop)
   (is_C1_diffeomorphism_iff : ∀ f, is_C1_diffeomorphism f ↔ 
@@ -33,6 +33,12 @@ class Theorem1_4_1
     Set.BijOn h U (h '' U) ∧ ContinuousOn h U ∧ 
     ∃ g, Set.LeftInvOn g h U ∧ Set.RightInvOn g h U ∧ ContinuousOn g (h '' U))
   where
+  /--
+  Hartman-Grobman Theorem for Maps: Theorem 1.4.1.
+  Extends local topological equivalence to discrete dynamical systems (diffeomorphisms) 
+  near a fixed point. Hyperbolicity is strictly enforced by barring linear operators from 
+  possessing eigenvalues on the unit circle (`λ = e^(iθ)`).
+  -/
   hartman_grobman_map : ∃ (U : Set E), IsOpen U ∧ x_bar ∈ U ∧
     ∃ (h : E → E),
     is_homeomorphism_on h U ∧
@@ -43,7 +49,7 @@ Litlib.equation "guckenheimer1983nonlinear"
   page "18"
   kind "theorem"
 class Theorem1_4_2
-  (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E]
+  (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
   (r : ℕ∞) (_hr : 1 ≤ r)
   (G : E → E)
   (_h_diff : ContDiff ℝ r G)
@@ -66,6 +72,11 @@ class Theorem1_4_2
   (_h_Es : is_stable_subspace_map DG Es)
   (_h_Eu : is_unstable_subspace_map DG Eu)
   where
+  /--
+  Local Stable and Unstable Manifold Theorem for Maps: Theorem 1.4.2.
+  Defines the rigorous existence of invariant manifolds corresponding to exponential 
+  contraction and expansion directions for iterations of a discrete map on a Banach space.
+  -/
   stable_manifold_map_exists : 
     ∃ (V_s : Set Es) (psi_s : Es → E) (incl_s : Es →L[ℝ] E), 
       IsOpen V_s ∧ (0 : Es) ∈ V_s ∧

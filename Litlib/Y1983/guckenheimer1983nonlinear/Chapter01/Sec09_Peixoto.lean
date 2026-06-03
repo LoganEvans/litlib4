@@ -21,6 +21,12 @@ class Theorem1_9_1
   (has_saddle_connections : V → Prop)
   (nonwandering_set_is_only_fixed_and_periodic : V → Prop)
   where
+  /--
+  Peixoto's Theorem: Theorem 1.9.1.
+  A foundational theorem identifying the precise topological conditions under which a 
+  dynamical system on a compact two-dimensional manifold maintains structural stability. 
+  Topologically binds the system against saddle connections and non-hyperbolic degeneracies.
+  -/
   peixoto_iff : ∀ (v : V), 
     is_structurally_stable v ↔ 
       (has_finite_fixed_points_and_closed_orbits v ∧ 

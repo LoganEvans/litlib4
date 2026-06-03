@@ -14,7 +14,7 @@ Litlib.equation "guckenheimer1983nonlinear"
   page "13"
   kind "theorem"
 class Theorem1_3_1
-  (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E]
+  (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
   (f : E → E)
   (x_bar : E)
   (_hx_bar : f x_bar = 0)
@@ -31,6 +31,13 @@ class Theorem1_3_1
     Set.BijOn h U (h '' U) ∧ ContinuousOn h U ∧ 
     ∃ g, Set.LeftInvOn g h U ∧ Set.RightInvOn g h U ∧ ContinuousOn g (h '' U))
   where
+  /--
+  Hartman-Grobman Theorem for Flows: Theorem 1.3.1.
+  Establishes topological conjugacy between a nonlinear flow and its linearization in the neighborhood 
+  of a hyperbolic fixed point. The hyperbolicity constraint explicitly forbids purely imaginary eigenvalues 
+  via the `A^2 x + ω^2 x = 0` condition over real numbers, effectively barring degenerate center manifolds 
+  from trivially passing the constraint.
+  -/
   hartman_grobman : ∃ (U : Set E), IsOpen U ∧ x_bar ∈ U ∧
     ∃ (h : E → E),
     is_homeomorphism_on h U ∧
@@ -41,7 +48,7 @@ Litlib.equation "guckenheimer1983nonlinear"
   page "13"
   kind "theorem"
 class Theorem1_3_2
-  (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E]
+  (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
   (r : ℕ∞) (_hr : 1 ≤ r)
   (f : E → E)
   (_h_diff : ContDiff ℝ r f)
@@ -62,6 +69,12 @@ class Theorem1_3_2
   (_h_Es : is_stable_subspace (fderiv ℝ f x_bar) Es)
   (_h_Eu : is_unstable_subspace (fderiv ℝ f x_bar) Eu)
   where
+  /--
+  Local Stable and Unstable Manifold Theorem: Theorem 1.3.2.
+  Asserts the existence of invariant manifolds tangent to the respective stable and unstable eigenspaces 
+  at a hyperbolic equilibrium point. Requires a Banach space (`CompleteSpace E`) structure to ensure 
+  the converging mappings constructing the manifolds are mathematically well-founded.
+  -/
   stable_manifold_exists : 
     ∃ (V_s : Set Es) (psi_s : Es → E) (incl_s : Es →L[ℝ] E), 
       IsOpen V_s ∧ (0 : Es) ∈ V_s ∧

@@ -16,6 +16,12 @@ class Proposition1_5_1
   (is_saddle_type : ℝ → ℝ → Prop)
   (is_saddle_type_iff : ∀ α β, is_saddle_type α β ↔ abs (mathieu_trace α β) > 2)
   where
+  /--
+  Mathieu Equation Stability Constraint: Proposition 1.5.1.
+  Calculates the bounds determining whether the linear parametrically excited Mathieu 
+  system behaves as a saddle or a neutrally stable center. Predicate definitions strictly 
+  bound the absolute value of the trace matrix operator.
+  -/
   neutrally_stable_0 : ∀ α, (∀ n : ℤ, α ≠ (n : ℝ) / 2) → 
     ∃ β_max > 0, ∀ β, 0 < abs β → abs β < β_max → is_neutrally_stable α β
   saddle_type_pi : ∀ α, α ≠ 0 → 
