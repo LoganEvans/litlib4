@@ -25,37 +25,53 @@ Litlib.equation "infeld1949motion"
 class TestParticleGeodesic 
     (M : Type*) [TopologicalSpace M]
     (Metric : Type*)
+    (StressEnergy : Type*)
     (isLorentzian : Metric → Prop)
-    (isVacuum : Metric → Prop)
+    (satisfiesFieldEquations : Metric → StressEnergy → Prop)
     (isSmoothCurve : (ℝ → M) → Prop)
     (hasNonZeroTangent : (ℝ → M) → Prop)
     (isTimelike : Metric → (ℝ → M) → Prop)
     (isTestParticleWorldline : Metric → (ℝ → M) → Prop)
     (isGeodesic : Metric → (ℝ → M) → Prop) where
   
-  -- 1. Garbage-In Exploit Prevention
-  -- Ensure the function mapping proper time to spacetime is continuous.
+  /-- 
+  Topological Well-Posedness: Ensure the function mapping proper time to spacetime 
+  is continuous to prevent pathological worldline topologies.
+  -/
   worldline_continuous_req : ∀ g γ, isTestParticleWorldline g γ → Continuous γ
   
-  -- Ensure test particle worldlines meet the required differential smoothness.
+  /-- 
+  Differential Smoothness Constraint: Test particle worldlines must possess a 
+  well-defined differentiable structure to permit tangent vector evaluation.
+  -/
   worldline_smoothness_req : ∀ g γ, isTestParticleWorldline g γ → isSmoothCurve γ
 
-  -- 2. Zero/Trivial Exploit Prevention
-  -- Ensure worldline is not a trivial stationary coordinate point (tangent ≠ 0).
+  /-- 
+  Geometric Non-Degeneracy Constraint: Ensure the worldline is not a trivial 
+  stationary coordinate point, requiring a strictly non-zero tangent vector.
+  -/
   worldline_non_degenerate_req : ∀ g γ, isTestParticleWorldline g γ → hasNonZeroTangent γ
 
-  -- Ensure the worldline is strictly time-like (massive particle boundary condition).
+  /-- 
+  Physical Domain Bound: The worldline must be strictly time-like, establishing 
+  the proper mass boundary condition for the massive test particle.
+  -/
   worldline_timelike_req : ∀ g γ, isTestParticleWorldline g γ → isTimelike g γ
 
-  -- 3. Tautology Exploit Prevention
-  -- We do not define `isTestParticleWorldline` as `isGeodesic`. They are 
-  -- distinct physical properties connected by the field equations.
+  /-- 
+  Physical State Distinction: We do not define `isTestParticleWorldline` trivially 
+  as `isGeodesic`. They represent distinct physical properties (a limiting singularity 
+  vs a pure geometric path) connected fundamentally by the field equations.
 
-  -- The Core Theorem (Page 413): "As a consequence of the gravitational field 
-  -- equations in empty space, a test particle must move along a geodesic of the background field."
-  test_particle_motion_is_geodesic : ∀ g γ,
+  Core Theorem (Page 413, extended in Section 6):
+  As a consequence of the gravitational field equations, a test particle must move 
+  along a geodesic of the background field. By introducing a macroscopic stress-energy 
+  tensor T, we physically bind the theorem to a domain where a background spacetime 
+  is sourced appropriately, preventing trivial application to degenerate vacuum states.
+  -/
+  test_particle_motion_is_geodesic : ∀ g T γ,
     isLorentzian g →
-    isVacuum g →
+    satisfiesFieldEquations g T →
     isTestParticleWorldline g γ →
     isGeodesic g γ
 
