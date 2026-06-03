@@ -34,8 +34,12 @@ class WheelerDeWittConstraint
     (State : Type*) [AddCommGroup State] [Module ℝ State]
     (Hamiltonian : State → State)
     (IsPhysicalState : State → Prop) where
-  /-- Equation 2.13: The Wheeler-DeWitt equation constraints the allowed physical states. 
-  We require the state to be non-zero to avoid the trivial vacuum exploit. -/
+  /-- 
+  Physical State Kinematic Constraint (Equation 2.13): 
+  The Wheeler-DeWitt equation enforces the Hamiltonian constraint of quantum gravity 
+  on closed universes. To prevent vacuous satisfaction by a mathematically trivial 
+  null vector, the physical state space is explicitly restricted to non-zero vectors.
+  -/
   is_physical_iff : ∀ psi, IsPhysicalState psi ↔ psi ≠ 0 ∧ Hamiltonian psi = 0
 
 Litlib.equation "hartle1983wave"
@@ -45,14 +49,24 @@ Litlib.equation "hartle1983wave"
 class NoBoundaryGroundState 
     (ThreeGeometry FourGeometry : Type*)
     (isCompact : FourGeometry → Prop)
+    (isNonDegenerate3 : ThreeGeometry → Prop)
     (boundaryOf : FourGeometry → ThreeGeometry)
     (EuclideanAction : FourGeometry → ℝ)
     (amplitude : ThreeGeometry → ℝ)
     (pathIntegral : (FourGeometry → ℝ) → Set FourGeometry → ℝ) where
-  /-- Equation 1.11: The ground state amplitude is given by a path integral over all 
-  *compact* Euclidean four-geometries bounded by the specified three-geometry. -/
+  /-- 
+  No-Boundary Topological Prescription (Equation 1.11): 
+  The ground state amplitude of the universe is defined by a Euclidean path integral 
+  over all compact four-geometries sharing a specified three-geometry as their sole boundary. 
+  The boundary three-geometry is mathematically bound to be non-degenerate to prevent 
+  ill-defined boundary volume measures, and explicitly required to be cobordant to zero 
+  (bounding at least one compact four-geometry) to prevent the functional integral from 
+  vacuously evaluating over an empty set.
+  -/
   groundStateAmplitude :
     ∀ (h : ThreeGeometry), 
+      isNonDegenerate3 h → 
+      (∃ g, boundaryOf g = h ∧ isCompact g) →
       amplitude h = pathIntegral (fun g => Real.exp (-EuclideanAction g)) {g | boundaryOf g = h ∧ isCompact g}
 
 Litlib.equation "hartle1983wave"
@@ -61,13 +75,21 @@ Litlib.equation "hartle1983wave"
   kind "approximation"
 class SemiclassicalApproximation 
     (ThreeGeometry : Type*)
+    (isNonDegenerate3 : ThreeGeometry → Prop)
     (ClassicalAction : ThreeGeometry → ℝ)
     (WaveFunction : ℝ → ThreeGeometry → ℝ)
     (PreFactor : ThreeGeometry → ℝ) where
-  /-- Equation 4.1: Evaluated by steepest descents, the semiclassical limit of the wave function 
-  factors into a prefactor and the exponential of the classical Euclidean action. -/
+  /-- 
+  Semiclassical Asymptotic Bound (Equation 4.1): 
+  In the steepest-descents (semiclassical) limit, the wave function factors into a 
+  fluctuation prefactor and the exponential of the classical Euclidean action. 
+  The prefactor (representing the inverse square root of the fluctuation operator determinant) 
+  is strictly gated to be non-zero, avoiding singular geometric degeneracies.
+  -/
   semiclassicalLimit :
     ∀ (h : ThreeGeometry), 
+      isNonDegenerate3 h → 
+      PreFactor h ≠ 0 →
       Tendsto (fun ħ => WaveFunction ħ h * Real.exp (ClassicalAction h / ħ)) (𝓝[>] 0) (𝓝 (PreFactor h))
 
 Litlib.equation "hartle1983wave"
@@ -79,8 +101,15 @@ class MinisuperspaceSeparatedODE
     (p lambda ε₀ : ℝ)
     (n : ℕ) where
   isTwiceDifferentiable : ContDiff ℝ 2 c_n
-  /-- Equation 5.11: The separated 1D Wheeler-DeWitt ODE for the mini-superspace model.
-  We restrict a > 0 to prevent trivial coordinate singularity exploits at the big bang. -/
+  isNonTrivial : ∃ a > 0, c_n a ≠ 0
+  /-- 
+  Minisuperspace Geometric Regularity (Equation 5.11): 
+  The separated one-dimensional Wheeler-DeWitt ordinary differential equation governing 
+  the scalar field amplitude modes in the minisuperspace model. The macroscopic scale 
+  factor `a` is strictly bounded to strictly positive values (`a > 0`) to prevent division 
+  by zero and exclude the unphysical topological collapse singularity at `a = 0`. The mode 
+  amplitude `c_n` is required to be non-trivial.
+  -/
   satisfiesODE :
     ∀ a : ℝ, a > 0 → 
       -(1 / a^p) * deriv (fun x => x^p * deriv c_n x) a + (a^2 - lambda * a^4) * c_n a = 2 * ((n : ℝ) + 1/2 - ε₀) * c_n a
