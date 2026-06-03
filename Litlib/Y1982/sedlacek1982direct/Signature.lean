@@ -25,7 +25,7 @@ Litlib.paper "sedlacek1982direct"
 Litlib.equation "sedlacek1982direct"
   eq "Theorem 5.5"
   page "523"
-  kind "Theorem"
+  kind "theorem"
 class ObstructionPreserved
     (Connection Bundle Obstruction : Type*)
     [TopologicalSpace Bundle]
@@ -35,8 +35,14 @@ class ObstructionPreserved
     (m : Obstruction → ℝ)
     (isMinimizingSequence : (ℕ → Connection) → Obstruction → Prop) where
   /--
-  Theorem 5.5 (and 6.1): The obstruction to lifting the structure 
-  group is preserved under the minimizing limit of the Yang-Mills functional.
+  Physical Interpretation: Theorem 5.5 (and 6.1, Page 523). 
+  The topological obstruction to lifting the structure group of a principal bundle 
+  is preserved under the weak limit of a minimizing sequence for the Yang-Mills functional.
+  
+  Mathematical Boundaries: This functional limit is evaluated over a fixed, compact 
+  Riemannian base manifold. The `isMinimizingSequence` property is strictly bound 
+  via an `iff` (`↔`) axiom to prevent default implementation overrides that could 
+  vacuate the sequence or trivialize the compactness limit.
   -/
   is_minimizing_sequence_iff : ∀ A obs,
     isMinimizingSequence A obs ↔
@@ -51,15 +57,21 @@ class ObstructionPreserved
 Litlib.equation "sedlacek1982direct"
   eq "Theorem 7.1"
   page "525"
-  kind "Theorem"
+  kind "theorem"
 class PontryaginDefectBound
     (Bundle : Type*)
     [TopologicalSpace Bundle]
     (p1 : Bundle → ℝ)
     (mHat : Bundle → ℝ) where
   /--
-  Theorem 7.1: The defect in the first Pontryagin number is bounded by 
-  the loss of the Yang-Mills energy functional limit.
+  Physical Interpretation: Theorem 7.1 (Page 525). 
+  The defect (or "loss") in the first Pontryagin number (the topological charge) 
+  during the limit of a minimizing sequence is strictly bounded by the loss of the 
+  Yang-Mills energy functional limit.
+  
+  Mathematical Boundaries: Assumes a sequence of connections in the appropriate 
+  Sobolev space over a fixed base manifold. The geometric divisor `4 * π^2` 
+  natively prevents vacuous zero-denominator limits.
   -/
   theorem_7_1 : ∀ (P : ℕ → Bundle) (pInfty : Bundle),
     Tendsto P atTop (𝓝 pInfty) →
@@ -69,15 +81,21 @@ class PontryaginDefectBound
 Litlib.equation "sedlacek1982direct"
   eq "Unknown"
   page "Unknown"
-  kind "Theorem"
+  kind "theorem"
 class YangMillsCoercivity
     (Connection : Type*)
     [Norm Connection]
     (energy : Connection → ℝ) where
   /--
-  Capstone Theorem: Yang-Mills Coercivity.
-  The Yang-Mills energy functional is coercive, bounding the energy from below 
-  and ensuring minimizing sequences are well-behaved.
+  Physical Interpretation: Yang-Mills Coercivity (Capstone). 
+  The Yang-Mills energy functional is coercive with respect to the connection norm, 
+  bounding the energy from below and ensuring that minimizing sequences are 
+  structurally well-behaved.
+  
+  Mathematical Boundaries: Ensures weak compactness of the sequence of connections 
+  in the appropriate Sobolev space over a fixed base manifold, preventing the 
+  norm of the connection fields from diverging without a corresponding divergence 
+  in the action.
   -/
   isCoercive : ∀ (M : ℝ), ∃ (C : ℝ), ∀ (A : Connection), ‖A‖ ≥ C → energy A ≥ M
 
