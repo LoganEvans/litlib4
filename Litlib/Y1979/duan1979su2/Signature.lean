@@ -19,10 +19,19 @@ Litlib.paper "duan1979su2"
 Litlib.equation "duan1979su2"
   eq "1.13"
   page "3"
-  kind "equation"
+  kind "theorem"
 class GaugePotentialDecomposition where
-  /-- Equations (1.13-1.15): The decomposition of the SU(2) gauge potential W 
-      shows that the massive vector particle part b_mu is orthogonal to the fundamental field n. -/
+  /-- 
+  Physical Interpretation: Equations (1.13-1.15) (pages 3-4): The Cho-Duan-Ge 
+  decomposition of the SU(2) gauge potential W isolates the massive vector 
+  particle part b_mu. This theorem verifies that b_mu is strictly orthogonal 
+  to the fundamental isospin field n in the internal space.
+  
+  Mathematical Boundaries: The parameter e represents the coupling constant and 
+  must be strictly non-zero (`he : e ≠ 0`) to mathematically prevent a pathological 
+  division by zero. The internal isospin space is abstracted as a real module equipped 
+  with a valid antisymmetric cross product and symmetric inner product.
+  -/
   b_is_orthogonal
     (V : Type*) [AddCommGroup V] [Module ℝ V]
     (inner : V → V → ℝ)
@@ -42,11 +51,22 @@ class GaugePotentialDecomposition where
 Litlib.equation "duan1979su2"
   eq "1.33"
   page "6"
-  kind "equation"
+  kind "theorem"
 class PhysicalElectromagneticTensor where
-  /-- Equations (1.30, 1.32, 1.33): The derivation of the physical U(1) electromagnetic tensor F_mu_nu 
-      from the SU(2) field strength G_mu_nu. This requires validating the full Lie algebraic 
-      expansion of the SU(2) curvature. -/
+  /-- 
+  Physical Interpretation: Equations (1.30, 1.32, 1.33) (pages 5-6): 
+  The derivation of the physical U(1) electromagnetic tensor F_mu_nu 
+  from the SU(2) field strength G_mu_nu. This algebraic identity establishes 
+  the Cho-Duan-Ge decomposition, isolating the Abelian component and the 
+  topological monopole source terms into a gauge-invariant structure.
+  
+  Mathematical Boundaries: This requires validating the full Lie algebraic 
+  expansion of the SU(2) curvature. To prevent topological trivialization 
+  (the "Zero Exploit"), the internal isospin field `n` must be properly 
+  normalized to unity (`hn : inner n n = 1`), and its derivative must be 
+  strictly orthogonal (`hdn : inner n (dn μ) = 0`). The gauge coupling 
+  constant must also be strictly non-zero (`e ≠ 0`).
+  -/
   physical_tensor_eq
     (V : Type*) [AddCommGroup V] [Module ℝ V]
     (inner : V → V → ℝ)
