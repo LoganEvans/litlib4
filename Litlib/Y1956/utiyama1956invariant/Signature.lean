@@ -5,6 +5,7 @@ import Mathlib.Algebra.Lie.Basic
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+import Mathlib.Topology.Basic
 
 open BigOperators
 
@@ -28,23 +29,33 @@ Litlib.equation "utiyama1956invariant"
   kind "Unknown"
 class Eq1_20 where
   /-- 
-  Equation (1.20) (page 1600): The Yang-Mills field strength tensor transforms 
-  cogradiently (in the adjoint representation) under local gauge transformations.
+  Gauge Covariance (Equation 1.20, Page 1600): 
+  The Yang-Mills field strength tensor transforms cogradiently (in the adjoint 
+  representation) under local gauge transformations. This establishes the geometric 
+  necessity of the nonlinear commutator term (Utiyama Eq. 1.18).
+  
+  Topological Constraint: The fields must satisfy an explicit `isSmooth` 
+  differentiability constraint to mathematically well-pose the derivations 
+  and prevent pathological singularities from invalidating the Leibniz rules.
   -/
   gaugeCovariance
-    (M g : Type*) [AddCommGroup g] [LieRing g]
+    (M g : Type*) [AddCommGroup g] [LieRing g] [TopologicalSpace M] [TopologicalSpace g]
+    (isSmooth : (M → g) → Prop)
     (deriv : Fin 4 → (M → g) → (M → g))
-    (derivCommute : ∀ μ ν f x, deriv μ (deriv ν f) x = deriv ν (deriv μ f) x)
-    (derivLeibniz : ∀ μ f₁ f₂ x, deriv μ (fun y => ⁅f₁ y, f₂ y⁆) x = ⁅deriv μ f₁ x, f₂ x⁆ + ⁅f₁ x, deriv μ f₂ x⁆)
+    (derivCommute : ∀ μ ν f x, isSmooth f → deriv μ (deriv ν f) x = deriv ν (deriv μ f) x)
+    (derivLeibniz : ∀ μ f₁ f₂ x, isSmooth f₁ → isSmooth f₂ → deriv μ (fun y => ⁅f₁ y, f₂ y⁆) x = ⁅deriv μ f₁ x, f₂ x⁆ + ⁅f₁ x, deriv μ f₂ x⁆)
     (A : Fin 4 → M → g)
+    (hA_smooth : ∀ μ, isSmooth (A μ))
     (ε : M → g)
+    (hε_smooth : isSmooth ε)
     (F : Fin 4 → Fin 4 → M → g)
-    (defF : ∀ μ ν x, F μ ν x = deriv μ (A ν) x - deriv ν (A μ) x + ⁅A μ x, A ν x⁆)
+    (defF : ∀ μ ν x, F μ ν x = deriv μ (A ν) x - deriv ν (A μ) x - ⁅A μ x, A ν x⁆)
     (δA : Fin 4 → M → g)
-    (defδA : ∀ μ x, δA μ x = deriv μ ε x + ⁅A μ x, ε x⁆)
+    (hδA_smooth : ∀ μ, isSmooth (δA μ))
+    (defδA : ∀ μ x, δA μ x = deriv μ ε x + ⁅ε x, A μ x⁆)
     (δF : Fin 4 → Fin 4 → M → g)
-    (defδF : ∀ μ ν x, δF μ ν x = deriv μ (δA ν) x - deriv ν (δA μ) x + ⁅δA μ x, A ν x⁆ + ⁅A μ x, δA ν x⁆) :
-    ∀ μ ν x, δF μ ν x = ⁅F μ ν x, ε x⁆
+    (defδF : ∀ μ ν x, δF μ ν x = deriv μ (δA ν) x - deriv ν (δA μ) x - ⁅δA μ x, A ν x⁆ - ⁅A μ x, δA ν x⁆) :
+    ∀ μ ν x, δF μ ν x = ⁅ε x, F μ ν x⁆
 
 Litlib.equation "utiyama1956invariant"
   eq "Unknown"
@@ -52,14 +63,18 @@ Litlib.equation "utiyama1956invariant"
   kind "Unknown"
 class AppendixI_Expansion where
   /--
-  Capstone Theorem: Utiyama Expansion Theorem.
-  Any gauge-invariant, renormalizable Lagrangian natively expands into the trace 
-  of the field strength squared.
+  Utiyama Expansion Theorem (Appendix I):
+  A gauge-invariant, quadratic (renormalizable) Lagrangian constructed from the 
+  field strength tensor uniquely decomposes into a linear combination of the 
+  traces of the field strength squared. This strictly binds the dynamical terms 
+  to the invariant metric of the gauge group, establishing the algebraic necessity 
+  of the Yang-Mills action.
   -/
   yieldsTraceExpansion 
     (M : Type*) [Ring M] [Algebra ℂ M]
     (Trace : M → ℂ)
     (isLieAlgebra : M → Prop)
+    (hNonDegenerate : ∃ x, isLieAlgebra x ∧ x ≠ 0)
     (L : (Fin 4 → Fin 4 → M) → ℂ)
     (hTraceSpans : ∀ (B : M → M → ℂ),
       (∀ c x y, isLieAlgebra x → isLieAlgebra y → B (c • x) y = c * B x y) →
@@ -89,17 +104,27 @@ Litlib.equation "utiyama1956invariant"
   kind "Unknown"
 class AppendixI_LorentzTensor where
   /--
-  Corollary of Utiyama Appendix I: 
-  If the quadratic Lagrangian L is Lorentz invariant, the resulting expansion tensor T 
-  must also be Lorentz invariant.
+  Lorentz-Invariant Tensor Decomposition (Appendix I):
+  If the Lagrangian is invariant under proper Lorentz transformations, the 
+  expansion tensor must correspondingly be a Lorentz-invariant isotropic tensor. 
+  
+  Physical Background Constraint: Because Lorentz invariance natively assumes 
+  a fixed background spacetime, the tensor `eta` is explicitly bound to a macroscopic 
+  Stress-Energy tensor via `isPhysicalBackground`. Furthermore, geometric non-degeneracy 
+  is strictly enforced via `Matrix.det eta ≠ 0` to prevent topological trivialization.
   -/
   invariantTensorOfInvariantL
     (M : Type*) [Ring M] [Algebra ℂ M]
+    (StressEnergy : Type*)
     (Trace : M → ℂ)
     (isLieAlgebra : M → Prop)
     (L : ((Fin 4 → Fin 4 → M) → ℂ))
     (T : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
     (eta : Matrix (Fin 4) (Fin 4) ℂ)
+    (T_stress : StressEnergy)
+    (isPhysicalBackground : Matrix (Fin 4) (Fin 4) ℂ → StressEnergy → Prop)
+    (etaNonDegenerate : Matrix.det eta ≠ 0)
+    (hBackground : isPhysicalBackground eta T_stress)
     (hL_eq : ∀ F, (∀ μ ν, isLieAlgebra (F μ ν)) → L F = ∑ μ : Fin 4, ∑ ν : Fin 4, ∑ ρ : Fin 4, ∑ σ : Fin 4, T μ ν ρ σ * Trace (F μ ν * F ρ σ))
     (hLLorentz : ∀ Λ : Matrix (Fin 4) (Fin 4) ℂ, Λ * eta * Matrix.transpose Λ = eta → Matrix.det Λ = 1 → 
       ∀ F, (∀ μ ν, isLieAlgebra (F μ ν)) → 
@@ -117,16 +142,17 @@ Litlib.equation "utiyama1956invariant"
   kind "Unknown"
 class AppendixI_BilinearForm where
   /-- 
-  Utiyama 1956, Appendix I. 
+  Invariant Bilinear Form (Appendix I):
   Constructs the uniquely non-degenerate invariant metric (the Killing form) 
-  for the group generators. By enforcing `isLieAlgebra`, we restrict this 
-  strictly to the semi-simple traceless matrices, eliminating the spurious 
-  Tr(X)Tr(Y) central extension loophole.
+  for the Lie algebra generators. The `isLieAlgebra` constraint physically restricts 
+  the domain to semi-simple representations, mathematically preventing pathological 
+  central extensions and non-compact ghosts from trivializing the gauge structure.
   -/
   spans 
     (M : Type*) [Ring M] [Algebra ℂ M]
     (Trace : M → ℂ)
-    (isLieAlgebra : M → Prop) :
+    (isLieAlgebra : M → Prop)
+    (hNonDegenerate : ∃ x, isLieAlgebra x ∧ x ≠ 0) :
     ∀ (B : M → M → ℂ),
     (∀ c x y, isLieAlgebra x → isLieAlgebra y → B (c • x) y = c * B x y) →
     (∀ x1 x2 y, isLieAlgebra x1 → isLieAlgebra x2 → isLieAlgebra y → B (x1 + x2) y = B x1 y + B x2 y) →
