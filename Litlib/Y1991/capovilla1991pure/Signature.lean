@@ -38,14 +38,18 @@ class Eq2_1
     (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (Psi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
-  -- ANTI-BS: Fields must be measurable to prevent meaningless integrals
+  /-- Measure-Theoretic Integrability Constraint: Fields must be strongly measurable across the spacetime manifold to ensure that the action integral is rigorously well-defined. -/
   hSigma_meas : ∀ μ ν A B, MeasureTheory.AEStronglyMeasurable (fun x => Sigma x μ ν A B) volume
   hR_meas : ∀ μ ν A B, MeasureTheory.AEStronglyMeasurable (fun x => R x μ ν A B) volume
   hPsi_meas : ∀ A B C D, MeasureTheory.AEStronglyMeasurable (fun x => Psi x A B C D) volume
-  -- ANTI-BS: epsilon4 is non-zero and totally antisymmetric
+  
+  /-- Topological Orientation Constraint: The Levi-Civita symbol must be strictly antisymmetric under index exchange to preserve the proper volume form of the spacetime manifold. -/
   h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
   h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
+  
+  /-- Non-Degeneracy Constraint: The four-dimensional Levi-Civita symbol must be strictly non-zero. -/
   h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
+  
   eq2_1_iff : S = MeasureTheory.integral volume (fun x =>
     let term1 := sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
       epsilon4 μ ν ρ σ * sumFin2 fun A => sumFin2 fun B =>
@@ -64,10 +68,15 @@ class Eq2_2a
     (Spacetime : Type*) [TopologicalSpace Spacetime]
     (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
-  -- ANTI-BS checks
+  /-- Algebraic Symmetry Constraint: $\Sigma$ must transform as a valid 2-form, requiring strict antisymmetry in its spacetime indices. -/
   hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
+  
+  /-- Spinor Symmetry Constraint: $\Sigma$ must be strictly symmetric in its chiral spinor indices. -/
   hSigma_symm : ∀ x μ ν A B, Sigma x μ ν A B = Sigma x μ ν B A
+  
+  /-- Non-Degeneracy Constraint: The four-dimensional Levi-Civita symbol must be strictly non-zero. -/
   h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
+  
   eq2_2a_iff : ∀ x A B C D,
     let w := fun A' B' C' D' => sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
       epsilon4 μ ν ρ σ * Sigma x μ ν A' B' * Sigma x ρ σ C' D';
@@ -84,9 +93,12 @@ class Eq2_2b
     (omega : Spacetime → Fin 4 → Fin 2 → Fin 2 → ℂ) -- 1-form connection
     (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ) -- 2-form
     (eps2_up : Fin 2 → Fin 2 → ℂ) where
-  -- ANTI-BS: Enforce symmetries
+  /-- Algebraic Form Constraint: Enforces proper exterior algebra antisymmetry on spacetime indices for $\Sigma$. -/
   hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
+  
+  /-- Connection Symmetry Constraint: The spin connection $\omega$ must be symmetric in its spinor indices. -/
   homega_symm : ∀ x μ A B, omega x μ A B = omega x μ B A
+  
   eq2_2b_iff : ∀ x μ ν ρ A B,
     let omega_up := fun lam A' C' => sumFin2 fun E => eps2_up A' E * omega x lam E C';
     let term := fun m n r => dSigma x m n r A B + 
@@ -103,17 +115,20 @@ class Eq2_2c
     (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (Psi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
     (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ) where
-  -- ANTI-BS: R and Sigma are 2-forms, strictly antisymmetric in spacetime indices
+  /-- Curvature 2-Form Constraint: The curvature tensor $R$ and $\Sigma$ must be strictly antisymmetric in their spacetime indices. -/
   hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
   hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
-  -- ANTI-BS: R and Sigma are symmetric in chiral spinor indices
+  
+  /-- Spinor Symmetry Constraint: $R$ and $\Sigma$ must be symmetric in their chiral spinor indices. -/
   hR_symm_spin : ∀ x μ ν A B, R x μ ν A B = R x μ ν B A
   hSigma_symm_spin : ∀ x μ ν A B, Sigma x μ ν A B = Sigma x μ ν B A
-  -- Psi is a totally symmetric Lagrange multiplier field. 
+  
+  /-- Trace-Free Weyl Symmetry: The Lagrange multiplier field $\Psi$ must be totally symmetric in all four of its spinor indices, encoding the 5 complex degrees of freedom of the self-dual Weyl tensor. -/
   hPsiSymm : ∀ x A B C D, 
     Psi x A B C D = Psi x B A C D ∧ 
     Psi x A B C D = Psi x A C B D ∧ 
     Psi x A B C D = Psi x A B D C
+    
   eq2_2c_iff : ∀ x μ ν A B, R x μ ν A B = 
     sumFin2 fun C => sumFin2 fun D => 
       Psi x A B C D * Sigma x μ ν C D
@@ -136,15 +151,18 @@ class Theorem_Eq2_2c_RicciFlat
     (dSigma : Spacetime → Fin 4 → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (omega : Spacetime → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (isRicciFlat : (Spacetime → Fin 4 → Fin 4 → ℂ) → Prop) where
+  /-- Spinor Metric Antisymmetry: The fundamental spinor metrics must be antisymmetric to properly raise and lower $SL(2, \mathbb{C})$ indices. -/
   heps2_anti : ∀ A B, eps2_down A B = - eps2_down B A
   heps2_bar_anti : ∀ A' B', eps2_bar_down A' B' = - eps2_bar_down B' A'
   heps2_right_anti : ∀ A' B', eps2_right A' B' = - eps2_right B' A'
   heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
+  
   hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
   homega_symm : ∀ x μ A B, omega x μ A B = omega x μ B A
   hg_def : ∀ x μ ν, g x μ ν = 
     sumFin2 fun A => sumFin2 fun B => sumFin2 fun A' => sumFin2 fun B' =>
       eps2_down A B * eps2_bar_down A' B' * theta x μ A A' * theta x ν B B'
+      
   eq2_2c_implies_ricci_flat :
     -- Hypothesis 1: Sigma is derived from the tetrad (Eq 2.3)
     (∀ x μ ν A B, Sigma x μ ν A B = (1/2 : ℂ) * sumFin2 fun A' => sumFin2 fun B' =>
@@ -185,20 +203,25 @@ class Eq2_4
     (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
     (eps2_up : Fin 2 → Fin 2 → ℂ) where
-  -- ANTI-BS: The metric density must be non-degenerate.
+  /-- Geometric Non-Degeneracy Constraint: The macroscopic metric density determinant must be strictly non-zero to prevent topological collapse of the volume form. -/
   hg_dens_nondeg : ∀ x, Matrix.det (g_dens x) ≠ 0
-  -- ANTI-BS: Sigma is a 2-form, antisymmetric in spacetime indices.
+  
+  /-- Algebraic Form Constraint: $\Sigma$ is a valid 2-form, antisymmetric in spacetime indices. -/
   hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
-  -- ANTI-BS: Sigma is symmetric in its chiral spinor indices.
+  
+  /-- Spinor Symmetry Constraint: $\Sigma$ is symmetric in its chiral spinor indices. -/
   hSigma_symm_spin : ∀ x μ ν A B, Sigma x μ ν A B = Sigma x μ ν B A
-  -- ANTI-BS: epsilon4 must be a totally antisymmetric, non-zero tensor.
+  
+  /-- Topological Orientation Constraint: The four-dimensional Levi-Civita symbol must be totally antisymmetric and strictly non-zero. -/
   h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
   h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
   h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
   h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
-  -- ANTI-BS: eps2_up (spinor metric) is antisymmetric and non-degenerate.
+  
+  /-- Spinor Metric Constraint: The $SL(2, \mathbb{C})$ spinor metric must be strictly non-degenerate and antisymmetric to serve as a valid index manipulation operator. -/
   heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
   heps2_up_nondeg : eps2_up 0 1 ≠ 0
+  
   eq2_4_iff : ∀ x μ ν, g_dens x μ ν = 
     (1 / 3 : ℂ) * sumFin4 fun α => sumFin4 fun β => sumFin4 fun γ => sumFin4 fun δ =>
       sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D => sumFin2 fun E => sumFin2 fun F =>
@@ -264,6 +287,7 @@ class Eq2_7
     (invPsi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
     (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
+  /-- Measure-Theoretic Integrability Constraint: Fields must be strongly measurable across the spacetime manifold to ensure the action integral is well-defined. -/
   hinvPsi_meas : ∀ A B C D, MeasureTheory.AEStronglyMeasurable (fun x => invPsi x A B C D) volume
   hR_meas : ∀ μ ν A B, MeasureTheory.AEStronglyMeasurable (fun x => R x μ ν A B) volume
   h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
@@ -285,10 +309,12 @@ class Eq2_9
     (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
     (eps2_up : Fin 2 → Fin 2 → ℂ) where
-  -- ANTI-BS: R is a 2-form, antisymmetric in spacetime indices.
+  /-- Curvature 2-Form Structure: The curvature tensor $R$ must be antisymmetric in spacetime indices. -/
   hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
-  -- ANTI-BS: R is symmetric in its chiral spinor indices.
+  
+  /-- Spinor Symmetry Constraint: $R$ must be symmetric in its chiral spinor indices. -/
   hR_symm_spin : ∀ x μ ν A B, R x μ ν A B = R x μ ν B A
+  
   eq2_9_iff : ∀ x A B C D, 
     let R_up := fun ρ σ C_idx D_idx => sumFin2 fun C' => sumFin2 fun D' => eps2_up C_idx C' * eps2_up D_idx D' * R x ρ σ C' D';
     M x A B C D = 
@@ -305,16 +331,18 @@ class Page62_Psi3x3
     (Psi_3x3 : Spacetime → Fin 3 → Fin 3 → ℂ)
     (clump : Fin 2 → Fin 2 → Fin 3)
     (detPsi : Spacetime → ℂ) where
-  -- ANTI-BS: Psi is totally symmetric
+  /-- Trace-Free Weyl Symmetry: The $\Psi$ tensor must be totally symmetric to correctly encode the complex degrees of freedom of the self-dual Weyl tensor. -/
   hPsiSymm : ∀ x A B C D, 
     Psi x A B C D = Psi x B A C D ∧ 
     Psi x A B C D = Psi x A C B D ∧ 
     Psi x A B C D = Psi x A B D C
-  -- ANTI-BS: The "clump" mapping must respect the symmetry of the index pair
+    
+  /-- Index Projection Symmetry: The mapping from spinor pairs to the 3-dimensional basis must respect the underlying symmetry of the indices. -/
   h_clump_symm : ∀ A B, clump A B = clump B A
-  -- ANTI-BS: The mapping must be surjective onto Fin 3 to be a valid 3D basis projection
-  -- This prevents the 3x3 matrix from trivially having zero rows/columns.
+  
+  /-- Basis Projection Surjectivity: The projection mapping must be surjective onto `Fin 3` to prevent the resulting $3 \times 3$ matrix from trivially containing zero rows or columns, ensuring algebraic completeness. -/
   h_clump_surj : Function.Surjective (fun (p : Fin 2 × Fin 2) => clump p.1 p.2)
+  
   -- Psi_3x3 is exactly the 4-index Psi evaluated via the clumped indices
   h_Psi_3x3_iff : ∀ x A B C D, Psi_3x3 x (clump A B) (clump C D) = Psi x A B C D
   -- detPsi, as used in Eq 2.21, is formally the 3x3 determinant of this matrix!
@@ -331,17 +359,20 @@ class Eq2_18
     (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
     (eps2_up : Fin 2 → Fin 2 → ℂ) where
-  -- ANTI-BS: Fields must be measurable/integrable to prevent meaningless integrals
+  /-- Measure-Theoretic Integrability Constraint: Fields must be strongly measurable across the spacetime manifold to ensure the action integral is well-defined. -/
   heta_meas : MeasureTheory.AEStronglyMeasurable eta volume
   hR_meas : ∀ μ ν A B, MeasureTheory.AEStronglyMeasurable (fun x => R x μ ν A B) volume
-  -- ANTI-BS: epsilon4 must be a totally antisymmetric, non-zero tensor.
+  
+  /-- Topological Orientation Constraint: The four-dimensional Levi-Civita symbol must be strictly non-zero and totally antisymmetric. -/
   h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
   h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
   h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
   h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
-  -- ANTI-BS: eps2_up (spinor metric) is antisymmetric and non-degenerate.
+  
+  /-- Spinor Metric Constraint: The $SL(2, \mathbb{C})$ spinor metric must be strictly non-degenerate and antisymmetric. -/
   heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
   heps2_up_nondeg : eps2_up 0 1 ≠ 0
+  
   eq2_18_iff : S = MeasureTheory.integral volume (fun x => 
     let R_up := fun μ ν A B => sumFin2 fun A' => sumFin2 fun B' => eps2_up A A' * eps2_up B B' * R x μ ν A' B';
     eta x * sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D => 
@@ -360,17 +391,22 @@ class Eq2_19a
     (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (eps2_up : Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
-  -- ANTI-BS: R is a 2-form, antisymmetric in spacetime indices.
+  /-- Curvature 2-Form Structure: The curvature tensor $R$ must be antisymmetric in spacetime indices. -/
   hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
+  
+  /-- Spinor Symmetry Constraint: $R$ must be symmetric in its chiral spinor indices. -/
   hR_symm_spin : ∀ x μ ν A B, R x μ ν A B = R x μ ν B A
-  -- ANTI-BS: epsilon4 is totally antisymmetric
+  
+  /-- Topological Orientation Constraint: The four-dimensional Levi-Civita symbol must be strictly non-zero and totally antisymmetric. -/
   h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
   h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
   h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
   h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
-  -- ANTI-BS: eps2_up is antisymmetric and non-degenerate
+  
+  /-- Spinor Metric Constraint: The $SL(2, \mathbb{C})$ spinor metric must be strictly non-degenerate and antisymmetric. -/
   heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
   heps2_up_nondeg : eps2_up 0 1 ≠ 0
+  
   eq2_19a_iff : ∀ x,
     let R_up := fun ρ σ A B => sumFin2 fun A' => sumFin2 fun B' => eps2_up A A' * eps2_up B B' * R x ρ σ A' B';
     let RR_up := fun A B C D => sumFin4 fun μ => sumFin4 fun ν => sumFin4 fun ρ => sumFin4 fun σ =>
@@ -391,19 +427,25 @@ class Eq2_19b
     (eps2_up : Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
     (CovariantDerivative : (Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ) → (Spacetime → Fin 4 → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)) where
-  -- ANTI-BS: R is a 2-form
+  /-- Curvature 2-Form Structure: The curvature tensor $R$ must be antisymmetric in spacetime indices. -/
   hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
+  
+  /-- Spinor Symmetry Constraint: $R$ must be symmetric in its chiral spinor indices. -/
   hR_symm_spin : ∀ x μ ν A B, R x μ ν A B = R x μ ν B A
-  -- ANTI-BS: eta cannot be zero
+  
+  /-- Scalar Density Non-Degeneracy: The scalar density $\eta$ must be strictly non-zero everywhere to maintain equivalence with the non-degenerate metric formulation of General Relativity. -/
   heta_nondeg : ∀ x, eta x ≠ 0
-  -- ANTI-BS: epsilon4 is totally antisymmetric
+  
+  /-- Topological Orientation Constraint: The four-dimensional Levi-Civita symbol must be strictly non-zero and totally antisymmetric. -/
   h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
   h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
   h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
   h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
-  -- ANTI-BS: eps2_up is antisymmetric and non-degenerate
+  
+  /-- Spinor Metric Constraint: The $SL(2, \mathbb{C})$ spinor metric must be strictly non-degenerate and antisymmetric. -/
   heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
   heps2_up_nondeg : eps2_up 0 1 ≠ 0
+  
   eq2_19b_iff :
     let R_up := fun x ρ σ A B => sumFin2 fun A' => sumFin2 fun B' => eps2_up A A' * eps2_up B B' * R x ρ σ A' B';
     let Bracket := fun x μ ν A B =>
@@ -423,17 +465,20 @@ class Eq2_20a
     (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (eps2_up : Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
-  -- ANTI-BS: Sigma and R are 2-forms
+  /-- Algebraic Form Constraint: $\Sigma$ and $R$ are valid 2-forms, strictly antisymmetric in spacetime indices. -/
   hSigma_anti : ∀ x μ ν A B, Sigma x μ ν A B = - Sigma x ν μ A B
   hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
-  -- ANTI-BS: epsilon4 is totally antisymmetric
+  
+  /-- Topological Orientation Constraint: The four-dimensional Levi-Civita symbol must be strictly non-zero and totally antisymmetric. -/
   h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
   h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
   h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
   h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
-  -- ANTI-BS: eps2_up is antisymmetric and non-degenerate
+  
+  /-- Spinor Metric Constraint: The $SL(2, \mathbb{C})$ spinor metric must be strictly non-degenerate and antisymmetric. -/
   heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
   heps2_up_nondeg : eps2_up 0 1 ≠ 0
+  
   eq2_20a_iff : ∀ x μ ν A B,
     let R_up := fun ρ σ A_idx B_idx => sumFin2 fun A' => sumFin2 fun B' => eps2_up A_idx A' * eps2_up B_idx B' * R x ρ σ A' B';
     Sigma x μ ν A B =
@@ -452,16 +497,19 @@ class Eq2_20b
     (R : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (eps2_up : Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) where
-  -- ANTI-BS: R is a 2-form
+  /-- Curvature 2-Form Structure: The curvature tensor $R$ must be antisymmetric in spacetime indices. -/
   hR_anti : ∀ x μ ν A B, R x μ ν A B = - R x ν μ A B
-  -- ANTI-BS: epsilon4 is totally antisymmetric
+  
+  /-- Topological Orientation Constraint: The four-dimensional Levi-Civita symbol must be strictly non-zero and totally antisymmetric. -/
   h_eps_swap1 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 β α γ δ
   h_eps_swap2 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α γ β δ
   h_eps_swap3 : ∀ α β γ δ, epsilon4 α β γ δ = - epsilon4 α β δ γ
   h_eps_nonzero : epsilon4 0 1 2 3 ≠ 0
-  -- ANTI-BS: eps2_up is antisymmetric and non-degenerate
+  
+  /-- Spinor Metric Constraint: The $SL(2, \mathbb{C})$ spinor metric must be strictly non-degenerate and antisymmetric. -/
   heps2_up_anti : ∀ A B, eps2_up A B = - eps2_up B A
   heps2_up_nondeg : eps2_up 0 1 ≠ 0
+  
   eq2_20b_iff : ∀ x A B C D,
     let R_up := fun ρ σ A_idx B_idx => sumFin2 fun A' => sumFin2 fun B' => eps2_up A_idx A' * eps2_up B_idx B' * R x ρ σ A' B';
     invPsi x A B C D =
@@ -497,9 +545,10 @@ class Eq2_21
     (eta : Spacetime → ℂ)
     (sqrt_g : Spacetime → ℂ)
     (detPsi : Spacetime → ℂ) where
-  -- ANTI-BS: Neither sqrt_g nor detPsi can be zero because they appear in a denominator.
+  /-- Denominator Non-Degeneracy Constraint: The metric determinant factor and the Weyl curvature determinant must be strictly non-zero to prevent singularities and division-by-zero artifacts in the scalar density definition. -/
   h_sqrt_g_nondeg : ∀ x, sqrt_g x ≠ 0
   h_detPsi_nondeg : ∀ x, detPsi x ≠ 0
+  
   eq2_21_iff : ∀ x, eta x = (sqrt_g x * detPsi x)⁻¹
 
 Litlib.equation "capovilla1991pure"
@@ -518,17 +567,21 @@ class Theorem_Eq2_22_Derivation
     (Sigma : Spacetime → Fin 4 → Fin 4 → Fin 2 → Fin 2 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
     (eps2_up : Fin 2 → Fin 2 → ℂ) where
-  -- ANTI-BS: A metric must be non-degenerate.
+  /-- Geometric Non-Degeneracy Constraint: The derived macroscopic metric determinant must be strictly non-zero to prevent topological collapse and ensure a valid Lorentzian/Riemannian signature. This mathematically blocks the `0⁻¹ = 0` exploit from forcing trivial metric states via Eq 2.21. -/
   hg_nondeg : ∀ x, Matrix.det (g x) ≠ 0
   h_g_dens_def : ∀ x μ ν, g_dens x μ ν = sqrt_g x * g x μ ν
+  
   -- Definitions as explicit hypotheses corresponding to (2.4, 2.2c, 2.21)
   eq2_4_holds : ∀ x μ ν, g_dens x μ ν = 
     (1 / 3 : ℂ) * sumFin4 fun α => sumFin4 fun β => sumFin4 fun γ => sumFin4 fun δ =>
       sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D => sumFin2 fun E => sumFin2 fun F =>
         epsilon4 α β γ δ * Sigma x μ α A B * eps2_up B C * Sigma x β γ C D * eps2_up D E * Sigma x δ ν E F * eps2_up F A
+        
   eq2_2c_holds : ∀ x μ ν A B, R x μ ν A B = 
     sumFin2 fun C => sumFin2 fun D => Psi x A B C D * Sigma x μ ν C D
+    
   eq2_21_holds : ∀ x, eta x = (sqrt_g x * detPsi x)⁻¹
+  
   -- The theorem claim (2.22), logically dependent on the above holding
   eq2_22_derived : ∀ x μ ν, g x μ ν = 
     (1 / 3 : ℂ) * eta x * 
