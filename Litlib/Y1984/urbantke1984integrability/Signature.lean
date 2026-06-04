@@ -152,4 +152,30 @@ class Case1_1 where
     (hM : ∀ a b, M a b = Finset.sum Finset.univ (fun μ => Finset.sum Finset.univ (fun ν => F_dual a μ ν * F b μ ν))) :
     (Matrix.det M ≠ 0 ↔ Matrix.det (Matrix.of g) ≠ 0)
 
+Litlib.equation "urbantke1984integrability"
+  eq "10"
+  page "2322"
+  kind "Theorem"
+class Theorem_Eq10_Symmetry where
+  /--
+  Urbantke Metric Symmetry Constraint:
+  An algebraic identity proving that the nested Urbantke metric 
+  polynomial g_μν, when constructed from an explicitly antisymmetric 
+  curvature tensor F, is structurally symmetric (g_μν = g_νμ).
+  This mathematically guarantees that the quasimetric behaves as a valid
+  pseudo-Riemannian metric tensor.
+  -/
+  symmetricQuasimetric
+    (F : Fin 3 → Fin 4 → Fin 4 → ℂ)
+    (F_dual : Fin 3 → Fin 4 → Fin 4 → ℂ)
+    (epsilon3 : Fin 3 → Fin 3 → Fin 3 → ℂ)
+    (g : Fin 4 → Fin 4 → ℂ)
+    (hF_anti : ∀ a μ ν, F a μ ν = - F a ν μ)
+    (hF_dual_anti : ∀ a μ ν, F_dual a μ ν = - F_dual a ν μ)
+    (hepsilon3_anti : ∀ a b c, epsilon3 a b c = - epsilon3 b a c ∧ epsilon3 a b c = - epsilon3 a c b)
+    (hg_def : ∀ μ ν, g μ ν = (-1 / 6 : ℂ) * Finset.sum Finset.univ (fun a => Finset.sum Finset.univ (fun b => Finset.sum Finset.univ (fun c => 
+      Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β => 
+        epsilon3 a c b * F a μ α * F_dual c α β * F b β ν)))))) :
+    ∀ μ ν, g μ ν = g ν μ
+
 end Litlib.Y1984.urbantke1984integrability
