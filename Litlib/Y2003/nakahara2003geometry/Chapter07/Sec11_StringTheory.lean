@@ -13,13 +13,18 @@ Litlib.equation "nakahara2003geometry"
   eq "7.237a"
   page "62"
   kind "equation"
+/-- 
+Polyakov Equation of Motion:
+The classical equation of motion for a bosonic string derived from the Polyakov action.
+-/
 class PolyakovEquationOfMotion
     (WorldSheet Index : Type _) [Fintype Index] [Nonempty WorldSheet]
     (g_inv : Index → Index → WorldSheet → ℝ)
     (sqrt_det_g : WorldSheet → ℝ)
     (X : Index → WorldSheet → ℝ)
     (partialDeriv : Index → (WorldSheet → ℝ) → WorldSheet → ℝ) where
-  -- Anti-BS
+  
+  /-- Geometric Non-Degeneracy Constraint: The worldsheet metric determinant must be strictly non-zero (typically negative for Lorentzian signature) so that the volume element does not degenerate. -/
   h_nontrivial_g : ∃ x, sqrt_det_g x ≠ 0
   
   polyakovEOM : ∀ (mu : Index) (x : WorldSheet),
@@ -31,13 +36,18 @@ Litlib.equation "nakahara2003geometry"
   eq "7.237b"
   page "62"
   kind "equation"
+/-- 
+Virasoro Constraint:
+The constraint equation arising from the variation of the Polyakov action with respect to the worldsheet metric.
+-/
 class VirasoroConstraint
     (WorldSheet Index SpaceIndex : Type _) [Fintype Index] [Fintype SpaceIndex] [Nonempty WorldSheet]
     (g g_inv : Index → Index → WorldSheet → ℝ)
     (X : SpaceIndex → WorldSheet → ℝ)
     (partialDeriv : Index → (WorldSheet → ℝ) → WorldSheet → ℝ)
     (T : Index → Index → WorldSheet → ℝ) where
-  -- Anti-BS
+  
+  /-- Non-Trivial Embedding Constraint: The string embedding must not be constant; there must be non-zero derivatives to avoid a vacuous point-like state. -/
   h_nontrivial_X : ∃ mu alpha p, partialDeriv alpha (fun p' => X mu p') p ≠ 0
   
   virasoro_def : ∀ (alpha beta : Index) (p : WorldSheet),

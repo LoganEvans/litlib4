@@ -21,8 +21,7 @@ class PrincipalBundleTriviality
   
   h_principal : isPrincipalBundle p
   
-  -- Rigorous anti-BS lock: No opaque properties allowed. 
-  -- Triviality (LHS) iff admits global continuous section (RHS).
+  /-- Global Section Constraint: A principal bundle is trivial if and only if it admits a global continuous section. The triviality is witnessed by a homeomorphism to the product space. -/
   trivial_iff_global_section :
     (∃ (h : Bundle ≃ Base × GroupType), Continuous h ∧ Continuous h.symm ∧ ∀ x, (h x).1 = p x) ↔ 
     (∃ s : Base → Bundle, Continuous s ∧ ∀ x, p (s x) = x)
@@ -44,6 +43,7 @@ class VectorBundleTriviality
   h_vector : isVectorBundle p_vec
   h_associated : isAssociatedPrincipalBundle p_prin p_vec
   
+  /-- Associated Section Constraint: A vector bundle is trivial if and only if its associated principal bundle admits a global continuous section. -/
   trivial_iff_associated_global_section :
     (∃ (h : Bundle ≃ Base × F), Continuous h ∧ Continuous h.symm ∧ ∀ x, (h x).1 = p_vec x) ↔ 
     (∃ s : Base → PrincipalBundle, Continuous s ∧ ∀ x, p_prin (s x) = x)

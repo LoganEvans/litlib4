@@ -75,15 +75,20 @@ Litlib.equation "nakahara2003geometry"
   kind "theorem"
 class Theorem_InverseMetricCompatibility
     (Point Index : Type _) [Fintype Index] [DecidableEq Index] [Nonempty Index] [Nonempty Point]
+    (isSmooth : (Point → ℝ) → Prop)
     (partialDeriv : Index → (Point → ℝ) → Point → ℝ) where
   
   inverse_metric_comp :
     ∀ (g g_inv : Index → Index → Point → ℝ)
       (christoffel : Index → Index → Index → Point → ℝ),
-      -- PREMISES:
+      -- PREMISES (Algebraic):
       (∀ x i j, (∑ k, g i k x * g_inv k j x) = if i = j then 1 else 0) →
       (∀ x rho mu nu, christoffel rho mu nu x = (1/2 : ℝ) * ∑ sigma, g_inv rho sigma x * (
         partialDeriv mu (fun p => g sigma nu p) x + partialDeriv nu (fun p => g mu sigma p) x - partialDeriv sigma (fun p => g mu nu p) x)) →
+      -- PREMISES (Differential Smoothness):
+      (∀ i j, isSmooth (fun p => g i j p)) →
+      (∀ i j, isSmooth (fun p => g_inv i j p)) →
+      (∀ rho mu nu, isSmooth (fun p => christoffel rho mu nu p)) →
       -- CONCLUSION:
       ∀ (mu nu lambda : Index) (x : Point),
         partialDeriv mu (fun p => g_inv nu lambda p) x + 
@@ -96,13 +101,14 @@ Litlib.equation "nakahara2003geometry"
   kind "theorem"
 class Theorem_DivergenceIndexRaising
     (Point Index : Type _) [Fintype Index] [DecidableEq Index] [Nonempty Index] [Nonempty Point]
+    (isSmooth : (Point → ℝ) → Prop)
     (partialDeriv : Index → (Point → ℝ) → Point → ℝ) where
   
   divergence_index_raising :
     ∀ (g g_inv : Index → Index → Point → ℝ)
       (christoffel : Index → Index → Index → Point → ℝ)
       (G T : Index → Index → Point → ℝ),
-      -- PREMISES:
+      -- PREMISES (Algebraic):
       (∀ x i j, (∑ k, g i k x * g_inv k j x) = if i = j then 1 else 0) →
       (∀ x i j, G i j x = G j i x) →
       (∀ (nu : Index) (x : Point),
@@ -113,6 +119,12 @@ class Theorem_DivergenceIndexRaising
         ) = 0) →
       (∀ (a b : Index) (x : Point), 
         T a b x = ∑ mu, ∑ nu, g_inv a mu x * g_inv b nu x * G mu nu x) →
+      -- PREMISES (Differential Smoothness):
+      (∀ i j, isSmooth (fun p => g i j p)) →
+      (∀ i j, isSmooth (fun p => g_inv i j p)) →
+      (∀ rho mu nu, isSmooth (fun p => christoffel rho mu nu p)) →
+      (∀ mu nu, isSmooth (fun p => G mu nu p)) →
+      (∀ a b, isSmooth (fun p => T a b p)) →
       -- CONCLUSION:
       ∀ (b : Index) (x : Point),
         ∑ a, (

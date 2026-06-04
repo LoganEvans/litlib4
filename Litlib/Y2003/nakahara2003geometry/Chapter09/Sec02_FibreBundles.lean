@@ -45,6 +45,7 @@ class HomotopyPullbackEquivalence
     (pullback_p : ∀ f, PullbackBundle f → ManifoldN)
     (isPullback : ∀ f, (PullbackBundle f → ManifoldN) → Prop)
     where
+  /-- Bundle Equivalence Constraint: The equivalence between pullback bundles must be established via a continuous bijection with a continuous inverse that commutes with the bundle projections. -/
   homotopy_pullback_equiv :
     ∀ (f g : ManifoldN → ManifoldM),
       isFibreBundle p →
@@ -52,7 +53,6 @@ class HomotopyPullbackEquivalence
       isHomotopic f g →
       isPullback f (pullback_p f) →
       isPullback g (pullback_p g) →
-      -- Rigorous anti-BS equivalency: A bijection exists that is continuous, has a continuous inverse, and commutes with the projections
       ∃ (h : PullbackBundle f ≃ PullbackBundle g), Continuous h ∧ Continuous h.symm ∧ ∀ x, pullback_p g (h x) = pullback_p f x
 
 Litlib.equation "nakahara2003geometry"
@@ -66,10 +66,10 @@ class ContractibleBaseTrivialBundle
     (isFibreBundle : (Bundle → Manifold) → Prop)
     (isContractible : Type _ → Prop)
     where
+  /-- Triviality Constraint: A bundle is trivial if it is homeomorphic to the product space of the base and fibre, with the homeomorphism commuting with the projection. -/
   h_contractible_implies_trivial : 
     isFibreBundle p →
     isContractible Manifold →
-    -- Rigorous anti-BS triviality: Homeomorphic (via continuous Equiv) to Base x Fibre mapping points via projection.
     ∃ (h : Bundle ≃ Manifold × F), Continuous h ∧ Continuous h.symm ∧ ∀ x, (h x).1 = p x
 
 end Litlib.Y2003.nakahara2003geometry
