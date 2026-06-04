@@ -7,6 +7,9 @@ open Matrix
 
 namespace Litlib.Y2024.gielen2024unimodular.Proofs
 
+/--
+Proof of the algebraic simplicity constraint solution for the pure connection matrix identity.
+-/
 instance verified_PureConnectionMatrixSolution : PureConnectionMatrixSolution where
   pureConnectionMatrix M Minv X hMSymm hMinvSymm hInv hEq := by
     -- In finite dimensions, a right inverse is a left inverse

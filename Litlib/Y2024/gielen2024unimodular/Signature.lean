@@ -5,6 +5,7 @@ import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.LinearAlgebra.Matrix.Trace
+import Mathlib.Topology.Basic
 
 open BigOperators
 
@@ -26,6 +27,10 @@ Litlib.equation "gielen2024unimodular"
   eq "3"
   page "4"
   kind "definition"
+/--
+Physical Interpretation: Constructs the chiral Plebański 2-forms `Σ^i` from a tetrad field `e`, demonstrating the equivalence between the metric variables and the chiral form variables.
+Mathematical Boundaries: The volume form `ω` determined by the tetrad must be strictly non-zero (`detE ≠ 0`), which mathematically prevents topological collapse into a degenerate geometry and avoids a trivial zero-equals-zero tautology.
+-/
 class PlebanskiTetradReconstruction where
   general_solution_tetrad
     (e0 : Fin 4 → ℂ)
@@ -33,7 +38,8 @@ class PlebanskiTetradReconstruction where
     (eps3 : Fin 3 → Fin 3 → Fin 3 → ℂ)
     (hEps3 : eps3 0 1 2 = 1 ∧ ∀ i j k, eps3 i j k = -eps3 j i k ∧ eps3 i j k = -eps3 i k j ∧ eps3 i j k = -eps3 k j i)
     (eps4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    (hEps4 : eps4 0 1 2 3 = 1 ∧ ∀ a b c d, eps4 a b c d = -eps4 b a c d ∧ eps4 a b c d = -eps4 a c b d ∧ eps4 a b c d = -eps4 a b d c) :
+    (hEps4 : eps4 0 1 2 3 = 1 ∧ ∀ a b c d, eps4 a b c d = -eps4 b a c d ∧ eps4 a b c d = -eps4 a c b d ∧ eps4 a b c d = -eps4 a b d c)
+    (hNonDegenerate : (∑ a : Fin 4, ∑ b : Fin 4, ∑ c : Fin 4, ∑ d : Fin 4, eps4 a b c d * e0 a * eS 0 b * eS 1 c * eS 2 d) ≠ 0) :
     let sigma := fun (i : Fin 3) (μ ν : Fin 4) =>
       Complex.I * (e0 μ * eS i ν - eS i μ * e0 ν)
       - ∑ j : Fin 3, ∑ k : Fin 3, eps3 i j k * eS j μ * eS k ν
@@ -49,14 +55,19 @@ Litlib.equation "gielen2024unimodular"
   eq "6"
   page "4"
   kind "identity"
+/--
+Physical Interpretation: Relates the contraction of the Plebański 2-forms to the Urbantke metric, explicitly mapping the chiral algebraic structure back to the macroscopic spacetime metric tensor.
+Mathematical Boundaries: Requires the Urbantke metric `g` to be non-degenerate to maintain a well-defined physical spacetime without coordinate singularities.
+-/
 class UrbantkeMetricIdentity where
   sigma_algebra 
     (sigmaUp : Fin 3 → Fin 4 → Fin 4 → ℂ)
     (sigmaDown : Fin 3 → Fin 4 → Fin 4 → ℂ)
     (g : Fin 4 → Fin 4 → ℂ)
-    (eps3 : Fin 3 → Fin 3 → Fin 3 → ℂ) : Prop
-  sigma_algebra_iff : ∀ sigmaUp sigmaDown g eps3, 
-    sigma_algebra sigmaUp sigmaDown g eps3 ↔ 
+    (eps3 : Fin 3 → Fin 3 → Fin 3 → ℂ)
+    (hNonDegenerate : Matrix.det (fun μ ν => g μ ν) ≠ 0) : Prop
+  sigma_algebra_iff : ∀ sigmaUp sigmaDown g eps3 hN, 
+    sigma_algebra sigmaUp sigmaDown g eps3 hN ↔ 
     ∀ i j μ ν, 
       (∑ ρ : Fin 4, sigmaUp i μ ρ * sigmaDown j ρ ν) = 
       -(if i = j then (1:ℂ) else 0) * g μ ν + 
@@ -66,6 +77,10 @@ Litlib.equation "gielen2024unimodular"
   eq "7"
   page "5"
   kind "equation"
+/--
+Physical Interpretation: Derives the trace of the Einstein field equations entirely from the Bianchi identities and the algebraic simplicity constraints. This is the cornerstone of the unimodular gravity formulation where the cosmological constant arises as an integration constant.
+Mathematical Boundaries: Strictly requires the total antisymmetry of the 2-forms and structural consistency with the internal SU(2)/SO(3) algebra.
+-/
 class BianchiTraceIdentity where
   derive_trace_eom 
     (sigma : Fin 3 → Fin 4 → Fin 4 → ℂ)
@@ -84,6 +99,10 @@ Litlib.equation "gielen2024unimodular"
   eq "11"
   page "6"
   kind "equation"
+/--
+Physical Interpretation: Solves the simplicity constraint in the pure connection formalism, linking the independent connection fields to the chiral 2-forms via a matrix equation.
+Mathematical Boundaries: By specifying `Minv * M = 1`, the formulation explicitly excludes pathological vacua where the mapping matrix `M` drops rank, guaranteeing a bijective mapping to physical tetrad states.
+-/
 class PureConnectionMatrixSolution where
   pureConnectionMatrix 
     (M Minv X : Matrix (Fin 3) (Fin 3) ℂ)
@@ -97,18 +116,29 @@ Litlib.equation "gielen2024unimodular"
   eq "14"
   page "6"
   kind "equation"
+/--
+Physical Interpretation: Evaluates the equation of motion for unimodular gravity in the pure connection framework. It describes the covariant dynamics of the pure connection without reference to an independent tetrad field.
+Mathematical Boundaries: The spacetime must possess a topological structure to admit continuous field mappings. The matrix field `X_tilde` must be globally invertible to compute the inverse square roots required for the action.
+-/
 class PureConnectionEOM 
-    (SpacetimePoint : Type*)
+    (SpacetimePoint : Type*) [TopologicalSpace SpacetimePoint]
+    [TopologicalSpace ℂ]
+    [TopologicalSpace (Fin 3 → ℂ)]
+    [TopologicalSpace (Matrix (Fin 3) (Fin 3) ℂ)]
     (covariantDeriv : (SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ) → (SpacetimePoint → ℂ) → SpacetimePoint → Fin 4 → ℂ) where
   unimodular_eom
     (X_tilde : SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ)
     (X_tilde_inv_sqrt : SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ)
     (F : SpacetimePoint → Fin 3 → ℂ)
     (A : SpacetimePoint → Matrix (Fin 3) (Fin 3) ℂ)
+    (hContX : Continuous X_tilde)
+    (hContXInv : Continuous X_tilde_inv_sqrt)
+    (hContF : Continuous F)
+    (hContA : Continuous A)
     (hNonDegenerate : ∀ x, Matrix.det (X_tilde x) ≠ 0)
     (hInvSqrt : ∀ x, X_tilde_inv_sqrt x * X_tilde_inv_sqrt x * X_tilde x = 1) : Prop
-  unimodular_eom_iff : ∀ X_tilde X_tilde_inv_sqrt F A hN hI,
-    unimodular_eom X_tilde X_tilde_inv_sqrt F A hN hI ↔ 
+  unimodular_eom_iff : ∀ X_tilde X_tilde_inv_sqrt F A hCX hCXI hCF hCA hN hI,
+    unimodular_eom X_tilde X_tilde_inv_sqrt F A hCX hCXI hCF hCA hN hI ↔ 
     ∀ x μ, 
       let tr_sqrt_X p := Matrix.trace (X_tilde_inv_sqrt p * X_tilde p)
       let inner_term p j := tr_sqrt_X p * ∑ i, (X_tilde_inv_sqrt p) i j * F p j
