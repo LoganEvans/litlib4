@@ -19,8 +19,23 @@ Litlib.equation "arnold1989mathematical"
 class LiouvilleTheorem1D
     (H : ℝ × ℝ → ℝ)
     [MeasureTheory.MeasureSpace (ℝ × ℝ)] where
+  /--
+  Hamiltonian Regularity Constraint: The Hamiltonian function must be differentiable 
+  with respect to both position and momentum coordinates.
+  -/
   H_diff_p : ∀ q, Differentiable ℝ (fun p => H (p, q))
   H_diff_q : ∀ p, Differentiable ℝ (fun q => H (p, q))
+  /--
+  Volume Non-Degeneracy Constraint: Prevents the "Garbage-In" exploit where the theorem 
+  could be trivially and vacuously satisfied by equipping the phase space with a 
+  degenerate zero measure. Ensures there exists at least one measurable set with non-zero volume.
+  -/
+  vol_non_trivial : ∃ s : Set (ℝ × ℝ), MeasurableSet s ∧ MeasureTheory.volume s ≠ 0
+  /--
+  Liouville's Theorem (1D Phase Space): Theorem 1, page 69.
+  Demonstrates that the canonical phase flow of a Hamiltonian system preserves the 
+  standard symplectic volume (the canonical measure volume).
+  -/
   preserves_volume : ∀ (g : ℝ → (ℝ × ℝ) → (ℝ × ℝ)),
     (∀ x, Differentiable ℝ (fun t => (g t x).1)) →
     (∀ x, Differentiable ℝ (fun t => (g t x).2)) →
@@ -37,6 +52,16 @@ Litlib.equation "arnold1989mathematical"
 class LiouvilleTheoremND
     {n : ℕ}
     [MeasureTheory.MeasureSpace (Fin n → ℝ)] where
+  /--
+  Volume Non-Degeneracy Constraint: Binds the phase space measure to a non-trivial measure,
+  barring the vacuous satisfaction of the volume-preservation identity.
+  -/
+  vol_non_trivial : ∃ s : Set (Fin n → ℝ), MeasurableSet s ∧ MeasureTheory.volume s ≠ 0
+  /--
+  Liouville's Theorem (n-Dimensional Divergence Form): Theorem 2, page 69.
+  Proves that any smooth vector field with identically zero divergence generates 
+  a volume-preserving flow.
+  -/
   preserves_volume : ∀ (f : (Fin n → ℝ) → (Fin n → ℝ)) (g : ℝ → (Fin n → ℝ) → (Fin n → ℝ)),
     (∀ x i j, Differentiable ℝ (fun y => f (Function.update x j y) i)) →
     (∀ x i, Differentiable ℝ (fun t => g t x i)) →
