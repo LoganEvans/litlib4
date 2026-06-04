@@ -27,10 +27,10 @@ Litlib.equation "urbantke1984integrability"
 class Eq2_and_6 where
   /-- 
   Kinematic Bivector Constraint: Equations (2) and (6) (page 2321).
-  Establishes the algebraic condition for a simple bivector (constructed from 
-  two linearly independent vectors u and v) to annihilate the Yang-Mills field strength.
-  The antisymmetry of the field strength F is explicitly enforced in the hypothesis 
-  to mathematically guarantee the equivalence holds.
+  Establishes the local algebraic condition for a simple bivector, constructed from 
+  two linearly independent vectors u and v, to annihilate the SU(2) Yang-Mills field strength.
+  The antisymmetry of the field strength F is explicitly enforced to mathematically guarantee 
+  the equivalence of the vanishing of the contraction.
   -/
   simpleBivectorAnnihilation
     (F : Fin 3 → Fin 4 → Fin 4 → ℂ) :
@@ -46,9 +46,9 @@ Litlib.equation "urbantke1984integrability"
 class Eq4 where
   /-- 
   Hodge Dual Tensor Definition: Equation (4) (page 2321).
-  Rigorously defines the dual tensor in the complexified tangent space via the 
-  totally antisymmetric Levi-Civita symbol. The logic is bound by an equivalence 
-  to prevent overriding the definition at instantiation.
+  Defines the dual tensor in the complexified tangent space via contraction with the 
+  totally antisymmetric permutation symbol. Formulated as a strict equivalence to 
+  guarantee uniqueness of the dual structure.
   -/
   dualTensor
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
@@ -66,8 +66,9 @@ Litlib.equation "urbantke1984integrability"
 class Eq10 where
   /-- 
   Urbantke Quasimetric Definition: Equation (10) (page 2322).
-  Defines the macroscopic geometric tensor induced naturally by the SU(2) Yang-Mills 
+  Defines the conformal geometric tensor naturally induced by the SU(2) Yang-Mills 
   field strengths, coupling the field to its dual via the gauge structure constants.
+  This tensor serves as a background-independent quasimetric for the resulting geometry.
   -/
   quasimetricDef
     (F : Fin 3 → Fin 4 → Fin 4 → ℂ)
@@ -129,12 +130,11 @@ Litlib.equation "urbantke1984integrability"
 class Case1_1 where
   /--
   Algebraic Non-Degeneracy Classification: Case 1.1 (page 2322).
-  The generic integrability classification proves that the 3x3 matrix M^ab has 
-  full rank if and only if the induced Urbantke quasimetric g_μν is non-degenerate 
-  (det g ≠ 0). To prevent topological and algebraic exploits, the theorem is strictly 
-  bound to domains where F is explicitly antisymmetric, the Hodge dual is correctly 
-  constructed via the Levi-Civita symbol, and the SU(2) gauge structure constants 
-  are totally antisymmetric.
+  The generic integrability classification establishes that the gauge-traced 3x3 matrix M^ab 
+  has full rank if and only if the induced Urbantke quasimetric g_μν is strictly non-degenerate 
+  (det g ≠ 0). This theorem formally requires the explicit antisymmetry of the field strength, 
+  the canonical orientation of the Hodge dual, and the structural antisymmetry of the SU(2) 
+  Lie algebra constants to prevent pathological vacuum states.
   -/
   generic_rank_iff
     (F : Fin 3 → Fin 4 → Fin 4 → ℂ)
@@ -155,15 +155,14 @@ class Case1_1 where
 Litlib.equation "urbantke1984integrability"
   eq "10"
   page "2322"
-  kind "Theorem"
-class Theorem_Eq10_Symmetry where
+  kind "identity"
+class Eq10_Symmetry where
   /--
-  Urbantke Metric Symmetry Constraint:
-  An algebraic identity proving that the nested Urbantke metric 
-  polynomial g_μν, when constructed from an explicitly antisymmetric 
-  curvature tensor F, is structurally symmetric (g_μν = g_νμ).
-  This mathematically guarantees that the quasimetric behaves as a valid
-  pseudo-Riemannian metric tensor.
+  Urbantke Metric Symmetry Identity:
+  Demonstrates that the Urbantke quasimetric g_μν, when constructed from an 
+  antisymmetric curvature tensor F and its dual, is inherently symmetric (g_μν = g_νμ).
+  This algebraic property is a foundational requirement for g_μν to act as a 
+  valid pseudo-Riemannian conformal metric.
   -/
   symmetricQuasimetric
     (F : Fin 3 → Fin 4 → Fin 4 → ℂ)
