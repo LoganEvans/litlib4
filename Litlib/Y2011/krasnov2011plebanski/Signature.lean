@@ -24,6 +24,10 @@ Litlib.equation "krasnov2011plebanski"
   eq "3"
   page "3"
   kind "theorem"
+/--
+Physical Interpretation: Reformulates the Einstein vacuum field equations using the Hodge duality operator on the Riemann curvature tensor. A metric is an Einstein metric (its Ricci tensor is proportional to the metric) if and only if the left and right Hodge duals of the Riemann tensor coincide.
+Mathematical Boundaries: The metric `g` must be strictly invertible (`g_is_inv`), which mathematically prevents topological collapse and rules out degenerate metrics (i.e. ensures `det g ≠ 0`). The curvature tensor `R` must be antisymmetric in its index pairs and satisfy the first Bianchi identity.
+-/
 class Eq3
     (g : Fin 4 → Fin 4 → ℝ)
     (g_inv : Fin 4 → Fin 4 → ℝ)
@@ -52,6 +56,10 @@ Litlib.equation "krasnov2011plebanski"
   eq "4"
   page "4"
   kind "definition"
+/--
+Physical Interpretation: Defines self-dual and anti-self-dual bivectors as the eigenspaces of the Hodge star operator with eigenvalues `i` and `-i` respectively. These are the fundamental building blocks of the Plebański formulation.
+Mathematical Boundaries: Applies to complex-valued 2-forms over the 4-dimensional spacetime. The existence of imaginary eigenvalues requires the Hodge star operator to satisfy `HodgeStar^2 = -1` on 2-forms, strictly binding this formulation to Lorentzian metric signatures.
+-/
 class Eq4
     (HodgeStar : (Fin 4 → Fin 4 → ℂ) → (Fin 4 → Fin 4 → ℂ))
     (isSelfDual : (Fin 4 → Fin 4 → ℂ) → Prop)
@@ -66,6 +74,10 @@ Litlib.equation "krasnov2011plebanski"
   eq "14"
   page "5"
   kind "theorem"
+/--
+Physical Interpretation: Decomposes the curvature of the self-dual connection into self-dual (`F_ij`) and anti-self-dual (`F_bar_ij`) components. The self-dual part corresponds to the Weyl curvature and the scalar curvature, while the anti-self-dual part relates to the trace-free Ricci tensor.
+Mathematical Boundaries: The decomposition strictly requires that the background self-dual (`Sigma`) and anti-self-dual (`Sigma_bar`) 2-forms constitute a complete basis for the space of all antisymmetric 2-forms (`forms_basis`).
+-/
 class Eq14
     (Sigma : Fin 3 → Fin 4 → Fin 4 → ℂ)
     (Sigma_bar : Fin 3 → Fin 4 → Fin 4 → ℂ)
@@ -85,6 +97,10 @@ Litlib.equation "krasnov2011plebanski"
   eq "15"
   page "6"
   kind "definition"
+/--
+Physical Interpretation: Formulates the vacuum Einstein equations in the Plebański formalism. The trace of the self-dual curvature matrix is strictly proportional to the cosmological constant, and its anti-self-dual part strictly vanishes.
+Mathematical Boundaries: This replaces the traditional differential, tensorial Ricci-flatness conditions with a purely algebraic constraint on the curvature components in the self-dual basis.
+-/
 class Eq15
     (plebanski_vacuum : ℂ → (Fin 3 → Fin 3 → ℂ) → (Fin 3 → Fin 3 → ℂ) → Prop)
     where
@@ -96,6 +112,10 @@ Litlib.equation "krasnov2011plebanski"
   eq "16"
   page "6"
   kind "definition"
+/--
+Physical Interpretation: Defines the projection of the trace-free macroscopic stress-energy tensor onto the mixed self-dual/anti-self-dual basis. This term serves as the source coupling matter to the gravitational field in the Plebański formalism.
+Mathematical Boundaries: The construction explicitly requires raising the indices of the anti-self-dual basis forms (`Sigma_bar`) using the inverse background metric (`g_inv`), strictly binding the definition to domains where the metric is non-degenerate.
+-/
 class Eq16
     (Sigma : Fin 3 → Fin 4 → Fin 4 → ℂ)
     (Sigma_bar : Fin 3 → Fin 4 → Fin 4 → ℂ)
@@ -116,6 +136,10 @@ Litlib.equation "krasnov2011plebanski"
   eq "17"
   page "6"
   kind "definition"
+/--
+Physical Interpretation: The full non-vacuum Einstein equations coupled to macroscopic matter in the Plebański formulation. The trace of the self-dual curvature is determined by the cosmological constant and the trace of the stress-energy tensor. The anti-self-dual part is proportional to the trace-free stress-energy tensor.
+Mathematical Boundaries: By coupling the curvature to the stress-energy components `T` and `T_ij`, these equations are strictly bound to domains where macroscopic matter fields are well-defined.
+-/
 class Eq17
     (Lambda : ℂ)
     (G : ℂ)
