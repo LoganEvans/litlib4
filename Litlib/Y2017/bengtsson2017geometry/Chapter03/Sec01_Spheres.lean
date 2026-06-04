@@ -14,6 +14,10 @@ Litlib.equation "bengtsson2017geometry"
   eq "3.14"
   page "62"
   kind "theorem"
+/--
+Physical Interpretation: Represents a geodesic path on an N-dimensional sphere, defining the shortest geometrical distance (a great circle) between states in real projective geometry.
+Mathematical Boundaries: Restricted to strictly positive dimensions (`N > 0`). The geodesic distance is strictly bounded by the cosine of the inner product of the embedding unit vectors.
+-/
 class Eq3_14
     (N : ℕ)
     (X : ℝ → EuclideanSpace ℝ (Fin N))

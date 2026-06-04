@@ -13,6 +13,10 @@ Litlib.equation "bengtsson2017geometry"
   eq "4.88"
   page "119"
   kind "theorem"
+/--
+Physical Interpretation: Computes the total symplectic volume of the complex projective space, corresponding to the total number of mutually exclusive quantum states in a finite volume of phase space.
+Mathematical Boundaries: Requires a properly normalized invariant measure over the space CP^n.
+-/
 class Eq4_88
     (CP : ℕ → Type)
     [∀ n, MeasureTheory.MeasureSpace (CP n)] where

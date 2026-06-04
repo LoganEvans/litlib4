@@ -11,6 +11,10 @@ Litlib.equation "bengtsson2017geometry"
   eq "3.144"
   page "91"
   kind "theorem"
+/--
+Physical Interpretation: Calculates the dimension of a coset space, which corresponds to the remaining physical degrees of freedom of a system modulo its gauge or symmetry transformations.
+Mathematical Boundaries: Assumes `G` and `H` are Lie groups. The dimension of the normal subgroup `H` must be less than or equal to `G` to prevent negative or vacuous dimensionality.
+-/
 class Eq3_144
     (G : Type) [Group G] [TopologicalSpace G]
     (H : Subgroup G) [Subgroup.Normal H]

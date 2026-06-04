@@ -14,6 +14,10 @@ Litlib.equation "bengtsson2017geometry"
   eq "3.96"
   page "79"
   kind "definition"
+/--
+Physical Interpretation: The Hopf fibration maps the 3-sphere to the 2-sphere, illustrating how complex SU(2) state vectors relate to observable Bloch sphere states modulo a U(1) phase.
+Mathematical Boundaries: The coordinates are defined using complex exponentials of the Euler angles.
+-/
 class Eq3_96
     (Z1 Z2 : ℝ → ℝ → ℝ → ℂ) where
   hopf_Z1 : ∀ τ θ φ, Z1 τ θ φ = Complex.exp (Complex.I * ((τ + φ) : ℂ) / 2) * (Real.cos (θ / 2) : ℂ)
@@ -23,6 +27,10 @@ Litlib.equation "bengtsson2017geometry"
   eq "3.98"
   page "79"
   kind "definition"
+/--
+Physical Interpretation: The intrinsic metric of the 3-sphere expressed in the Euler angle coordinates adapted to the Hopf fibration.
+Mathematical Boundaries: The coordinate patch requires `0 < θ < π` to ensure the metric tensor is non-degenerate. Outside this boundary, the determinant vanishes, leading to coordinate singularities at the poles.
+-/
 class Eq3_98
     (g : ℝ → ℝ → ℝ → Matrix (Fin 3) (Fin 3) ℝ) where
   -- The coordinates in the Fin 3 basis are 0=τ, 1=θ, 2=φ
@@ -36,7 +44,7 @@ class Eq3_98
   metric_12 : ∀ τ θ φ, g τ θ φ 1 2 = 0
   metric_21 : ∀ τ θ φ, g τ θ φ 2 1 = 0
   
-  -- The metric patch is non-degenerate inside the bounds 0 < θ < π
+  -- Geometric Non-Degeneracy Constraint: The metric patch is non-degenerate inside the bounds 0 < θ < π
   metric_non_degenerate : ∀ τ θ φ, 0 < θ → θ < Real.pi → Matrix.det (g τ θ φ) ≠ 0
 
 end Litlib.Y2017.bengtsson2017geometry
