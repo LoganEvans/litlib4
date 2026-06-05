@@ -32,8 +32,8 @@ Litlib.equation "papapetrou1951spinning"
 Geometric Non-Degeneracy Constraint: The macroscopic metric density determinant must be strictly non-zero.
 Velocity Non-Degeneracy Constraint: The 4-velocity must not be identically zero.
 Algebraic Domain Constraint: Parameterized over a generic Field `F` with Characteristic Zero (`CharZero`).
-Physical Domain Binding: Papapetrou (1951) Eq (2.12): If a tensor distribution T represents a single-pole 
-test particle, and it is covariantly conserved with respect to the background connection, 
+Physical Domain Binding: Papapetrou (1951) Eq (2.12): If a contravariant tensor distribution T represents a single-pole 
+test particle, and it is covariantly conserved with respect to the background connection (Eq 2.2), 
 then its worldline must exactly satisfy the geodesic equation.
 -/
 class Eq2_12
@@ -66,7 +66,7 @@ Litlib.equation "papapetrou1951spinning"
 Geometric Non-Degeneracy Constraint: The macroscopic metric density determinant must be strictly non-zero.
 Velocity Non-Degeneracy Constraint: The 4-velocity must not be identically zero.
 Physical Domain Binding: Eq (5.3) is the covariant formulation of the equation of motion of the spin for a pole-dipole particle, 
-strictly derived from the covariant conservation of the internal stress-energy tensor.
+strictly derived from the covariant conservation of the internal contravariant stress-energy tensor.
 -/
 class Eq5_3
     (M : Type*) [TopologicalSpace M]
@@ -107,7 +107,7 @@ Velocity Non-Degeneracy Constraint: The 4-velocity must not be identically zero.
 Mass Non-Degeneracy Constraint: The rest mass must be strictly non-zero.
 Physical Domain Binding: Equation (5.7) is the covariant equation of motion of a pole-dipole particle, 
 generalizing the geodesic equation by coupling the spin tensor to the spacetime curvature, strictly derived from 
-the conservation of the particle's internal stress-energy tensor.
+the conservation of the particle's internal contravariant stress-energy tensor.
 -/
 class Eq5_7
     (M : Type*) [TopologicalSpace M]
