@@ -4,6 +4,7 @@ import Litlib.Core
 import Mathlib.Topology.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Real.Basic
+import Mathlib.Data.Complex.Basic
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.Data.Fintype.Basic
 
@@ -28,17 +29,19 @@ Litlib.equation "papapetrou1951spinning"
   page "252"
   kind "theorem"
 /--
-Geometric Non-Degeneracy Constraint: The macroscopic metric density determinant must be strictly non-zero to prevent topological collapse of the volume form.
+Geometric Non-Degeneracy Constraint: The macroscopic metric density determinant must be strictly non-zero.
 Velocity Non-Degeneracy Constraint: The 4-velocity must not be identically zero, preventing trivial static solutions where the test-particle possesses no worldline progression.
-Equation (2.12) proves that the orbits of a single-pole test particle are geodesics of the basic background metric field.
+Algebraic Domain Constraint: Parameterized over a generic Field `F` with Characteristic Zero (`CharZero`). This supports exact complex spacetime geometries while mathematically preventing characteristic-2 finite field collapse.
+Equation (2.12) establishes that the orbits of a single-pole test particle are geodesics of the basic background metric field.
 -/
 class Eq2_12
     (M : Type*) [TopologicalSpace M]
-    (Metric : M → Matrix (Fin 4) (Fin 4) ℝ)
-    (Christoffel : M → (Fin 4 → Fin 4 → Fin 4 → ℝ))
-    (worldline : ℝ → M)
-    (u_up : ℝ → (Fin 4 → ℝ))
-    (du_up_ds : ℝ → (Fin 4 → ℝ))
+    (F : Type*) [Field F] [CharZero F]
+    (Metric : M → Matrix (Fin 4) (Fin 4) F)
+    (Christoffel : M → (Fin 4 → Fin 4 → Fin 4 → F))
+    (worldline : F → M)
+    (u_up : F → (Fin 4 → F))
+    (du_up_ds : F → (Fin 4 → F))
     where
   metric_nondegenerate : ∀ p, (Metric p).det ≠ 0
   u_norm_nonzero : ∀ s, ∑ μ, ∑ ν, Metric (worldline s) μ ν * u_up s μ * u_up s ν ≠ 0
@@ -56,12 +59,13 @@ Equation (5.3) is the covariant formulation of the equation of motion of the spi
 -/
 class Eq5_3
     (M : Type*) [TopologicalSpace M]
-    (Metric : M → Matrix (Fin 4) (Fin 4) ℝ)
-    (worldline : ℝ → M)
-    (u_up : ℝ → (Fin 4 → ℝ))
-    (u_down : ℝ → (Fin 4 → ℝ))
-    (S_up : ℝ → Matrix (Fin 4) (Fin 4) ℝ)
-    (CovDerivS_up : ℝ → Matrix (Fin 4) (Fin 4) ℝ)
+    (F : Type*) [Field F] [CharZero F]
+    (Metric : M → Matrix (Fin 4) (Fin 4) F)
+    (worldline : F → M)
+    (u_up : F → (Fin 4 → F))
+    (u_down : F → (Fin 4 → F))
+    (S_up : F → Matrix (Fin 4) (Fin 4) F)
+    (CovDerivS_up : F → Matrix (Fin 4) (Fin 4) F)
     where
   metric_nondegenerate : ∀ p, (Metric p).det ≠ 0
   u_norm_nonzero : ∀ s, ∑ μ, ∑ ν, Metric (worldline s) μ ν * u_up s μ * u_up s ν ≠ 0
@@ -79,29 +83,30 @@ Litlib.equation "papapetrou1951spinning"
 /--
 Geometric Non-Degeneracy Constraint: The macroscopic metric density determinant must be strictly non-zero.
 Velocity Non-Degeneracy Constraint: The 4-velocity must not be identically zero.
-Mass Non-Degeneracy Constraint: The rest mass must be strictly positive to represent a massive physical test particle.
+Mass Non-Degeneracy Constraint: The rest mass must be strictly non-zero.
 Equation (5.7) is the covariant equation of motion of a pole-dipole particle, generalizing the geodesic equation by coupling the spin tensor to the spacetime curvature.
 -/
 class Eq5_7
     (M : Type*) [TopologicalSpace M]
-    (Metric : M → Matrix (Fin 4) (Fin 4) ℝ)
-    (Riemann : M → (Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ))
-    (worldline : ℝ → M)
-    (m : ℝ → ℝ)
-    (u_up : ℝ → (Fin 4 → ℝ))
-    (u_down : ℝ → (Fin 4 → ℝ))
-    (S_up : ℝ → Matrix (Fin 4) (Fin 4) ℝ)
-    (CovDerivS_up : ℝ → Matrix (Fin 4) (Fin 4) ℝ)
-    (P_up : ℝ → (Fin 4 → ℝ))
-    (CovDerivP_up : ℝ → (Fin 4 → ℝ))
+    (F : Type*) [Field F] [CharZero F]
+    (Metric : M → Matrix (Fin 4) (Fin 4) F)
+    (Riemann : M → (Fin 4 → Fin 4 → Fin 4 → Fin 4 → F))
+    (worldline : F → M)
+    (m : F → F)
+    (u_up : F → (Fin 4 → F))
+    (u_down : F → (Fin 4 → F))
+    (S_up : F → Matrix (Fin 4) (Fin 4) F)
+    (CovDerivS_up : F → Matrix (Fin 4) (Fin 4) F)
+    (P_up : F → (Fin 4 → F))
+    (CovDerivP_up : F → (Fin 4 → F))
     where
   metric_nondegenerate : ∀ p, (Metric p).det ≠ 0
   u_norm_nonzero : ∀ s, ∑ μ, ∑ ν, Metric (worldline s) μ ν * u_up s μ * u_up s ν ≠ 0
-  mass_positive : ∀ s, m s > 0
+  mass_nonzero : ∀ s, m s ≠ 0
   u_lowering : ∀ s ρ, u_down s ρ = ∑ σ, Metric (worldline s) ρ σ * u_up s σ
   P_def : ∀ s α, P_up s α = m s * u_up s α + ∑ β, u_down s β * CovDerivS_up s α β
   pole_dipole_eom : ∀ s α,
     CovDerivP_up s α +
-    (1 / 2) * ∑ μ, ∑ ν, ∑ σ, S_up s μ ν * u_up s σ * Riemann (worldline s) α ν σ μ = 0
+    (1 / 2 : F) * ∑ μ, ∑ ν, ∑ σ, S_up s μ ν * u_up s σ * Riemann (worldline s) α ν σ μ = 0
 
 end Litlib.Y1951.papapetrou1951spinning
