@@ -106,6 +106,43 @@ class Eq2_4
 
 
 Litlib.equation "einstein1938gravitational"
+  eq "8, 9"
+  page "88"
+  kind "theorem"
+class Eq8_9
+    (Particle : Type*)
+    (lambda : ℝ)
+    (c_m : Particle → ℕ → ℝ)
+    (eihSum : Particle → ℕ → ℝ)
+    (isValidMotionUpToStage : Particle → ℕ → Prop)
+    where
+  /--
+  Physical Interpretation: The central Einstein-Infeld-Hoffmann (EIH) Theorem. 
+  It demonstrates that the vacuum gravitational field equations natively dictate the 
+  motion of point singularities, rendering any independent "geodesic postulate" redundant. 
+  The equations of motion for a singularity up to approximation stage `q` are satisfied 
+  if and only if the weighted sum of its spatial surface integrals `c_m` vanishes.
+  
+  Mathematical Boundaries: The approximation parameter `lambda` must be strictly positive 
+  and the approximation stage `q` must be at least 1. If `lambda = 0` or `q = 0`, the 
+  expansion trivially collapses into the empty Galilean case (as noted on page 88), 
+  rendering the equivalence meaningless. The finite sum is rigorously locked via 
+  recursive constraints to avoid unbound operations.
+  
+  Relationship to Literature: Corresponds to Equation (8, 9) on page 88, explicitly defining
+  the general approximate equations of motion for stage `l = q`.
+  -/
+  eihSum_base : ∀ (p : Particle), eihSum p 0 = 0
+  eihSum_step : ∀ (p : Particle) (q : ℕ), 
+    eihSum p (q + 1) = eihSum p q + (lambda ^ (2 * (q + 1))) * c_m p (q + 1)
+    
+  approximate_equations_of_motion : ∀ (p : Particle) (q : ℕ),
+    lambda > 0 →
+    q ≥ 1 →
+    isValidMotionUpToStage p q ↔ (eihSum p q = 0)
+
+
+Litlib.equation "einstein1938gravitational"
   eq "11.15"
   page "94"
   kind "theorem"
