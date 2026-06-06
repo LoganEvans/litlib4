@@ -129,12 +129,12 @@ Litlib.equation "urbantke1984integrability"
   kind "classification"
 class Case1_1 where
   /--
-  Algebraic Non-Degeneracy Classification: Case 1.1 (page 2322).
+  Geometric Non-Degeneracy Constraint: Case 1.1 (page 2322).
   The generic integrability classification establishes that the gauge-traced 3x3 matrix M^ab 
   has full rank if and only if the induced Urbantke quasimetric g_μν is strictly non-degenerate 
   (det g ≠ 0). This theorem formally requires the explicit antisymmetry of the field strength, 
-  the canonical orientation of the Hodge dual, and the structural antisymmetry of the SU(2) 
-  Lie algebra constants to prevent pathological vacuum states.
+  the canonical orientation of the Hodge dual, and strict non-degeneracy bounds on the permutation 
+  symbols to prevent topological collapse of the volume form.
   -/
   generic_rank_iff
     (F : Fin 3 → Fin 4 → Fin 4 → ℂ)
@@ -145,6 +145,8 @@ class Case1_1 where
     (M : Fin 3 → Fin 3 → ℂ)
     (hF_anti : ∀ a μ ν, F a μ ν = - F a ν μ)
     (hepsilon3_anti : ∀ a b c, epsilon3 a b c = - epsilon3 b a c ∧ epsilon3 a b c = - epsilon3 a c b)
+    (hepsilon3_nondeg : epsilon3 0 1 2 ≠ 0)
+    (hepsilon4_nondeg : epsilon4 0 1 2 3 ≠ 0)
     (h_dual : ∀ a μ ν, F_dual a μ ν = (1 / 2 : ℂ) * Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β => epsilon4 μ ν α β * F a α β)))
     (hG : ∀ μ ν, g μ ν = (-1 / 6 : ℂ) * Finset.sum Finset.univ (fun a => Finset.sum Finset.univ (fun b => Finset.sum Finset.univ (fun c => 
       Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β => 
