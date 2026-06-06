@@ -328,7 +328,7 @@ Litlib.equation "capovilla1991pure"
 class Page62_Psi3x3
     (Spacetime : Type*) [TopologicalSpace Spacetime]
     (Psi : Spacetime → Fin 2 → Fin 2 → Fin 2 → Fin 2 → ℂ)
-    (Psi_3x3 : Spacetime → Fin 3 → Fin 3 → ℂ)
+    (Psi_3x3 : Spacetime → Matrix (Fin 3) (Fin 3) ℂ)
     (clump : Fin 2 → Fin 2 → Fin 3)
     (detPsi : Spacetime → ℂ) where
   /-- Trace-Free Weyl Symmetry: The $\Psi$ tensor must be totally symmetric to correctly encode the complex degrees of freedom of the self-dual Weyl tensor. -/
@@ -347,6 +347,50 @@ class Page62_Psi3x3
   h_Psi_3x3_iff : ∀ x A B C D, Psi_3x3 x (clump A B) (clump C D) = Psi x A B C D
   -- detPsi, as used in Eq 2.21, is formally the 3x3 determinant of this matrix!
   h_detPsi_iff : ∀ x, detPsi x = Matrix.det (Psi_3x3 x)
+
+Litlib.equation "capovilla1991pure"
+  eq "2.11"
+  page "63"
+  kind "Definition"
+class Eq2_11
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (Psi_3x3 : Spacetime → Matrix (Fin 3) (Fin 3) ℂ)
+    (M_3x3 : Spacetime → Matrix (Fin 3) (Fin 3) ℂ)
+    (mu : Spacetime → ℂ) where
+  /-- Non-Degeneracy Constraint: The metric volume element `mu` must be strictly non-zero. -/
+  h_mu_nondeg : ∀ x, mu x ≠ 0
+  /-- Matrix Square Root Definition: Encodes the algebraic relation between the Weyl spinor matrix and the curvature invariant matrix M. Uses squares to strictly bound the definition and avoid branch-cut ambiguities of the fractional exponent. -/
+  eq2_11_iff : ∀ x, (mu x) • (Psi_3x3 x * Psi_3x3 x) = M_3x3 x
+
+Litlib.equation "capovilla1991pure"
+  eq "2.14"
+  page "63"
+  kind "Identity"
+class Eq2_14
+    (M_3x3 : Matrix (Fin 3) (Fin 3) ℂ)
+    (B_3x3 : Matrix (Fin 3) (Fin 3) ℂ) where
+  /-- Determinant Non-Degeneracy Constraint: The square root matrix must be invertible. -/
+  hB_nondeg : Matrix.det B_3x3 ≠ 0
+  /-- Trace-Free Constraint: The matrix B represents the trace-free square root of M. -/
+  hB_tracefree : Matrix.trace B_3x3 = 0
+  /-- Root Property: B is the exact square root of M. -/
+  hB_root : B_3x3 * B_3x3 = M_3x3
+  /-- Algebraic Identity: Equation 2.14 evaluates the trace-free square root of a 3x3 matrix purely polynomially in terms of its square and trace. -/
+  eq2_14_iff : B_3x3 = (Matrix.det B_3x3)⁻¹ • (M_3x3 * (M_3x3 - ((1 / 2 : ℂ) * Matrix.trace M_3x3) • (1 : Matrix (Fin 3) (Fin 3) ℂ)))
+
+Litlib.equation "capovilla1991pure"
+  eq "2.16"
+  page "63"
+  kind "Definition"
+class Eq2_16
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (eta : Spacetime → ℂ)
+    (mu : Spacetime → ℂ)
+    (M_3x3 : Spacetime → Matrix (Fin 3) (Fin 3) ℂ) where
+  /-- Determinant Non-Degeneracy Constraint: M must be an invertible 3x3 matrix. -/
+  hM_nondeg : ∀ x, Matrix.det (M_3x3 x) ≠ 0
+  /-- Scalar Density Definition: Defines the geometric density eta algebraically. Squared to strictly bound the definition against branch-cut exploits. -/
+  eq2_16_iff : ∀ x, (eta x)^2 = mu x / Matrix.det (M_3x3 x)
 
 Litlib.equation "capovilla1991pure"
   eq "2.18"
@@ -588,5 +632,38 @@ class Theorem_Eq2_22_Derivation
     sumFin4 fun α => sumFin4 fun β => sumFin4 fun γ => sumFin4 fun δ =>
       sumFin2 fun A => sumFin2 fun B => sumFin2 fun C => sumFin2 fun D => sumFin2 fun E => sumFin2 fun F =>
         epsilon4 α β γ δ * R x μ α A B * eps2_up B C * R x β γ C D * eps2_up D E * R x δ ν E F * eps2_up F A
+
+Litlib.equation "capovilla1991pure"
+  eq "Page 67"
+  page "67"
+  kind "Theorem"
+class Theorem_Volume_Element_Identity
+    (Spacetime : Type*) [TopologicalSpace Spacetime]
+    (sqrt_g : Spacetime → ℂ)
+    (mu : Spacetime → ℂ)
+    (eta : Spacetime → ℂ)
+    (Psi_3x3 : Spacetime → Matrix (Fin 3) (Fin 3) ℂ)
+    (M_3x3 : Spacetime → Matrix (Fin 3) (Fin 3) ℂ) where
+  /-- Field Non-Degeneracy Constraint: Precludes division by zero and ensures metric non-degeneracy. -/
+  h_sqrt_g_nondeg : ∀ x, sqrt_g x ≠ 0
+  h_mu_nondeg : ∀ x, mu x ≠ 0
+  h_M_nondeg : ∀ x, Matrix.det (M_3x3 x) ≠ 0
+  h_Psi_nondeg : ∀ x, Matrix.det (Psi_3x3 x) ≠ 0
+  
+  -- Eq 2.16
+  eq2_16_holds : ∀ x, (eta x)^2 = mu x / Matrix.det (M_3x3 x)
+  -- Eq 2.21
+  eq2_21_holds : ∀ x, eta x = (sqrt_g x * Matrix.det (Psi_3x3 x))⁻¹
+  -- Eq 2.11 taking determinant: det(Psi) = mu^(-3/2) * det(M^(1/2)) => det(Psi)^2 = mu^(-3) * det(M)
+  eq2_11_det_holds : ∀ x, (Matrix.det (Psi_3x3 x))^2 = (mu x)⁻¹ * (mu x)⁻¹ * (mu x)⁻¹ * Matrix.det (M_3x3 x)
+  
+  /-- 
+  Physical Volume Density Evaluation:
+  The text on page 67 implicitly defines and utilizes this identity, showing that the 
+  Lagrange multiplier μ enforcing tracelessness in the matrix action natively encodes 
+  the emergent square root metric determinant \sqrt{g}. Computed algebraically 
+  from comparing the evaluation of η across equations 2.16 and 2.21.
+  -/
+  volume_element_identity : ∀ x, (sqrt_g x)^2 = (mu x)^2
 
 end Litlib.Y1991.capovilla1991pure
