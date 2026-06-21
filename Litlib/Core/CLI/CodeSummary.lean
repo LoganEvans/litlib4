@@ -2,6 +2,8 @@
 
 import Lean
 import Litlib.Core.CLI.Engine
+import Litlib.Core.CLI.Bibtex
+import Litlib.Core.CLI.Latex
 
 open Lean Meta
 
@@ -152,9 +154,6 @@ private def stripProofToSignature (s : String) (isInst : Bool) : String := Id.ru
     if validWheres.size > 0 then
       return String.ofList (chars.extract 0 validWheres[0]!).toList
 
-  -- Parse FORWARDS through valid level-0 assignments to find the proof start.
-  -- This reliably intercepts the first `:= by` while naturally skipping 
-  -- any `let ... := ...` variables in the type signature.
   for idx in validAssigns do
     let mut j := idx + 2
     while j < chars.size && chars[j]!.isWhitespace do j := j + 1
@@ -163,8 +162,6 @@ private def stripProofToSignature (s : String) (isInst : Bool) : String := Id.ru
       if nextW.isWhitespace || nextW == '\n' || j + 2 == chars.size then
         return String.ofList (chars.extract 0 idx).toList
       
-  -- Fallback: If no `:= by` is found (e.g. simple term proof without tactics),
-  -- take the absolute last `:=` as the term proof assignment
   if let some lastIdx := validAssigns.back? then
     return String.ofList (chars.extract 0 lastIdx).toList
 
@@ -191,6 +188,12 @@ partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet
     if let some info := env.find? curr then
       let mut consts : NameSet := {}
       consts := info.type.foldConsts consts (fun c acc => acc.insert c)
+
+      -- Structures and Classes store their fields inside their constructors. We must fold those too!
+      if let .inductInfo i := info then
+        for ctor in i.ctors do
+          if let some ctorInfo := env.find? ctor then
+            consts := ctorInfo.type.foldConsts consts (fun c acc => acc.insert c)
 
       let mut newQ := rest
       let mut newV := v
@@ -251,36 +254,96 @@ def ppDecl (env : Environment) (name : Name) : IO String := do
     else
       return s!"-- {name} <not found>"
   )).toIO ctx state
-  return res
+  
+  -- Prevent LaTeX fonts from crashing on Mathlib's mathcal nhds symbol
+  return res.replace "𝓝" "nhds "
 
-def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalData) : IO UInt32 := do
-  IO.println "\n===================================================================="
-  IO.println "                        CODE SUMMARY"
-  IO.println "===================================================================="
-
-  if globalData.papers.isEmpty && globalData.theorems.isEmpty then
-    IO.println "\n  [No tracked items found matching the filter.]\n"
-    return 0
-
-  -- 1. Gather all explicit target roots
+def gatherRoots (rootModule : Name) (globalData : GlobalData) (ctx : CliContext) : CoreM NameSet := do
+  let env ← getEnv
   let mut roots : NameSet := {}
+  
+  -- Helper to ensure we only start roots from the current project
+  let isLocal (declName : Name) : Bool :=
+    match env.getModuleIdxFor? declName with
+    | some idx =>
+      let modName := env.header.moduleNames[idx.toNat]!
+      modName.toString.startsWith rootModule.toString
+    | none => false
+  
+  -- Gather all explicitly tracked target roots matching the globs AND belonging to the project
   for paper in globalData.papers do
     for eq in paper.equations do
-      roots := roots.insert eq.declName
-      for prf in eq.proofs do
-        roots := roots.insert prf.declName
+      if isLocal eq.declName then
+        if matchesAnyGlob ctx.referenceGlobs eq.declName.toString then
+          roots := roots.insert eq.declName
+          for prf in eq.proofs do
+            if isLocal prf.declName then
+              roots := roots.insert prf.declName
 
   for thm in globalData.theorems do
-    roots := roots.insert thm.declName
+    if isLocal thm.declName then
+      if matchesAnyGlob ctx.theoremGlobs thm.declName.toString then
+        roots := roots.insert thm.declName
 
-  -- 2. Traverse AST
-  let ctx : Core.Context := { fileName := "<litlib>", fileMap := default }
+  -- Skip the sweeping environment search if we only want Litlib tracked targets
+  if !ctx.litlibTheoremsOnly then
+    for (declName, _) in env.constants.toList do
+      let isAuto := declName.isInternal || 
+        (match declName with 
+        | .str _ s => s == "mk" || s == "rec" || s == "casesOn" || s == "recOn" || s == "noConfusion" || s == "noConfusionType" || s == "injEq" || s.startsWith "match_" || s.startsWith "proof_" || s.startsWith "eq_" 
+        | _ => false)
+      
+      if !isAuto && !(← Lean.getProjectionFnInfo? declName).isSome then
+        if isLocal declName then
+          let isMatch := matchesAnyGlob ctx.theoremGlobs declName.toString || matchesAnyGlob ctx.referenceGlobs declName.toString
+          if isMatch then
+            roots := roots.insert declName
+          
+  return roots
+
+def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalData) (ctx : CliContext) : IO UInt32 := do
+  let isLatex := ctx.latexDir.isSome
+  let outStrRef ← IO.mkRef (if isLatex then "\\printleanrefs\n\\vspace{2em}\n\\begin{minted}{lean}\n" else "")
+  
+  let appendLine (s : String) : IO Unit := do
+    if isLatex then
+      outStrRef.modify (fun out => out ++ s ++ "\n")
+    else
+      IO.println s
+
+  if !isLatex then
+    appendLine "\n===================================================================="
+    appendLine "                        CODE SUMMARY"
+    appendLine "===================================================================="
+
+  let ctxCore : Core.Context := { fileName := "<litlib>", fileMap := default }
   let state : Core.State := { env := env }
-  let (allLocalConsts, _) ← (collectLocalDepsRec rootModule roots.toList roots).toIO ctx state
+  
+  -- 1. Gather starting roots from tracking metadata & globs
+  let (roots, _) ← (gatherRoots rootModule globalData ctx).toIO ctxCore state
 
-  -- 3. Group by Module
+  if roots.isEmpty then
+    if !isLatex then appendLine "\n  [No items found matching the filter.]\n"
+    return 0
+
+  -- 2. Traverse AST strictly over type signatures
+  let (allLocalConsts, _) ← (collectLocalDepsRec rootModule roots.toList roots).toIO ctxCore state
+
+  -- 3. Group by Module and build collision-safe NameMap for hyperlinking
   let mut byModule : NameMap (Array Name) := {}
-  for n in allLocalConsts.toList do
+  let printedDecls := allLocalConsts.toList
+  
+  let mut nameMap : Array (String × Name) := #[]
+  for n in printedDecls do
+    let s := n.getString!
+    let mut count := 0
+    for x in printedDecls do if x.getString! == s then count := count + 1
+    if count == 1 then nameMap := nameMap.push (s, n)
+    
+    let f := n.toString
+    if f != s then nameMap := nameMap.push (f, n)
+
+  for n in printedDecls do
     if let some idx := env.getModuleIdxFor? n then
       let modName := env.header.moduleNames[idx.toNat]!
       let arr := match byModule.find? modName with
@@ -288,23 +351,41 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
         | none => #[n]
       byModule := byModule.insert modName arr
 
-  -- 4. Print
+  -- 4. Print & Format
   let mut sortedMods := #[]
   for (modName, _) in byModule.toList do
     sortedMods := sortedMods.push modName
   sortedMods := sortedMods.qsort fun a b => a.toString < b.toString
 
   for modName in sortedMods do
-    IO.println s!"\n-- MODULE: {modName}"
-    IO.println s!"--------------------------------------------------------------------"
+    appendLine s!"\n-- MODULE: {modName}"
+    appendLine s!"--------------------------------------------------------------------"
     let names := (byModule.find? modName).getD #[]
     let sortedNames := names.qsort fun a b => a.toString < b.toString
     for n in sortedNames do
       let codeStr ← ppDecl env n
-      IO.println codeStr
-      IO.println ""
+      let formattedCode := injectLabelsAndLinks codeStr n nameMap isLatex
+      appendLine formattedCode
+      appendLine ""
 
-  IO.println "====================================================================\n"
+  if isLatex then
+    outStrRef.modify (fun out => out ++ "\\end{minted}\n")
+    let finalOutStr ← outStrRef.get
+    if let some dirStr := ctx.latexDir then
+      let dir := System.FilePath.mk dirStr
+      IO.FS.createDirAll dir
+      generateLitlibSty dir
+      generateLatexReadme dir
+      IO.FS.writeFile (dir / "litlib-code-summary.tex") finalOutStr
+      
+      let existingKeys ← scanForExistingBibKeys dir
+      let bibStr ← generateBibtexString globalData existingKeys
+      IO.FS.writeFile (dir / "litlib-references.bib") bibStr
+      
+      IO.println s!"LaTeX artifacts generated in {dir}"
+  else
+    appendLine "====================================================================\n"
+    
   return 0
 
 end Litlib.Core.CLI

@@ -50,6 +50,8 @@ structure CliContext where
   targetReferences : Bool := false
   theoremGlobs : List String := []
   referenceGlobs : List String := []
+  litlibTheoremsOnly : Bool := false
+  latexDir : Option String := none
 
 def myDropRight (s : String) (n : Nat) : String :=
   let chars := s.toList
