@@ -13,7 +13,7 @@ def runDashboard (rootModule : Name) (globalData : GlobalData) (_ctx : CliContex
   IO.println "===================================================================="
 
   if globalData.papers.isEmpty && globalData.theorems.isEmpty then
-    IO.println "\n  [No tracked papers or theorems found matching the filter.]\n"
+    IO.println "\n  [No tracked papers, theorems, or definitions found matching the filter.]\n"
     return 0
 
   if !globalData.papers.isEmpty then
@@ -42,32 +42,63 @@ def runDashboard (rootModule : Name) (globalData : GlobalData) (_ctx : CliContex
           eqIdx := eqIdx + 1
 
   if !globalData.theorems.isEmpty then
-    IO.println "\n--------------------------------------------------------------------"
-    IO.println "[STANDALONE THEOREMS]"
-    let mut fullyProved := 0
-    let mut incomplete := 0
+    let onlyDefs := globalData.theorems.filter (fun t => t.isDef)
+    let onlyTheorems := globalData.theorems.filter (fun t => !t.isDef)
     
-    let sortedTheorems := globalData.theorems.qsort fun a b => a.declName.toString < b.declName.toString
-    
-    for thm in sortedTheorems do
-      if thm.hasSorry then incomplete := incomplete + 1 else fullyProved := fullyProved + 1
-      let icon := if thm.hasSorry then "⚠" else "✔"
+    if !onlyDefs.isEmpty then
+      IO.println "\n--------------------------------------------------------------------"
+      IO.println "[STANDALONE DEFINITIONS]"
+      let sortedDefs := onlyDefs.qsort fun a b => a.declName.toString < b.declName.toString
       
-      IO.println s!"\n {icon} {thm.desc} ({thm.declName})"
-      
-      if !thm.deps.isEmpty then
-        let sortedDeps := thm.deps.qsort fun a b => a.paperId < b.paperId
-        let maxDepIdx := sortedDeps.size - 1
-        let mut depIdx := 0
-        for dep in sortedDeps do
-          let branch := if depIdx == maxDepIdx then "└─" else "├─"
-          let eqName := if dep.eqNum.isEmpty then "Unknown" else dep.eqNum
-          let depIcon := if dep.isProved then "✔" else "⚠"
-          let formalizedStr := if dep.isProved then "Formalized" else "Unformalized"
-          IO.println s!"    {branch} Depends on: {dep.paperId} Eq {eqName} ({depIcon} {formalizedStr})"
-          depIdx := depIdx + 1
+      let mut complete := 0
+      let mut incomplete := 0
+      for defn in sortedDefs do
+        if defn.hasSorry then incomplete := incomplete + 1 else complete := complete + 1
+        let icon := if defn.hasSorry then "⚠" else "✔"
+        
+        IO.println s!"\n {icon} {defn.desc} ({defn.declName})"
+        
+        if !defn.deps.isEmpty then
+          let sortedDeps := defn.deps.qsort fun a b => a.paperId < b.paperId
+          let maxDepIdx := sortedDeps.size - 1
+          let mut depIdx := 0
+          for dep in sortedDeps do
+            let branch := if depIdx == maxDepIdx then "└─" else "├─"
+            let eqName := if dep.eqNum.isEmpty then "Unknown" else dep.eqNum
+            let depIcon := if dep.isProved then "✔" else "⚠"
+            let formalizedStr := if dep.isProved then "Formalized" else "Unformalized"
+            IO.println s!"    {branch} Depends on: {dep.paperId} Eq {eqName} ({depIcon} {formalizedStr})"
+            depIdx := depIdx + 1
 
-    IO.println s!"\nTotal Standalone Theorems: {globalData.theorems.size}  |  Fully Proved: {fullyProved}  |  Incomplete: {incomplete}"
+      IO.println s!"\nTotal Standalone Definitions: {onlyDefs.size}  |  Complete: {complete}  |  Incomplete: {incomplete}"
+
+    if !onlyTheorems.isEmpty then
+      IO.println "\n--------------------------------------------------------------------"
+      IO.println "[STANDALONE THEOREMS]"
+      let mut fullyProved := 0
+      let mut incomplete := 0
+      
+      let sortedTheorems := onlyTheorems.qsort fun a b => a.declName.toString < b.declName.toString
+      
+      for thm in sortedTheorems do
+        if thm.hasSorry then incomplete := incomplete + 1 else fullyProved := fullyProved + 1
+        let icon := if thm.hasSorry then "⚠" else "✔"
+        
+        IO.println s!"\n {icon} {thm.desc} ({thm.declName})"
+        
+        if !thm.deps.isEmpty then
+          let sortedDeps := thm.deps.qsort fun a b => a.paperId < b.paperId
+          let maxDepIdx := sortedDeps.size - 1
+          let mut depIdx := 0
+          for dep in sortedDeps do
+            let branch := if depIdx == maxDepIdx then "└─" else "├─"
+            let eqName := if dep.eqNum.isEmpty then "Unknown" else dep.eqNum
+            let depIcon := if dep.isProved then "✔" else "⚠"
+            let formalizedStr := if dep.isProved then "Formalized" else "Unformalized"
+            IO.println s!"    {branch} Depends on: {dep.paperId} Eq {eqName} ({depIcon} {formalizedStr})"
+            depIdx := depIdx + 1
+
+      IO.println s!"\nTotal Standalone Theorems: {onlyTheorems.size}  |  Fully Proved: {fullyProved}  |  Incomplete: {incomplete}"
 
   IO.println "\n====================================================================\n"
   return 0

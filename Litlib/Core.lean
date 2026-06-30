@@ -56,6 +56,9 @@ initialize litlibEqExt : MapDeclarationExtension LitlibEqData ←
 initialize litlibTheoremExt : MapDeclarationExtension String ←
   mkMapDeclarationExtension
 
+initialize litlibDefinitionExt : MapDeclarationExtension String ←
+  mkMapDeclarationExtension
+
 -- ==========================================
 -- 3. Syntax Definitions
 -- ==========================================
@@ -76,6 +79,11 @@ syntax (name := litlibEquation)
 
 syntax (name := litlibTheoremCmd) 
   "Litlib.theorem"
+  "description" str
+  command : command
+
+syntax (name := litlibDefinitionCmd) 
+  "Litlib.definition"
   "description" str
   command : command
 
@@ -192,3 +200,20 @@ def elabLitlibTheoremCmd : CommandElab := fun stx => do
     modifyEnv fun e => litlibTheoremExt.insert e resolvedName desc
   else
     logWarning m!"Litlib.theorem: Could not extract theorem name from command."
+
+@[command_elab litlibDefinitionCmd]
+def elabLitlibDefinitionCmd : CommandElab := fun stx => do
+  let args := stx.getArgs
+  let desc := args[2]!.isStrLit?.getD ""
+  let cmd := args[3]!
+
+  elabCommand cmd
+
+  let targetNameOpt := findDeclId cmd
+  
+  if let some defName := targetNameOpt then
+    let currNs ← getCurrNamespace
+    let resolvedName := if defName.getRoot == defName then currNs ++ defName else defName
+    modifyEnv fun e => litlibDefinitionExt.insert e resolvedName desc
+  else
+    logWarning m!"Litlib.definition: Could not extract definition name from command."

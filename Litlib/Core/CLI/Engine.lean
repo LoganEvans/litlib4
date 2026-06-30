@@ -37,6 +37,7 @@ structure StandaloneTheoremInfo where
   desc : String
   hasSorry : Bool
   deps : Array TheoremDep
+  isDef : Bool := false
   deriving Inhabited
 
 structure GlobalData where
@@ -128,10 +129,19 @@ def extractAllTheorems (env : Environment) (ctx : CliContext) : CoreM GlobalData
           let newEInfo := { eInfo with proofs := eInfo.proofs.push { declName := declName, hasSorry := hSorry } }
           eqMap := eqMap.insert tn newEInfo
 
-  -- 4. Discover Standalone Theorems and their Equation Dependencies
+  -- 4. Discover Standalone Theorems, Definitions, and their Equation Dependencies
   let mut standaloneTheorems : Array StandaloneTheoremInfo := #[]
   for (declName, info) in env.constants.toList do
+    let mut isDef := false
+    let mut extDesc : Option String := none
+    
     if let some desc := litlibTheoremExt.find? env declName then
+      extDesc := some desc
+    else if let some desc := litlibDefinitionExt.find? env declName then
+      extDesc := some desc
+      isDef := true
+      
+    if let some desc := extDesc then
       let hSorry := checkHasSorry info
       
       -- Extract all constants used in the theorem's type signature and proof body
@@ -161,7 +171,8 @@ def extractAllTheorems (env : Environment) (ctx : CliContext) : CoreM GlobalData
         declName := declName, 
         desc := desc, 
         hasSorry := hSorry, 
-        deps := deps 
+        deps := deps,
+        isDef := isDef
       }
 
   -- 5. Nest Equations under Papers
