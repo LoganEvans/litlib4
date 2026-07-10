@@ -50,14 +50,33 @@ initialize litlibEqExt : MapDeclarationExtension LitlibEqData ←
   mkMapDeclarationExtension
 
 -- ==========================================
--- 2. Dashboard Tracker Extension
+-- 2. Dashboard Tracker Extension (Attribute)
 -- ==========================================
 
-initialize litlibTheoremExt : MapDeclarationExtension String ←
+initialize litlibTrackExt : MapDeclarationExtension String ←
   mkMapDeclarationExtension
 
-initialize litlibDefinitionExt : MapDeclarationExtension String ←
-  mkMapDeclarationExtension
+-- Fix: The syntax name must exactly match the attribute name for Lean's parser
+syntax (name := litlib_track) "litlib_track" (ppSpace str)? : attr
+
+partial def findStrLit (stx : Syntax) : Option String :=
+  if let some s := stx.isStrLit? then some s
+  else stx.getArgs.findSome? findStrLit
+
+initialize registerBuiltinAttribute {
+  name := `litlib_track
+  descr := "Tracks a declaration for Litlib dashboard and code summary."
+  add := fun declName stx _ => do
+    let mut desc := ""
+    if let some s := findStrLit stx then
+      desc := s
+    else
+      let docOpt ← Lean.findDocString? (← getEnv) declName
+      if let some doc := docOpt then
+        desc := doc.trimAscii.toString
+        
+    modifyEnv fun e => litlibTrackExt.insert e declName desc
+}
 
 -- ==========================================
 -- 3. Syntax Definitions
@@ -75,16 +94,6 @@ syntax (name := litlibPaper)
 syntax (name := litlibEquation) 
   "Litlib.equation" str
   litlibField*
-  command : command
-
-syntax (name := litlibTheoremCmd) 
-  "Litlib.theorem"
-  "description" str
-  command : command
-
-syntax (name := litlibDefinitionCmd) 
-  "Litlib.definition"
-  "description" str
   command : command
 
 -- ==========================================
@@ -136,13 +145,11 @@ def elabLitlibPaper : CommandElab := fun stx => do
     | "doi" => data := { data with doi := firstStr }
     | _ => pure ()
 
-  -- 1. Create a dummy declaration so the Extension has a valid environment key to bind to
   let metaName := Name.mkSimple (paperIdStr ++ "_paper_meta")
   let idIdent := mkIdent metaName
   let cmd ← `(def $idIdent : Unit := ())
   elabCommand cmd
 
-  -- 2. Bind the data to the generated declaration
   let currNs ← getCurrNamespace
   let resolvedName := if metaName.getRoot == metaName then currNs ++ metaName else metaName
   modifyEnv fun env => litlibPaperExt.insert env resolvedName data
@@ -183,37 +190,3 @@ def elabLitlibEquation : CommandElab := fun stx => do
     modifyEnv fun env => litlibEqExt.insert env resolvedName data
   else
     logWarning m!"Litlib.equation: Could not extract target name from command."
-
-@[command_elab litlibTheoremCmd]
-def elabLitlibTheoremCmd : CommandElab := fun stx => do
-  let args := stx.getArgs
-  let desc := args[2]!.isStrLit?.getD ""
-  let cmd := args[3]!
-
-  elabCommand cmd
-
-  let targetNameOpt := findDeclId cmd
-  
-  if let some thmName := targetNameOpt then
-    let currNs ← getCurrNamespace
-    let resolvedName := if thmName.getRoot == thmName then currNs ++ thmName else thmName
-    modifyEnv fun e => litlibTheoremExt.insert e resolvedName desc
-  else
-    logWarning m!"Litlib.theorem: Could not extract theorem name from command."
-
-@[command_elab litlibDefinitionCmd]
-def elabLitlibDefinitionCmd : CommandElab := fun stx => do
-  let args := stx.getArgs
-  let desc := args[2]!.isStrLit?.getD ""
-  let cmd := args[3]!
-
-  elabCommand cmd
-
-  let targetNameOpt := findDeclId cmd
-  
-  if let some defName := targetNameOpt then
-    let currNs ← getCurrNamespace
-    let resolvedName := if defName.getRoot == defName then currNs ++ defName else defName
-    modifyEnv fun e => litlibDefinitionExt.insert e resolvedName desc
-  else
-    logWarning m!"Litlib.definition: Could not extract definition name from command."

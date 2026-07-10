@@ -54,7 +54,6 @@ private def findSourceFile (modName : Name) : IO (Option System.FilePath) := do
   for c in candidates do
     if ← c.pathExists then return some c
 
-  -- Also search inside .lake/packages for Litlib files imported downstream
   let packagesDir := System.FilePath.mk ".lake" / "packages"
   if ← packagesDir.isDir then
     for entry in ← packagesDir.readDir do
@@ -189,7 +188,6 @@ partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet
       let mut consts : NameSet := {}
       consts := info.type.foldConsts consts (fun c acc => acc.insert c)
 
-      -- Structures and Classes store their fields inside their constructors. We must fold those too!
       if let .inductInfo i := info then
         for ctor in i.ctors do
           if let some ctorInfo := env.find? ctor then
@@ -262,7 +260,6 @@ def gatherRoots (rootModule : Name) (globalData : GlobalData) (ctx : CliContext)
   let env ← getEnv
   let mut roots : NameSet := {}
   
-  -- Helper to ensure we only start roots from the current project
   let isLocal (declName : Name) : Bool :=
     match env.getModuleIdxFor? declName with
     | some idx =>
@@ -270,11 +267,13 @@ def gatherRoots (rootModule : Name) (globalData : GlobalData) (ctx : CliContext)
       modName.toString.startsWith rootModule.toString
     | none => false
   
-  -- Gather all explicitly tracked target roots matching the globs AND belonging to the project
   for paper in globalData.papers do
     for eq in paper.equations do
       if isLocal eq.declName then
-        if matchesAnyGlob ctx.referenceGlobs eq.declName.toString then
+        let modNameStr := match env.getModuleIdxFor? eq.declName with
+          | some idx => env.header.moduleNames[idx.toNat]!.toString
+          | none => ""
+        if matchesAnyGlob ctx.referenceGlobs eq.declName.toString || matchesAnyGlob ctx.referenceGlobs modNameStr then
           roots := roots.insert eq.declName
           for prf in eq.proofs do
             if isLocal prf.declName then
@@ -282,10 +281,12 @@ def gatherRoots (rootModule : Name) (globalData : GlobalData) (ctx : CliContext)
 
   for thm in globalData.theorems do
     if isLocal thm.declName then
-      if matchesAnyGlob ctx.theoremGlobs thm.declName.toString then
+      let modNameStr := match env.getModuleIdxFor? thm.declName with
+        | some idx => env.header.moduleNames[idx.toNat]!.toString
+        | none => ""
+      if matchesAnyGlob ctx.theoremGlobs thm.declName.toString || matchesAnyGlob ctx.theoremGlobs modNameStr then
         roots := roots.insert thm.declName
 
-  -- Skip the sweeping environment search if we only want Litlib tracked targets
   if !ctx.litlibTheoremsOnly then
     for (declName, _) in env.constants.toList do
       let isAuto := declName.isInternal || 
@@ -295,7 +296,13 @@ def gatherRoots (rootModule : Name) (globalData : GlobalData) (ctx : CliContext)
       
       if !isAuto && !(← Lean.getProjectionFnInfo? declName).isSome then
         if isLocal declName then
-          let isMatch := matchesAnyGlob ctx.theoremGlobs declName.toString || matchesAnyGlob ctx.referenceGlobs declName.toString
+          let modNameStr := match env.getModuleIdxFor? declName with
+            | some idx => env.header.moduleNames[idx.toNat]!.toString
+            | none => ""
+          let isMatch := matchesAnyGlob ctx.theoremGlobs declName.toString || 
+                         matchesAnyGlob ctx.referenceGlobs declName.toString ||
+                         matchesAnyGlob ctx.theoremGlobs modNameStr ||
+                         matchesAnyGlob ctx.referenceGlobs modNameStr
           if isMatch then
             roots := roots.insert declName
           
@@ -319,17 +326,14 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
   let ctxCore : Core.Context := { fileName := "<litlib>", fileMap := default }
   let state : Core.State := { env := env }
   
-  -- 1. Gather starting roots from tracking metadata & globs
   let (roots, _) ← (gatherRoots rootModule globalData ctx).toIO ctxCore state
 
   if roots.isEmpty then
     if !isLatex then appendLine "\n  [No items found matching the filter.]\n"
     return 0
 
-  -- 2. Traverse AST strictly over type signatures
   let (allLocalConsts, _) ← (collectLocalDepsRec rootModule roots.toList roots).toIO ctxCore state
 
-  -- 3. Group by Module and build collision-safe NameMap for hyperlinking
   let mut byModule : NameMap (Array Name) := {}
   let printedDecls := allLocalConsts.toList
   
@@ -351,7 +355,6 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
         | none => #[n]
       byModule := byModule.insert modName arr
 
-  -- 4. Print & Format
   let mut sortedMods := #[]
   for (modName, _) in byModule.toList do
     sortedMods := sortedMods.push modName

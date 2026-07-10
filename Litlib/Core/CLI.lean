@@ -11,6 +11,12 @@ open Lean
 
 namespace Litlib.Core.CLI
 
+def sanitizePathToModule (val : String) : String :=
+  let cleanVal := val.replace "'" "" |>.replace "\"" ""
+  let cleanVal := cleanVal.replace "\\" "/"
+  let cleanVal := if cleanVal.endsWith ".lean" then (cleanVal.dropEnd 5).toString else cleanVal
+  cleanVal.replace "/" "."
+
 def parseArgs (args : List String) : CliContext := Id.run do
   let mut ctx : CliContext := {}
   for arg in args do
@@ -19,7 +25,7 @@ def parseArgs (args : List String) : CliContext := Id.run do
     else if arg == "--dashboard" then 
       ctx := { ctx with action := "dashboard" }
     else if arg.startsWith "--dashboard=" then
-      let globs := (arg.drop 12).toString.replace "'" "" |>.replace "\"" "" |>.splitOn "," |>.map (fun s => s.trimAscii.toString)
+      let globs := sanitizePathToModule (arg.drop 12).toString |>.splitOn "," |>.map (fun s => s.trimAscii.toString)
       ctx := { ctx with action := "dashboard", targetTheorems := true, theoremGlobs := globs, targetReferences := true, referenceGlobs := globs }
     else if arg.startsWith "--latex" then
       let dir := if arg.contains "=" then (arg.splitOn "=")[1]! else "latex-artifacts"
@@ -31,11 +37,11 @@ def parseArgs (args : List String) : CliContext := Id.run do
         if parts.length >= 2 then parts[1]! else "all"
       else "all"
       
-      let cleanVal := val.replace "'" "" |>.replace "\"" ""
+      let cleanVal := sanitizePathToModule val
       
       if cleanVal == "all" || cleanVal == "" then
         ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
-      else if cleanVal == "Litlib.theorem" || cleanVal == "Litlib.tracked" then
+      else if cleanVal == "litlib_track" || cleanVal == "Litlib.theorem" then
         ctx := { ctx with litlibTheoremsOnly := true, targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
       else if cleanVal == "theorem" || cleanVal == "theorems" then
         ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := false }
@@ -47,15 +53,15 @@ def parseArgs (args : List String) : CliContext := Id.run do
     else if arg == "--bibtex" then
       ctx := { ctx with action := "bibtex" }
     else if arg.startsWith "--bibtex=" then
-      let globs := (arg.drop 9).toString.replace "'" "" |>.replace "\"" "" |>.splitOn "," |>.map (fun s => s.trimAscii.toString)
+      let globs := sanitizePathToModule (arg.drop 9).toString |>.splitOn "," |>.map (fun s => s.trimAscii.toString)
       ctx := { ctx with action := "bibtex", targetReferences := true, referenceGlobs := globs }
     else if arg.startsWith "--theorem=" then
-      let globs := (arg.drop 10).toString.replace "'" "" |>.replace "\"" "" |>.splitOn "," |>.map (fun s => s.trimAscii.toString)
+      let globs := sanitizePathToModule (arg.drop 10).toString |>.splitOn "," |>.map (fun s => s.trimAscii.toString)
       ctx := { ctx with targetTheorems := true, theoremGlobs := globs }
     else if arg == "--theorem" then
       ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"] }
     else if arg.startsWith "--reference=" then
-      let globs := (arg.drop 12).toString.replace "'" "" |>.replace "\"" "" |>.splitOn "," |>.map (fun s => s.trimAscii.toString)
+      let globs := sanitizePathToModule (arg.drop 12).toString |>.splitOn "," |>.map (fun s => s.trimAscii.toString)
       ctx := { ctx with targetReferences := true, referenceGlobs := globs }
     else if arg == "--reference" then
       ctx := { ctx with targetReferences := true, referenceGlobs := ["all"] }
@@ -72,7 +78,6 @@ def parseArgs (args : List String) : CliContext := Id.run do
     if ctx.action == "bibtex" then
       ctx := { ctx with targetReferences := true, referenceGlobs := ["all"] }
     else if ctx.action == "dashboard" then
-      -- By default, dashboard shows everything
       ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
       
   return ctx

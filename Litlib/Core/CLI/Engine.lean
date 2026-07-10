@@ -132,16 +132,8 @@ def extractAllTheorems (env : Environment) (ctx : CliContext) : CoreM GlobalData
   -- 4. Discover Standalone Theorems, Definitions, and their Equation Dependencies
   let mut standaloneTheorems : Array StandaloneTheoremInfo := #[]
   for (declName, info) in env.constants.toList do
-    let mut isDef := false
-    let mut extDesc : Option String := none
-    
-    if let some desc := litlibTheoremExt.find? env declName then
-      extDesc := some desc
-    else if let some desc := litlibDefinitionExt.find? env declName then
-      extDesc := some desc
-      isDef := true
-      
-    if let some desc := extDesc then
+    if let some desc := litlibTrackExt.find? env declName then
+      let isDef := match info with | .thmInfo _ => false | _ => true
       let hSorry := checkHasSorry info
       
       -- Extract all constants used in the theorem's type signature and proof body
@@ -190,11 +182,14 @@ def extractAllTheorems (env : Environment) (ctx : CliContext) : CoreM GlobalData
     if a.data.year != b.data.year then a.data.year < b.data.year
     else a.data.title < b.data.title
 
-  -- 6. Apply User Filters
+  -- 6. Apply User Filters (Matching both Decl Name and Module Name)
   let mut filteredTheorems := #[]
   if ctx.targetTheorems then
     for thm in standaloneTheorems do
-      if matchesAnyGlob ctx.theoremGlobs thm.declName.toString then
+      let modNameStr := match env.getModuleIdxFor? thm.declName with
+        | some idx => env.header.moduleNames[idx.toNat]!.toString
+        | none => ""
+      if matchesAnyGlob ctx.theoremGlobs thm.declName.toString || matchesAnyGlob ctx.theoremGlobs modNameStr then
         filteredTheorems := filteredTheorems.push thm
 
   let mut filteredPapers := #[]
@@ -203,7 +198,10 @@ def extractAllTheorems (env : Environment) (ctx : CliContext) : CoreM GlobalData
       let paperMatches := matchesAnyGlob ctx.referenceGlobs p.paperId.toString
       let mut keptEqs := #[]
       for eq in p.equations do
-        if paperMatches || matchesAnyGlob ctx.referenceGlobs eq.declName.toString then
+        let modNameStr := match env.getModuleIdxFor? eq.declName with
+          | some idx => env.header.moduleNames[idx.toNat]!.toString
+          | none => ""
+        if paperMatches || matchesAnyGlob ctx.referenceGlobs eq.declName.toString || matchesAnyGlob ctx.referenceGlobs modNameStr then
           keptEqs := keptEqs.push eq
       if paperMatches || !keptEqs.isEmpty then
         filteredPapers := filteredPapers.push { p with equations := if paperMatches then p.equations else keptEqs }
