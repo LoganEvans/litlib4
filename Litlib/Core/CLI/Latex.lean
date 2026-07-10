@@ -154,13 +154,15 @@ def generateLitlibSty (dir : System.FilePath) : IO Unit := do
             }%
         \\fi
         \\ifmmode 
-            {}^{\\textnormal{\\hyperref[lean:#1]{\\pdftooltip{[L\\csname lean@ref@id@\\detokenize{#1}\\endcsname]}{\\detokenize{#1}}}}}%
+            {}^{\\textnormal{\\hyperref[lean:#1]{[L\\csname lean@ref@id@\\detokenize{#1}\\endcsname]}}}%
         \\else 
             \\textsuperscript{\\hyperref[lean:#1]{\\pdftooltip{[L\\csname lean@ref@id@\\detokenize{#1}\\endcsname]}{\\detokenize{#1}}}}%
         \\fi
     \\fi
 }
 \\makeatother
+
+\\newcommand{\\aleanref}[1]{\\rlap{\\quad \\leanref{#1}}}
 
 \\newcommand{\\printleanrefs}{%
     \\section*{Formal Verification Index}%

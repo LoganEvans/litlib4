@@ -41,7 +41,7 @@ def parseArgs (args : List String) : CliContext := Id.run do
       
       if cleanVal == "all" || cleanVal == "" then
         ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
-      else if cleanVal == "litlib_track" || cleanVal == "Litlib.theorem" then
+      else if cleanVal == "litlib_track" then
         ctx := { ctx with litlibTheoremsOnly := true, targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
       else if cleanVal == "theorem" || cleanVal == "theorems" then
         ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := false }
