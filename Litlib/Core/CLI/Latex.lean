@@ -145,7 +145,7 @@ def generateLitlibSty (dir : System.FilePath) : IO Unit := do
         \\ifmmode {}^{\\textnormal{[L?]}} \\else \\textsuperscript{[L?]} \\fi
     \\else
         \\expandafter\\ifx\\csname lean@ref@id@\\detokenize{#1}\\endcsname\\relax
-            \\refstepcounter{leancnt}%
+            \\stepcounter{leancnt}%
             \\expandafter\\xdef\\csname lean@ref@id@\\detokenize{#1}\\endcsname{\\theleancnt}%
             \\immediate\\write\\leanfile{%
                 \\string\\noindent\\string\\textbf{[L\\theleancnt]}\\string\\quad%
