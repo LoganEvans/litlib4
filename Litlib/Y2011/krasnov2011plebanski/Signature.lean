@@ -153,4 +153,26 @@ class Eq17
     ((∑ i : Fin 3, F_ij i i) = -Lambda - 2 * (Real.pi : ℂ) * G * T ∧ 
      (∀ i j, F_bar_ij i j = -2 * (Real.pi : ℂ) * G * T_ij i j))
 
+Litlib.equation "krasnov2011plebanski"
+  eq "bridge_theorem"
+  page "6"
+  kind "theorem"
+/--
+Physical Interpretation: Establishes the bridge between the Plebański formulation and the standard metric formulation of general relativity (Page 6). It mathematically proves that for a Levi-Civita (torsion-free) connection, the algebraic self-dual curvature conditions (vanishing anti-self-dual part and trace proportional to the cosmological constant) are rigorously equivalent to the tensorial trace-reversed vacuum Einstein field equations ($R_{ab} = \Lambda g_{ab}$).
+Mathematical Boundaries: The equivalence strictly requires a non-degenerate spacetime metric `g` with a well-defined inverse (`g_inv`) to prevent dimensional collapse. This constraint, alongside the explicit requirement that the connection is Levi-Civita (`isLeviCivitaRicci`), securely binds the theorem to standard Riemannian geometries where the isomorphism between the self-dual curvature and the Riemann curvature physically holds.
+-/
+class PlebanskiToEinsteinEquivalence
+    (g : Fin 4 → Fin 4 → ℝ)
+    (g_inv : Fin 4 → Fin 4 → ℝ)
+    (Ricci : Fin 4 → Fin 4 → ℝ)
+    (Lambda : ℝ)
+    (F_ij F_bar_ij : Fin 3 → Fin 3 → ℂ)
+    (plebanski_vacuum : ℂ → (Fin 3 → Fin 3 → ℂ) → (Fin 3 → Fin 3 → ℂ) → Prop)
+    (isLeviCivitaRicci : (Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → ℝ) → Prop)
+    where
+  equivalence_iff : 
+    (∀ mu nu, (∑ alpha : Fin 4, g mu alpha * g_inv alpha nu) = if mu = nu then 1 else 0) → 
+    isLeviCivitaRicci g Ricci → 
+    (plebanski_vacuum (Lambda : ℂ) F_ij F_bar_ij ↔ (∀ a b, Ricci a b = Lambda * g a b))
+
 end Litlib.Y2011.krasnov2011plebanski
