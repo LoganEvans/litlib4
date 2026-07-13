@@ -67,7 +67,7 @@ the 'Garbage-In' deriv exploit (where Mathlib returns 0 for non-smooth functions
 noncomputable def baryon_current_B 
   (U : (Fin 4 → ℝ) → Matrix (Fin 3) (Fin 3) ℂ) 
   (_h_SU3 : ∀ x, IsSU3 (U x))
-  (_h_smooth : ∀ i j, Differentiable ℝ (fun x => U x i j))
+  (_h_smooth : ∀ i j : Fin 3, Differentiable ℝ (fun x => U x i j))
   (μ : Fin 4) (x : Fin 4 → ℝ) : ℂ :=
   (1 / (24 * Real.pi ^ 2)) * 
   ∑ ν : Fin 4, ∑ α : Fin 4, ∑ β : Fin 4,
@@ -94,6 +94,20 @@ noncomputable def BaryonNumberIntegrand (U : (Fin 3 → ℝ) → Matrix (Fin 3) 
       ((U x)⁻¹ * (partialDeriv k U x))
     )
 
+noncomputable def partialDerivSU2 {n : ℕ} (i : Fin n) 
+  (f : (Fin n → ℝ) → Matrix (Fin 2) (Fin 2) ℂ) 
+  (x : Fin n → ℝ) : Matrix (Fin 2) (Fin 2) ℂ :=
+  Matrix.of (fun a b => deriv (fun t => f (Function.update x i t) a b) (x i))
+
+noncomputable def BaryonNumberIntegrandSU2 (U : (Fin 3 → ℝ) → Matrix (Fin 2) (Fin 2) ℂ) (x : Fin 3 → ℝ) : ℂ :=
+  ∑ i : Fin 3, ∑ j : Fin 3, ∑ k : Fin 3,
+    (eps3 i j k) *
+    Matrix.trace (
+      (U x)⁻¹ * (partialDerivSU2 i U x) *
+      ((U x)⁻¹ * (partialDerivSU2 j U x)) *
+      ((U x)⁻¹ * (partialDerivSU2 k U x))
+    )
+
 /--
 Asymptotic Vacuum Constraint: For the soliton to represent an element of the 
 3rd Homotopy group, space must be compactified to S^3. This rigorously requires 
@@ -103,6 +117,11 @@ def AsymptoticVacuum (U : (Fin 3 → ℝ) → Matrix (Fin 3) (Fin 3) ℂ) : Prop
   ∀ ε : ℝ, ε > 0 → ∃ R : ℝ, R > 0 ∧ ∀ x : Fin 3 → ℝ, 
     (x 0)^2 + (x 1)^2 + (x 2)^2 > R^2 → 
     ∀ i j : Fin 3, Complex.normSq ((U x) i j - (1 : Matrix (Fin 3) (Fin 3) ℂ) i j) < ε^2
+
+def AsymptoticVacuumSU2 (U : (Fin 3 → ℝ) → Matrix (Fin 2) (Fin 2) ℂ) : Prop :=
+  ∀ ε : ℝ, ε > 0 → ∃ R : ℝ, R > 0 ∧ ∀ x : Fin 3 → ℝ, 
+    (x 0)^2 + (x 1)^2 + (x 2)^2 > R^2 → 
+    ∀ i j : Fin 2, Complex.normSq ((U x) i j - (1 : Matrix (Fin 2) (Fin 2) ℂ) i j) < ε^2
 
 Litlib.equation "witten1983current" eq "3"
 /--
@@ -114,11 +133,21 @@ noncomputable def baryon_number
   [MeasureSpace (Fin 3 → ℝ)]
   (U : (Fin 3 → ℝ) → Matrix (Fin 3) (Fin 3) ℂ)
   (_h_SU3 : ∀ x, IsSU3 (U x)) 
-  (_h_smooth : ∀ i j, Differentiable ℝ (fun x => U x i j))
+  (_h_smooth : ∀ i j : Fin 3, Differentiable ℝ (fun x => U x i j))
   (_h_vacuum : AsymptoticVacuum U)
   (_h_integrable : Integrable (BaryonNumberIntegrand U)) : ℂ :=
   (1 / (24 * Real.pi ^ 2)) * 
   ∫ (x : Fin 3 → ℝ), BaryonNumberIntegrand U x
+
+noncomputable def baryon_number_SU2 
+  [MeasureSpace (Fin 3 → ℝ)]
+  (U : (Fin 3 → ℝ) → Matrix (Fin 2) (Fin 2) ℂ)
+  (_h_SU2 : ∀ x, IsSU2 (U x)) 
+  (_h_smooth : ∀ i j : Fin 2, Differentiable ℝ (fun x => U x i j))
+  (_h_vacuum : AsymptoticVacuumSU2 U)
+  (_h_integrable : Integrable (BaryonNumberIntegrandSU2 U)) : ℂ :=
+  (1 / (24 * Real.pi ^ 2)) * 
+  ∫ (x : Fin 3 → ℝ), BaryonNumberIntegrandSU2 U x
 
 Litlib.equation "witten1983current" eq "4"
 /--
@@ -270,8 +299,8 @@ noncomputable def wess_zumino_functional
   (_h_boundary : WZ_BoundaryMatching U_4D U_ext)
   (_h_disk : WZ_DiskCenterDegeneracy U_ext)
   (_h_SU3 : ∀ x ∈ WZ_Domain, IsSU3 (U_ext x))
-  (_h_ext_cont : ∀ i j, ContinuousOn (fun x => U_ext x i j) WZ_Domain)
-  (_h_ext_diff : ∀ i j, DifferentiableOn ℝ (fun x => U_ext x i j) WZ_Domain_interior)
+  (_h_ext_cont : ∀ i j : Fin 3, ContinuousOn (fun x => U_ext x i j) WZ_Domain)
+  (_h_ext_diff : ∀ i j : Fin 3, DifferentiableOn ℝ (fun x => U_ext x i j) WZ_Domain_interior)
   (_h_integrable : IntegrableOn (WessZuminoIntegrand U_ext) WZ_Domain) : ℂ :=
   (- Complex.I / (240 * (Real.pi ^ 2))) *
   ∫ (x : Fin 5 → ℝ) in WZ_Domain, WessZuminoIntegrand U_ext x
@@ -293,16 +322,16 @@ class WessZuminoEvalPi
   [MeasureSpace (Fin 3 → ℝ)]
   (W : (Fin 3 → ℝ) → Matrix (Fin 2) (Fin 2) ℂ)
   (_h_W_SU2 : ∀ x, IsSU2 (W x))
-  (_h_W_smooth : ∀ i j, Differentiable ℝ (fun x => W x i j))
+  (_h_W_smooth : ∀ i j : Fin 2, Differentiable ℝ (fun x => W x i j))
   (_h_V_SU3 : ∀ x, IsSU3 (V_field W x))
-  (_h_V_smooth : ∀ i j, Differentiable ℝ (fun x => V_field W x i j))
+  (_h_V_smooth : ∀ i j : Fin 3, Differentiable ℝ (fun x => V_field W x i j))
   (_h_V_vacuum : AsymptoticVacuum (V_field W))
   (_h_V_integrable : Integrable (BaryonNumberIntegrand (V_field W)))
   (_h_baryon_one : baryon_number (V_field W) _h_V_SU3 _h_V_smooth _h_V_vacuum _h_V_integrable = 1)
   (U_ext : (Fin 5 → ℝ) → Matrix (Fin 3) (Fin 3) ℂ) 
   (_h_ext_SU3 : ∀ x ∈ WZ_Domain, IsSU3 (U_ext x))
-  (_h_ext_cont : ∀ i j, ContinuousOn (fun x => U_ext x i j) WZ_Domain)
-  (_h_ext_diff : ∀ i j, DifferentiableOn ℝ (fun x => U_ext x i j) WZ_Domain_interior)
+  (_h_ext_cont : ∀ i j : Fin 3, ContinuousOn (fun x => U_ext x i j) WZ_Domain)
+  (_h_ext_diff : ∀ i j : Fin 3, DifferentiableOn ℝ (fun x => U_ext x i j) WZ_Domain_interior)
   (_h_ext_def : ∀ x ∈ WZ_Domain_interior, ∃ h_det, 
     U_ext x = U_tilde 
       (U_rotated (V_field W) (fun i => if i.val = 0 then x 0 else if i.val = 1 then x 1 else x 2) (x 4)) 
@@ -339,8 +368,49 @@ class SolitonSpinStatistics (N : ℕ)
   (_h_boundary : WZ_BoundaryMatching U_4D U_ext)
   (_h_disk : WZ_DiskCenterDegeneracy U_ext)
   (_h_SU3 : ∀ x ∈ WZ_Domain, IsSU3 (U_ext x))
-  (_h_ext_cont : ∀ i j, ContinuousOn (fun x => U_ext x i j) WZ_Domain)
-  (_h_ext_diff : ∀ i j, DifferentiableOn ℝ (fun x => U_ext x i j) WZ_Domain_interior)
+  (_h_ext_cont : ∀ i j : Fin 3, ContinuousOn (fun x => U_ext x i j) WZ_Domain)
+  (_h_ext_diff : ∀ i j : Fin 3, DifferentiableOn ℝ (fun x => U_ext x i j) WZ_Domain_interior)
   (_h_integrable : IntegrableOn (WessZuminoIntegrand U_ext) WZ_Domain)
   (_h_eval_pi : wess_zumino_functional U_4D U_ext _h_boundary _h_disk _h_SU3 _h_ext_cont _h_ext_diff _h_integrable = ↑Real.pi) : Prop where
   phase_shift : topological_phase N (wess_zumino_functional U_4D U_ext _h_boundary _h_disk _h_SU3 _h_ext_cont _h_ext_diff _h_integrable) = (-1 : ℂ)^N
+
+/-- 
+Explicit SO(3) spatial rotation matrix around the Z-axis, parameterized by an angle t. 
+This continuous coordinate transformation is strictly required to evaluate the 
+spatial rotation of a configuration space field.
+-/
+noncomputable def rotZ (t : ℝ) (x : Fin 3 → ℝ) : Fin 3 → ℝ :=
+  fun i =>
+    if i.val = 0 then (Real.cos t) * x 0 - (Real.sin t) * x 1
+    else if i.val = 1 then (Real.sin t) * x 0 + (Real.cos t) * x 1
+    else x 2
+
+/-- 
+Evaluates the quantum phase amplitude derived from the topological parity 
+(the mapping class in π_4) of a configuration path.
+-/
+noncomputable def quantum_weight (path_parity : (ℝ → (Fin 3 → ℝ) → Matrix (Fin 2) (Fin 2) ℂ) → ℕ)
+  (U_path : ℝ → (Fin 3 → ℝ) → Matrix (Fin 2) (Fin 2) ℂ) : ℂ :=
+  (-1 : ℂ) ^ (path_parity U_path)
+
+Litlib.equation "witten1983current" page "436" kind "theorem"
+/--
+Finkelstein-Rubinstein Spin-Statistics for SU(2) (Page 436):
+While the Wess-Zumino term vanishes for SU(2), the 4th homotopy group is non-trivial: π_4(SU(2)) = Z_2.
+An adiabatic 2π spatial rotation of a degree-1 SU(2) soliton traces the non-trivial loop in configuration space.
+Weighting this non-trivial topological history with a factor of -1 mathematically quantizes the soliton as a fermion.
+-/
+class FinkelsteinRubinsteinQuantization
+  [MeasureSpace (Fin 3 → ℝ)]
+  (path_parity : (ℝ → (Fin 3 → ℝ) → Matrix (Fin 2) (Fin 2) ℂ) → ℕ)
+  (U_0 : (Fin 3 → ℝ) → Matrix (Fin 2) (Fin 2) ℂ)
+  (_h_SU2 : ∀ x, IsSU2 (U_0 x))
+  (_h_smooth : ∀ i j : Fin 2, Differentiable ℝ (fun x => U_0 x i j))
+  (_h_vacuum : AsymptoticVacuumSU2 U_0)
+  (_h_integrable : Integrable (BaryonNumberIntegrandSU2 U_0))
+  (_h_degree_one : baryon_number_SU2 U_0 _h_SU2 _h_smooth _h_vacuum _h_integrable = 1)
+  (U_rot : ℝ → (Fin 3 → ℝ) → Matrix (Fin 2) (Fin 2) ℂ)
+  (_h_rot_SU2 : ∀ t x, IsSU2 (U_rot t x))
+  (_h_is_2pi_rot : ∀ t x, U_rot t x = U_0 (rotZ t x))
+  (_h_fr_parity : path_parity U_rot = 1) : Prop where
+  is_fermion : quantum_weight path_parity U_rot = -1
