@@ -2,7 +2,7 @@
 
 # Litlib: A Lean4 Library of Scientific Literature
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[![DOI](https://zenodo.org/badge/1206534238.svg)](https://doi.org/10.5281/zenodo.21432195)
 
 **Litlib** is a strict, Lean4-based metadata and transcription framework for bridging the impossible formalization gap in modern mathematical physics.
 
