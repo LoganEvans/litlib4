@@ -132,7 +132,9 @@ def runCli (rootModule : Name) (args : List String) : IO UInt32 := do
   let mut sp ← Lean.searchPathRef.get
   
   let candidates := #[
+    System.FilePath.mk ".lake" / "build" / "lib" / "lean",
     System.FilePath.mk ".lake" / "build" / "lib",
+    System.FilePath.mk "build" / "lib" / "lean",
     System.FilePath.mk "build" / "lib"
   ]
   for c in candidates do
