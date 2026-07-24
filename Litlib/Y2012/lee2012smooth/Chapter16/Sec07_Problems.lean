@@ -3,6 +3,8 @@
 import Mathlib
 import Litlib.Core
 
+namespace Litlib.Y2012.lee2012smooth
+
 -- Explicit definition outside the class prevents the "Default Override" exploit.
 noncomputable def problem16_9_omega (n : ℕ) (x : Fin (n + 1) → ℝ) (v : Fin n → (Fin (n + 1) → ℝ)) : ℝ :=
   let norm_x := Real.sqrt (∑ i : Fin (n + 1), x i ^ 2)
@@ -27,3 +29,5 @@ class Problem_16_9
       let aug : Fin (n + 1) → Fin (n + 1) → ℝ := Fin.cons x v;
       Matrix.det (fun (r c : Fin (n + 1)) => aug c r) = 1 →
       problem16_9_omega n x v = 1
+
+end Litlib.Y2012.lee2012smooth

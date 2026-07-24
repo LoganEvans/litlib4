@@ -5,6 +5,8 @@ import Litlib.Core
 
 set_option linter.unusedVariables false
 
+namespace Litlib.Y2012.lee2012smooth
+
 -- Hardcoded definitions outside the class prevent default override exploits.
 noncomputable def example16_9_F (φ θ : ℝ) : Fin 3 → ℝ :=
   ![Real.sin φ * Real.cos θ, Real.sin φ * Real.sin θ, Real.cos φ]
@@ -30,3 +32,5 @@ class Example_16_9
   -- Integral formulation explicitly matching 4π
   integralVal :
     (∫ φ in (0)..(Real.pi), ∫ θ in (0)..(2 * Real.pi), Real.sin φ) = 4 * Real.pi
+
+end Litlib.Y2012.lee2012smooth

@@ -3,6 +3,8 @@
 import Mathlib
 import Litlib.Core
 
+namespace Litlib.Y2012.lee2012smooth
+
 Litlib.equation "lee2012smooth" eq "15.29" page "389" kind "proposition"
 class Proposition_15_29
   (n : ℕ)
@@ -48,3 +50,5 @@ class Proposition_15_32
   -- Lean 4's `Fin.cons` prepends N to the frame perfectly.
   inducedVol : ∀ (v : Fin n → (Fin (n + 1) → ℝ)),
     omega_g_tilde v = omega_g (Fin.cons N v)
+
+end Litlib.Y2012.lee2012smooth

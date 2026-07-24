@@ -2,6 +2,8 @@
 
 import Litlib.Core
 
+namespace Litlib.Y2012.lee2012smooth
+
 Litlib.paper "lee2012smooth"
   type "book"
   title "Introduction to Smooth Manifolds"
@@ -9,3 +11,5 @@ Litlib.paper "lee2012smooth"
   year "2012"
   publisher "Springer"
   edition "2"
+
+end Litlib.Y2012.lee2012smooth
