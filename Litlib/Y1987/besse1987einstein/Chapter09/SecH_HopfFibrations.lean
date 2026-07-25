@@ -3,6 +3,8 @@
 import Litlib.Core
 import Mathlib
 
+namespace Litlib.Y1987.besse1987einstein
+
 Litlib.equation "besse1987einstein" eq "9.81" page "257" kind "example"
 class Example_9_81 (m : ℕ) [Fact (m ≥ 1)]
   (M B : Type*) [TopologicalSpace M] [TopologicalSpace B]
@@ -25,3 +27,5 @@ class Example_9_81 (m : ℕ) [Fact (m ≥ 1)]
   canonicalVariationScalarCurvature : ∀ (t : ℝ), t > 0 →
     scalarCurvature (canonicalVariation g t) = 
       2 * (m : ℝ) * (t ^ (-(1 : ℝ) / (2 * (m : ℝ) + 1))) * (2 * (m : ℝ) + 2 - t)
+
+end Litlib.Y1987.besse1987einstein

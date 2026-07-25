@@ -124,4 +124,22 @@ class CartanMaurerTopology
     (hCont : Continuous H) :
     ∀ t1 t2 : ℝ, windingNumber (H t1) = windingNumber (H t2)
 
+Litlib.equation "nakahara2003geometry"
+  eq "10.127"
+  page "36"
+  kind "theorem"
+class InstantonTopologicalCharge
+    (Bulk4D GaugePotential CurvatureForm GaugeMap : Type _)
+    [MeasureTheory.MeasureSpace Bulk4D]
+    (curvature : GaugePotential → CurvatureForm)
+    (asymptoticBoundaryMap : GaugePotential → GaugeMap)
+    (isAsymptoticallyPureGauge : GaugePotential → GaugeMap → Prop)
+    (trF2 : CurvatureForm → Bulk4D → ℝ)
+    (integral4D : (Bulk4D → ℝ) → ℝ)
+    (windingNumber : GaugeMap → ℤ) where
+  topologicalCharge :
+    ∀ (A : GaugePotential), 
+      isAsymptoticallyPureGauge A (asymptoticBoundaryMap A) →
+      integral4D (trF2 (curvature A)) = - 8 * (Real.pi ^ 2) * (windingNumber (asymptoticBoundaryMap A) : ℝ)
+
 end Litlib.Y2003.nakahara2003geometry
