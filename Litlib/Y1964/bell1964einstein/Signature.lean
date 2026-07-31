@@ -27,6 +27,8 @@ open scoped MeasureTheory
   - Opaque Function Exploit: The integral expectation values are expanded completely
     using mathlib's `MeasureTheory.integral`.
   - Garbage-In Exploit: Integrability requirements are explicitly stated.
+  - The Ultimate Exploit (Bell's Theorem): We rigorously formalize the main conclusion 
+    as a non-existence theorem over arbitrary measurable spaces.
 -/
 
 Litlib.equation "bell1964einstein" eq "1" page "196" kind "equation"
@@ -74,5 +76,26 @@ class Eq15 (P : EuclideanSpace ℝ (Fin 3) → EuclideanSpace ℝ (Fin 3) → �
   bellInequality (a b c : EuclideanSpace ℝ (Fin 3))
     (ha : ‖a‖ = 1) (hb : ‖b‖ = 1) (hc : ‖c‖ = 1) :
     1 + P b c ≥ |P a b - P a c|
+
+Litlib.equation "bell1964einstein" eq "Conclusion" page "199" kind "theorem"
+class Theorem_Conclusion : Prop where
+  cannot_represent_exactly (Λ : Type*) [MeasurableSpace Λ] :
+    ¬ ∃ (μ : Measure Λ) (A B : EuclideanSpace ℝ (Fin 3) → Λ → ℝ),
+      (μ univ = 1) ∧
+      (∀ a lam, ‖a‖ = 1 → A a lam = 1 ∨ A a lam = -1) ∧
+      (∀ b lam, ‖b‖ = 1 → B b lam = 1 ∨ B b lam = -1) ∧
+      (∀ a b, ‖a‖ = 1 → ‖b‖ = 1 → Integrable (fun lam => A a lam * B b lam) μ) ∧
+      (∀ a b, ‖a‖ = 1 → ‖b‖ = 1 →
+        ∫ lam, A a lam * B b lam ∂μ = - ∑ i : Fin 3, a i * b i)
+
+  cannot_represent_arbitrarily_closely (Λ : Type*) [MeasurableSpace Λ] :
+    ¬ ∀ (ε : ℝ), ε > 0 →
+      ∃ (μ : Measure Λ) (A B : EuclideanSpace ℝ (Fin 3) → Λ → ℝ),
+        (μ univ = 1) ∧
+        (∀ a lam, ‖a‖ = 1 → A a lam = 1 ∨ A a lam = -1) ∧
+        (∀ b lam, ‖b‖ = 1 → B b lam = 1 ∨ B b lam = -1) ∧
+        (∀ a b, ‖a‖ = 1 → ‖b‖ = 1 → Integrable (fun lam => A a lam * B b lam) μ) ∧
+        (∀ a b, ‖a‖ = 1 → ‖b‖ = 1 →
+          |(∫ lam, A a lam * B b lam ∂μ) - (- ∑ i : Fin 3, a i * b i)| < ε)
 
 end Litlib.Y1964.bell1964einstein
