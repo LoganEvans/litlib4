@@ -78,7 +78,7 @@ class Eq15 (P : EuclideanSpace ℝ (Fin 3) → EuclideanSpace ℝ (Fin 3) → �
     1 + P b c ≥ |P a b - P a c|
 
 Litlib.equation "bell1964einstein" eq "Conclusion" page "199" kind "theorem"
-class Theorem_Conclusion : Prop where
+class BellsTheorem : Prop where
   cannot_represent_exactly (Λ : Type*) [MeasurableSpace Λ] :
     ¬ ∃ (μ : Measure Λ) (A B : EuclideanSpace ℝ (Fin 3) → Λ → ℝ),
       (μ univ = 1) ∧
