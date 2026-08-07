@@ -1,11 +1,11 @@
--- FILENAME: Litlib/Y2012/lee2012smooth/Chapter16/Sec02_IntegrationOfDifferentialForms.lean
+-- FILENAME: Litlib/Y2012/lee2013introduction/Chapter16/Sec02_IntegrationOfDifferentialForms.lean
 
 import Mathlib
 import Litlib.Core
 
 set_option linter.unusedVariables false
 
-namespace Litlib.Y2012.lee2012smooth
+namespace Litlib.Y2012.lee2013introduction
 
 -- Hardcoded definitions outside the class prevent default override exploits.
 noncomputable def example16_9_F (φ θ : ℝ) : Fin 3 → ℝ :=
@@ -22,15 +22,15 @@ noncomputable def example16_9_dF_dφ (φ θ : ℝ) : Fin 3 → ℝ :=
 noncomputable def example16_9_dF_dθ (φ θ : ℝ) : Fin 3 → ℝ :=
   ![-Real.sin φ * Real.sin θ, Real.sin φ * Real.cos θ, 0]
 
-Litlib.equation "lee2012smooth" eq "16.9" page "409" kind "example"
+Litlib.equation "lee2013introduction" eq "16.9" page "409" kind "example"
 class Example_16_9
   where
   -- F^* ω = sin(φ) dφ ^ dθ
   pullbackEval : ∀ φ θ,
     example16_9_omega (example16_9_F φ θ) (example16_9_dF_dφ φ θ) (example16_9_dF_dθ φ θ) = Real.sin φ
-    
+
   -- Integral formulation explicitly matching 4π
   integralVal :
     (∫ φ in (0)..(Real.pi), ∫ θ in (0)..(2 * Real.pi), Real.sin φ) = 4 * Real.pi
 
-end Litlib.Y2012.lee2012smooth
+end Litlib.Y2012.lee2013introduction

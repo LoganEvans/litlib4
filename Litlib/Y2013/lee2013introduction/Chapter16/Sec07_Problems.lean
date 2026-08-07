@@ -1,9 +1,9 @@
--- FILENAME: Litlib/Y2012/lee2012smooth/Chapter16/Sec07_Problems.lean
+-- FILENAME: Litlib/Y2012/lee2013introduction/Chapter16/Sec07_Problems.lean
 
 import Mathlib
 import Litlib.Core
 
-namespace Litlib.Y2012.lee2012smooth
+namespace Litlib.Y2012.lee2013introduction
 
 -- Explicit definition outside the class prevents the "Default Override" exploit.
 noncomputable def problem16_9_omega (n : ℕ) (x : Fin (n + 1) → ℝ) (v : Fin n → (Fin (n + 1) → ℝ)) : ℝ :=
@@ -14,7 +14,7 @@ noncomputable def problem16_9_omega (n : ℕ) (x : Fin (n + 1) → ℝ) (v : Fin
   (norm_x ^ (-(n + 1 : ℝ))) * 
   (∑ i : Fin (n + 1), (-1 : ℝ) ^ (i.val) * x i * wedgeOmitted i)
 
-Litlib.equation "lee2012smooth" eq "16.22" page "435" kind "problem"
+Litlib.equation "lee2013introduction" eq "16.22" page "435" kind "problem"
 class Problem_16_9
   (n : ℕ)
   where
@@ -30,4 +30,4 @@ class Problem_16_9
       Matrix.det (fun (r c : Fin (n + 1)) => aug c r) = 1 →
       problem16_9_omega n x v = 1
 
-end Litlib.Y2012.lee2012smooth
+end Litlib.Y2012.lee2013introduction

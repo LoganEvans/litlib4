@@ -1,11 +1,11 @@
--- FILENAME: Litlib/Y2012/lee2012smooth/Chapter15/Sec03_RiemannianVolumeForm.lean
+-- FILENAME: Litlib/Y2012/lee2013introduction/Chapter15/Sec03_RiemannianVolumeForm.lean
 
 import Mathlib
 import Litlib.Core
 
-namespace Litlib.Y2012.lee2012smooth
+namespace Litlib.Y2012.lee2013introduction
 
-Litlib.equation "lee2012smooth" eq "15.29" page "389" kind "proposition"
+Litlib.equation "lee2013introduction" eq "15.29" page "389" kind "proposition"
 class Proposition_15_29
   (n : ℕ)
   (M : Type*)
@@ -22,7 +22,7 @@ class Proposition_15_29
     (∀ i j, innerProd p (e i) (e j) = if i = j then 1 else 0) →
     omega_g p e = 1
 
-Litlib.equation "lee2012smooth" eq "15.31" page "389" kind "proposition"
+Litlib.equation "lee2013introduction" eq "15.31" page "389" kind "proposition"
 class Proposition_15_31
   (n : ℕ)
   (g : Matrix (Fin n) (Fin n) ℝ)
@@ -37,7 +37,7 @@ class Proposition_15_31
   omegaCoordExpr :
     omega_g_eval = Real.sqrt (g.det) * Matrix.det (fun (i j : Fin n) => v j i)
 
-Litlib.equation "lee2012smooth" eq "15.32" page "390" kind "proposition"
+Litlib.equation "lee2013introduction" eq "15.32" page "390" kind "proposition"
 class Proposition_15_32
   (n : ℕ)
   (omega_g : (Fin (n + 1) → (Fin (n + 1) → ℝ)) → ℝ)
@@ -51,4 +51,4 @@ class Proposition_15_32
   inducedVol : ∀ (v : Fin n → (Fin (n + 1) → ℝ)),
     omega_g_tilde v = omega_g (Fin.cons N v)
 
-end Litlib.Y2012.lee2012smooth
+end Litlib.Y2012.lee2013introduction
