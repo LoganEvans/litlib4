@@ -15,11 +15,23 @@ private def nameToFilePath : Name → System.FilePath
   | .str p s => nameToFilePath p / s
   | .num p _ => nameToFilePath p
 
+/-- Precomputes an O(1) locality lookup table for modules -/
+private def mkIsLocalModArray (env : Environment) (rootModule : Name) : Array Bool := Id.run do
+  let mut arr : Array Bool := #[]
+  let rootStr := rootModule.toString
+  for i in [0:env.header.moduleNames.size] do
+    let modStr := env.header.moduleNames[i]!.toString
+    if modStr.startsWith rootStr || modStr.startsWith "Litlib" then
+      arr := arr.push true
+    else
+      arr := arr.push false
+  return arr
+
 /-- Attempts to locate the .lean source file for a given module. -/
 private def findSourceFile (modName : Name) : IO (Option System.FilePath) := do
   let sp ← Lean.searchPathRef.get
   let relPath := (nameToFilePath modName).withExtension "lean"
-  
+
   if let some oleanPath ← Lean.SearchPath.findWithExt sp "olean" modName then
     let mut curr := oleanPath
     let mut depth := 0
@@ -45,7 +57,7 @@ private def findSourceFile (modName : Name) : IO (Option System.FilePath) := do
     ]
     for c in candidates do
       if ← c.pathExists then return some c
-      
+
   let candidates := #[
     relPath,
     System.FilePath.mk "src" / relPath,
@@ -64,14 +76,11 @@ private def findSourceFile (modName : Name) : IO (Option System.FilePath) := do
 
   return none
 
-/-- Extracts the exact text of the declaration from the source file. -/
-private def extractSourceCode (env : Environment) (n : Name) : CoreM (Option String) := do
+/-- Extracts the exact text of the declaration from the cached source lines. -/
+private def extractSourceCode (env : Environment) (n : Name) (linesOpt : Option (Array String)) : CoreM (Option String) := do
   let some ranges ← Lean.findDeclarationRanges? n | return none
-  let some modIdx := env.getModuleIdxFor? n | return none
-  let modName := env.header.moduleNames[modIdx.toNat]!
-  let some srcPath ← findSourceFile modName | return none
-  
-  let lines ← IO.FS.lines srcPath
+  let some lines := linesOpt | return none
+
   let startLine := ranges.range.pos.line - 1
   let endLine := ranges.range.endPos.line
   if startLine < lines.size then
@@ -90,7 +99,7 @@ private def stripProofToSignature (s : String) (isInst : Bool) : String := Id.ru
   let mut inString := false
   let mut inLineComment := false
   let mut blockCommentDepth := 0
-  
+
   let mut validAssigns : Array Nat := #[]
   let mut validWheres : Array Nat := #[]
 
@@ -160,7 +169,7 @@ private def stripProofToSignature (s : String) (isInst : Bool) : String := Id.ru
       let nextW := if j + 2 < chars.size then chars[j+2]! else ' '
       if nextW.isWhitespace || nextW == '\n' || j + 2 == chars.size then
         return String.ofList (chars.extract 0 idx).toList
-      
+
   if let some lastIdx := validAssigns.back? then
     return String.ofList (chars.extract 0 lastIdx).toList
 
@@ -179,7 +188,7 @@ def withPPOptions {α} (x : MetaM α) : MetaM α := do
     |>.insert `pp.rawOnError (Lean.DataValue.ofBool true)
   withOptions (fun _ => opts) x
 
-partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet) : CoreM NameSet := do
+partial def collectLocalDepsRec (q : List Name) (v : NameSet) (isLocalMod : Array Bool) : CoreM NameSet := do
   match q with
   | [] => return v
   | curr :: rest =>
@@ -196,35 +205,32 @@ partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet
       let mut newQ := rest
       let mut newV := v
       for c in consts.toList do
-        let isLocalMod := match env.getModuleIdxFor? c with
-          | some idx =>
-            let modName := env.header.moduleNames[idx.toNat]!
-            let mStr := modName.toString
-            mStr.startsWith "Litlib" || mStr.startsWith rootModule.toString
+        let isLocal := match env.getModuleIdxFor? c with
+          | some idx => isLocalMod[idx.toNat]!
           | none => false
-        
-        let isAuto := c.isInternal || 
-          (match c with 
-          | .str _ s => s == "mk" || s == "rec" || s == "casesOn" || s == "recOn" || s.startsWith "match_" || s.startsWith "proof_" || s.startsWith "eq_" 
+
+        let isAuto := c.isInternal ||
+          (match c with
+          | .str _ s => s == "mk" || s == "rec" || s == "casesOn" || s == "recOn" || s.startsWith "match_" || s.startsWith "proof_" || s.startsWith "eq_"
           | _ => false)
 
         let isProj := (← Lean.getProjectionFnInfo? c).isSome
 
-        if !newV.contains c && isLocalMod && !isAuto && !isProj && c != curr then
+        if !newV.contains c && isLocal && !isAuto && !isProj && c != curr then
           newV := newV.insert c
           newQ := c :: newQ
-      
-      collectLocalDepsRec rootModule newQ newV
-    else
-      collectLocalDepsRec rootModule rest v
 
-def ppDecl (env : Environment) (name : Name) : IO String := do
+      collectLocalDepsRec newQ newV isLocalMod
+    else
+      collectLocalDepsRec rest v isLocalMod
+
+def ppDecl (env : Environment) (name : Name) (linesOpt : Option (Array String)) : IO String := do
   let ctx : Core.Context := { fileName := "<litlib>", fileMap := default }
   let state : Core.State := { env := env }
   let (res, _) ← (MetaM.run' (withPPOptions do
     let isThm := match env.find? name with | some (ConstantInfo.thmInfo _) => true | _ => false
-    
-    if let some src ← extractSourceCode env name then
+
+    if let some src ← extractSourceCode env name linesOpt then
       let isInst := src.trimAscii.toString.startsWith "instance"
       if isThm || isInst then
         return (stripProofToSignature src isInst).trimAsciiEnd.toString
@@ -252,66 +258,60 @@ def ppDecl (env : Environment) (name : Name) : IO String := do
     else
       return s!"-- {name} <not found>"
   )).toIO ctx state
-  
+
   -- Prevent LaTeX fonts from crashing on Mathlib's mathcal nhds symbol
   return res.replace "𝓝" "nhds "
 
-def gatherRoots (rootModule : Name) (globalData : GlobalData) (ctx : CliContext) : CoreM NameSet := do
+def gatherRoots (isLocalMod : Array Bool) (globalData : GlobalData) (ctx : CliContext) : CoreM NameSet := do
   let env ← getEnv
   let mut roots : NameSet := {}
-  
-  let isLocal (declName : Name) : Bool :=
-    match env.getModuleIdxFor? declName with
-    | some idx =>
-      let modName := env.header.moduleNames[idx.toNat]!
-      modName.toString.startsWith rootModule.toString
-    | none => false
-  
+
+  let theoremAll := ctx.theoremGlobs.length == 1 && ctx.theoremGlobs.head! == "all"
+  let referenceAll := ctx.referenceGlobs.length == 1 && ctx.referenceGlobs.head! == "all"
+
   for paper in globalData.papers do
     for eq in paper.equations do
-      if isLocal eq.declName then
-        let modNameStr := match env.getModuleIdxFor? eq.declName with
-          | some idx => env.header.moduleNames[idx.toNat]!.toString
-          | none => ""
-        if matchesAnyGlob ctx.referenceGlobs eq.declName.toString || matchesAnyGlob ctx.referenceGlobs modNameStr then
-          roots := roots.insert eq.declName
-          for prf in eq.proofs do
-            if isLocal prf.declName then
-              roots := roots.insert prf.declName
+      if let some idx := env.getModuleIdxFor? eq.declName then
+        if isLocalMod[idx.toNat]! then
+          let modNameStr := env.header.moduleNames[idx.toNat]!.toString
+          if referenceAll || matchesAnyGlob ctx.referenceGlobs eq.declName.toString || matchesAnyGlob ctx.referenceGlobs modNameStr then
+            roots := roots.insert eq.declName
+            for prf in eq.proofs do
+              if let some pIdx := env.getModuleIdxFor? prf.declName then
+                if isLocalMod[pIdx.toNat]! then roots := roots.insert prf.declName
 
   for thm in globalData.theorems do
-    if isLocal thm.declName then
-      let modNameStr := match env.getModuleIdxFor? thm.declName with
-        | some idx => env.header.moduleNames[idx.toNat]!.toString
-        | none => ""
-      if matchesAnyGlob ctx.theoremGlobs thm.declName.toString || matchesAnyGlob ctx.theoremGlobs modNameStr then
-        roots := roots.insert thm.declName
+    if let some idx := env.getModuleIdxFor? thm.declName then
+      if isLocalMod[idx.toNat]! then
+        let modNameStr := env.header.moduleNames[idx.toNat]!.toString
+        if theoremAll || matchesAnyGlob ctx.theoremGlobs thm.declName.toString || matchesAnyGlob ctx.theoremGlobs modNameStr then
+          roots := roots.insert thm.declName
 
   if !ctx.litlibTheoremsOnly then
     for (declName, _) in env.constants.toList do
-      let isAuto := declName.isInternal || 
-        (match declName with 
-        | .str _ s => s == "mk" || s == "rec" || s == "casesOn" || s == "recOn" || s == "noConfusion" || s == "noConfusionType" || s == "injEq" || s.startsWith "match_" || s.startsWith "proof_" || s.startsWith "eq_" 
+      let isAuto := declName.isInternal ||
+        (match declName with
+        | .str _ s => s == "mk" || s == "rec" || s == "casesOn" || s == "recOn" || s == "noConfusion" || s == "noConfusionType" || s == "injEq" || s.startsWith "match_" || s.startsWith "proof_" || s.startsWith "eq_"
         | _ => false)
-      
+
       if !isAuto && !(← Lean.getProjectionFnInfo? declName).isSome then
-        if isLocal declName then
-          let modNameStr := match env.getModuleIdxFor? declName with
-            | some idx => env.header.moduleNames[idx.toNat]!.toString
-            | none => ""
-          let isMatch := matchesAnyGlob ctx.theoremGlobs declName.toString || 
-                         matchesAnyGlob ctx.referenceGlobs declName.toString ||
-                         matchesAnyGlob ctx.theoremGlobs modNameStr ||
-                         matchesAnyGlob ctx.referenceGlobs modNameStr
-          if isMatch then
-            roots := roots.insert declName
-          
+        if let some idx := env.getModuleIdxFor? declName then
+          if isLocalMod[idx.toNat]! then
+            let modNameStr := env.header.moduleNames[idx.toNat]!.toString
+            let isMatch := theoremAll || referenceAll ||
+                           matchesAnyGlob ctx.theoremGlobs declName.toString ||
+                           matchesAnyGlob ctx.referenceGlobs declName.toString ||
+                           matchesAnyGlob ctx.theoremGlobs modNameStr ||
+                           matchesAnyGlob ctx.referenceGlobs modNameStr
+            if isMatch then
+              roots := roots.insert declName
+
   return roots
 
 def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalData) (ctx : CliContext) : IO UInt32 := do
   let isLatex := ctx.latexDir.isSome
   let outStrRef ← IO.mkRef (if isLatex then "\\printleanrefs\n\\vspace{2em}\n\\begin{minted}{lean}\n" else "")
-  
+
   let appendLine (s : String) : IO Unit := do
     if isLatex then
       outStrRef.modify (fun out => out ++ s ++ "\n")
@@ -325,25 +325,26 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
 
   let ctxCore : Core.Context := { fileName := "<litlib>", fileMap := default }
   let state : Core.State := { env := env }
-  
-  let (roots, _) ← (gatherRoots rootModule globalData ctx).toIO ctxCore state
+
+  let isLocalMod := mkIsLocalModArray env rootModule
+  let (roots, _) ← (gatherRoots isLocalMod globalData ctx).toIO ctxCore state
 
   if roots.isEmpty then
     if !isLatex then appendLine "\n  [No items found matching the filter.]\n"
     return 0
 
-  let (allLocalConsts, _) ← (collectLocalDepsRec rootModule roots.toList roots).toIO ctxCore state
+  let (allLocalConsts, _) ← (collectLocalDepsRec roots.toList roots isLocalMod).toIO ctxCore state
 
   let mut byModule : NameMap (Array Name) := {}
   let printedDecls := allLocalConsts.toList
-  
+
   let mut nameMap : Array (String × Name) := #[]
   for n in printedDecls do
     let s := n.getString!
     let mut count := 0
     for x in printedDecls do if x.getString! == s then count := count + 1
     if count == 1 then nameMap := nameMap.push (s, n)
-    
+
     let f := n.toString
     if f != s then nameMap := nameMap.push (f, n)
 
@@ -365,8 +366,18 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
     appendLine s!"--------------------------------------------------------------------"
     let names := (byModule.find? modName).getD #[]
     let sortedNames := names.qsort fun a b => a.toString < b.toString
+
+    -- OPTIMIZATION 2: Hoist file reads
+    let srcPathOpt ← findSourceFile modName
+    let mut linesOpt : Option (Array String) := none
+    if let some p := srcPathOpt then
+      try
+        let lines ← IO.FS.lines p
+        linesOpt := some lines
+      catch _ => pure ()
+
     for n in sortedNames do
-      let codeStr ← ppDecl env n
+      let codeStr ← ppDecl env n linesOpt
       let formattedCode := injectLabelsAndLinks codeStr n nameMap isLatex
       appendLine formattedCode
       appendLine ""
@@ -380,15 +391,15 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
       generateLitlibSty dir
       generateLatexReadme dir
       IO.FS.writeFile (dir / "litlib-code-summary.tex") finalOutStr
-      
+
       let existingKeys ← scanForExistingBibKeys dir
       let bibStr ← generateBibtexString globalData existingKeys
       IO.FS.writeFile (dir / "litlib-references.bib") bibStr
-      
+
       IO.println s!"LaTeX artifacts generated in {dir}"
   else
     appendLine "====================================================================\n"
-    
+
   return 0
 
 end Litlib.Core.CLI

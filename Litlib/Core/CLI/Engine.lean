@@ -53,6 +53,7 @@ structure CliContext where
   referenceGlobs : List String := []
   litlibTheoremsOnly : Bool := false
   latexDir : Option String := none
+  explicitFilters : Bool := false
 
 def myDropRight (s : String) (n : Nat) : String :=
   let chars := s.toList
@@ -85,7 +86,9 @@ def globMatch (pat target : String) : Bool :=
     return ok
 
 def matchesAnyGlob (globs : List String) (target : String) : Bool :=
-  if globs.isEmpty then true else globs.any (fun pat => globMatch pat target)
+  if globs.isEmpty then false
+  else if globs.length == 1 && globs.head! == "all" then true
+  else globs.any (fun pat => globMatch pat target)
 
 def hasSorryInExpr (e : Expr) : Bool :=
   e.foldConsts false fun n b => b || n == ``sorryAx
@@ -102,72 +105,74 @@ def checkHasSorry (info : ConstantInfo) : Bool :=
 def extractAllTheorems (env : Environment) (ctx : CliContext) : CoreM GlobalData := do
   let mut finalPaperMap : NameMap PaperInfo := {}
   let mut eqMap : NameMap EquationInfo := {}
-  
-  -- 1. Discover Papers
-  for (declName, _) in env.constants.toList do
+
+  let mut potentialProofs : Array (Name × ConstantInfo × Name) := #[]
+  let mut rawTheorems : Array (Name × ConstantInfo × String) := #[]
+
+  -- OPTIMIZATION 1: Single pass over the massive env.constants array
+  for (declName, info) in env.constants.toList do
+    let mut handled := false
+
     if let some paperData := litlibPaperExt.find? env declName then
       let pId := Name.mkSimple paperData.id
       finalPaperMap := finalPaperMap.insert pId { paperId := pId, data := paperData, equations := #[] }
+      handled := true
 
-  -- 2. Discover Equations
-  for (declName, _) in env.constants.toList do
     if let some eqData := litlibEqExt.find? env declName then
       eqMap := eqMap.insert declName { declName := declName, data := eqData, proofs := #[] }
+      handled := true
 
-  -- 3. Discover Proofs for the Equations
-  for (declName, info) in env.constants.toList do
-    let targetName := info.type.getAppFn.constName?
-    if let some tn := targetName then
+    if let some desc := litlibTrackExt.find? env declName then
+      rawTheorems := rawTheorems.push (declName, info, desc)
+      handled := true
+
+    if !handled then
       let isAuto :=
         declName.isInternal ||
         (match declName with
         | .str _ s => s == "mk" || s == "rec" || s == "casesOn" || s == "recOn" || s == "noConfusion" || s == "noConfusionType" || s == "injEq"
         | _ => false)
-      if !isAuto && declName != tn then
-        if let some eInfo := eqMap.find? tn then
-          let hSorry := checkHasSorry info
-          let newEInfo := { eInfo with proofs := eInfo.proofs.push { declName := declName, hasSorry := hSorry } }
-          eqMap := eqMap.insert tn newEInfo
+      if !isAuto then
+        if let some tn := info.type.getAppFn.constName? then
+          if declName != tn then
+            potentialProofs := potentialProofs.push (declName, info, tn)
 
-  -- 4. Discover Standalone Theorems, Definitions, and their Equation Dependencies
-  let mut standaloneTheorems : Array StandaloneTheoremInfo := #[]
-  for (declName, info) in env.constants.toList do
-    if let some desc := litlibTrackExt.find? env declName then
-      let isDef := match info with | .thmInfo _ => false | _ => true
+  -- Cross-reference Proofs
+  for (declName, info, targetName) in potentialProofs do
+    if let some eInfo := eqMap.find? targetName then
       let hSorry := checkHasSorry info
-      
-      -- Extract all constants used in the theorem's type signature and proof body
-      let mut usedConsts : NameSet := {}
-      usedConsts := info.type.foldConsts usedConsts (fun c acc => acc.insert c)
-      if let some v := info.value? then
-        usedConsts := v.foldConsts usedConsts (fun c acc => acc.insert c)
-        
-      -- Map those constants to our known equations
-      let mut deps : Array TheoremDep := #[]
-      for c in usedConsts.toList do
-        if let some eInfo := eqMap.find? c then
-          let isProved := !eInfo.proofs.isEmpty && eInfo.proofs.any (fun p => !p.hasSorry)
-          let pIdName := Name.mkSimple eInfo.data.paperId
-          let pTitle := if let some pInfo := finalPaperMap.find? pIdName then pInfo.data.title else "Unknown Paper"
-          
-          if !(deps.any fun d => d.eqName == c) then
-            deps := deps.push {
-              eqName := c
-              paperId := eInfo.data.paperId
-              paperTitle := pTitle
-              eqNum := eInfo.data.eqNum
-              isProved := isProved
-            }
-            
-      standaloneTheorems := standaloneTheorems.push { 
-        declName := declName, 
-        desc := desc, 
-        hasSorry := hSorry, 
-        deps := deps,
-        isDef := isDef
-      }
+      let newEInfo := { eInfo with proofs := eInfo.proofs.push { declName := declName, hasSorry := hSorry } }
+      eqMap := eqMap.insert targetName newEInfo
 
-  -- 5. Nest Equations under Papers
+  -- Cross-reference Dependencies for tracked theorems
+  let mut standaloneTheorems : Array StandaloneTheoremInfo := #[]
+  for (declName, info, desc) in rawTheorems do
+    let isDef := match info with | .thmInfo _ => false | _ => true
+    let hSorry := checkHasSorry info
+
+    let mut usedConsts : NameSet := {}
+    usedConsts := info.type.foldConsts usedConsts (fun c acc => acc.insert c)
+    if let some v := info.value? then
+      usedConsts := v.foldConsts usedConsts (fun c acc => acc.insert c)
+
+    let mut deps : Array TheoremDep := #[]
+    for c in usedConsts.toList do
+      if let some eInfo := eqMap.find? c then
+        let isProved := !eInfo.proofs.isEmpty && eInfo.proofs.any (fun p => !p.hasSorry)
+        let pIdName := Name.mkSimple eInfo.data.paperId
+        let pTitle := if let some pInfo := finalPaperMap.find? pIdName then pInfo.data.title else "Unknown Paper"
+
+        if !(deps.any fun d => d.eqName == c) then
+          deps := deps.push {
+            eqName := c, paperId := eInfo.data.paperId, paperTitle := pTitle,
+            eqNum := eInfo.data.eqNum, isProved := isProved
+          }
+
+    standaloneTheorems := standaloneTheorems.push {
+      declName := declName, desc := desc, hasSorry := hSorry, deps := deps, isDef := isDef
+    }
+
+  -- Nest Equations under Papers
   for (_, eqInfo) in eqMap.toList do
     let pId := Name.mkSimple eqInfo.data.paperId
     if let some pInfo := finalPaperMap.find? pId then
@@ -182,27 +187,37 @@ def extractAllTheorems (env : Environment) (ctx : CliContext) : CoreM GlobalData
     if a.data.year != b.data.year then a.data.year < b.data.year
     else a.data.title < b.data.title
 
-  -- 6. Apply User Filters (Matching both Decl Name and Module Name)
+  -- OPTIMIZATION 4: Short-circuit string formatting if filter is "all"
+  let theoremAll := ctx.theoremGlobs.length == 1 && ctx.theoremGlobs.head! == "all"
+  let referenceAll := ctx.referenceGlobs.length == 1 && ctx.referenceGlobs.head! == "all"
+
   let mut filteredTheorems := #[]
   if ctx.targetTheorems then
     for thm in standaloneTheorems do
-      let modNameStr := match env.getModuleIdxFor? thm.declName with
-        | some idx => env.header.moduleNames[idx.toNat]!.toString
-        | none => ""
-      if matchesAnyGlob ctx.theoremGlobs thm.declName.toString || matchesAnyGlob ctx.theoremGlobs modNameStr then
+      if theoremAll then
         filteredTheorems := filteredTheorems.push thm
+      else
+        let modNameStr := match env.getModuleIdxFor? thm.declName with
+          | some idx => env.header.moduleNames[idx.toNat]!.toString
+          | none => ""
+        if matchesAnyGlob ctx.theoremGlobs thm.declName.toString || matchesAnyGlob ctx.theoremGlobs modNameStr then
+          filteredTheorems := filteredTheorems.push thm
 
   let mut filteredPapers := #[]
   if ctx.targetReferences then
     for p in finalPapers do
-      let paperMatches := matchesAnyGlob ctx.referenceGlobs p.paperId.toString
+      let paperMatches := referenceAll || matchesAnyGlob ctx.referenceGlobs p.paperId.toString
       let mut keptEqs := #[]
       for eq in p.equations do
-        let modNameStr := match env.getModuleIdxFor? eq.declName with
-          | some idx => env.header.moduleNames[idx.toNat]!.toString
-          | none => ""
-        if paperMatches || matchesAnyGlob ctx.referenceGlobs eq.declName.toString || matchesAnyGlob ctx.referenceGlobs modNameStr then
+        if paperMatches then
           keptEqs := keptEqs.push eq
+        else
+          let modNameStr := match env.getModuleIdxFor? eq.declName with
+            | some idx => env.header.moduleNames[idx.toNat]!.toString
+            | none => ""
+          if matchesAnyGlob ctx.referenceGlobs eq.declName.toString || matchesAnyGlob ctx.referenceGlobs modNameStr then
+            keptEqs := keptEqs.push eq
+
       if paperMatches || !keptEqs.isEmpty then
         filteredPapers := filteredPapers.push { p with equations := if paperMatches then p.equations else keptEqs }
 
