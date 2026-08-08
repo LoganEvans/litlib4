@@ -25,11 +25,11 @@ Litlib.equation "urbantke1984integrability"
   page "2321"
   kind "identity"
 class Eq2_and_6 where
-  /-- 
+  /--
   Kinematic Bivector Constraint: Equations (2) and (6) (page 2321).
-  Establishes the local algebraic condition for a simple bivector, constructed from 
+  Establishes the local algebraic condition for a simple bivector, constructed from
   two linearly independent vectors u and v, to annihilate the SU(2) Yang-Mills field strength.
-  The antisymmetry of the field strength F is explicitly enforced to mathematically guarantee 
+  The antisymmetry of the field strength F is explicitly enforced to mathematically guarantee
   the equivalence of the vanishing of the contraction.
   -/
   simpleBivectorAnnihilation
@@ -44,10 +44,10 @@ Litlib.equation "urbantke1984integrability"
   page "2321"
   kind "definition"
 class Eq4 where
-  /-- 
+  /--
   Hodge Dual Tensor Definition: Equation (4) (page 2321).
-  Defines the dual tensor in the complexified tangent space via contraction with the 
-  totally antisymmetric permutation symbol. Formulated as a strict equivalence to 
+  Defines the dual tensor in the complexified tangent space via contraction with the
+  totally antisymmetric permutation symbol. Formulated as a strict equivalence to
   guarantee uniqueness of the dual structure.
   -/
   dualTensor
@@ -64,9 +64,9 @@ Litlib.equation "urbantke1984integrability"
   page "2322"
   kind "definition"
 class Eq10 where
-  /-- 
+  /--
   Urbantke Quasimetric Definition: Equation (10) (page 2322).
-  Defines the conformal geometric tensor naturally induced by the SU(2) Yang-Mills 
+  Defines the conformal geometric tensor naturally induced by the SU(2) Yang-Mills
   field strengths, coupling the field to its dual via the gauge structure constants.
   This tensor serves as a background-independent quasimetric for the resulting geometry.
   -/
@@ -78,8 +78,8 @@ class Eq10 where
 
   quasimetricDef_iff : ∀ F F_dual epsilon3 g,
     quasimetricDef F F_dual epsilon3 g ↔
-    ∀ μ ν, g μ ν = (-1 / 6 : ℂ) * Finset.sum Finset.univ (fun a => Finset.sum Finset.univ (fun b => Finset.sum Finset.univ (fun c => 
-      Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β => 
+    ∀ μ ν, g μ ν = (-1 / 6 : ℂ) * Finset.sum Finset.univ (fun a => Finset.sum Finset.univ (fun b => Finset.sum Finset.univ (fun c =>
+      Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β =>
         epsilon3 a c b * F a μ α * F_dual c α β * F b β ν)))))
 
 Litlib.equation "urbantke1984integrability"
@@ -89,19 +89,19 @@ Litlib.equation "urbantke1984integrability"
 class Eq11 where
   /--
   Totally Null Subspace Condition: Equation (11) (page 2322).
-  Proves that if the symmetric quasimetric evaluated on an arbitrary vector 
-  spanning the 2-plane (u, v) vanishes, then the basis vectors u and v must be 
-  totally null with respect to the metric. 
+  Proves that if the symmetric quasimetric evaluated on an arbitrary vector
+  spanning the 2-plane (u, v) vanishes, then the basis vectors u and v must be
+  totally null with respect to the metric.
   -/
   totallyNull
     (g : Fin 4 → Fin 4 → ℂ) :
     ∀ (u v : Fin 4 → ℂ),
       (∀ μ ν, g μ ν = g ν μ) →
-      (∀ c1 c2 : ℂ, 
-        Finset.sum Finset.univ (fun μ => Finset.sum Finset.univ (fun ν => 
+      (∀ c1 c2 : ℂ,
+        Finset.sum Finset.univ (fun μ => Finset.sum Finset.univ (fun ν =>
           g μ ν * (c1 * u μ + c2 * v μ) * (c1 * u ν + c2 * v ν))) = 0) →
-      (Finset.sum Finset.univ (fun μ => Finset.sum Finset.univ (fun ν => g μ ν * u μ * u ν)) = 0) ∧ 
-      (Finset.sum Finset.univ (fun μ => Finset.sum Finset.univ (fun ν => g μ ν * v μ * v ν)) = 0) ∧ 
+      (Finset.sum Finset.univ (fun μ => Finset.sum Finset.univ (fun ν => g μ ν * u μ * u ν)) = 0) ∧
+      (Finset.sum Finset.univ (fun μ => Finset.sum Finset.univ (fun ν => g μ ν * v μ * v ν)) = 0) ∧
       (Finset.sum Finset.univ (fun μ => Finset.sum Finset.univ (fun ν => g μ ν * u μ * v ν)) = 0)
 
 Litlib.equation "urbantke1984integrability"
@@ -111,7 +111,7 @@ Litlib.equation "urbantke1984integrability"
 class Eq12 where
   /--
   Gauge Trace Matrix Definition: Equation (12) (page 2322).
-  Defines the 3x3 scalar matrix M^ab constructed from the contraction of the 
+  Defines the 3x3 scalar matrix M^ab constructed from the contraction of the
   field strength with its dual.
   -/
   mMatrixDef
@@ -130,10 +130,10 @@ Litlib.equation "urbantke1984integrability"
 class Case1_1 where
   /--
   Geometric Non-Degeneracy Constraint: Case 1.1 (page 2322).
-  The generic integrability classification establishes that the gauge-traced 3x3 matrix M^ab 
-  has full rank if and only if the induced Urbantke quasimetric g_μν is strictly non-degenerate 
-  (det g ≠ 0). This theorem formally requires the explicit antisymmetry of the field strength, 
-  the canonical orientation of the Hodge dual, and strict non-degeneracy bounds on the permutation 
+  The generic integrability classification establishes that the gauge-traced 3x3 matrix M^ab
+  has full rank if and only if the induced Urbantke quasimetric g_μν is strictly non-degenerate
+  (det g ≠ 0). This theorem formally requires the explicit antisymmetry of the field strength,
+  the canonical orientation of the Hodge dual, and strict non-degeneracy bounds on the permutation
   symbols to prevent topological collapse of the volume form.
   -/
   generic_rank_iff
@@ -148,8 +148,8 @@ class Case1_1 where
     (hepsilon3_nondeg : epsilon3 0 1 2 ≠ 0)
     (hepsilon4_nondeg : epsilon4 0 1 2 3 ≠ 0)
     (h_dual : ∀ a μ ν, F_dual a μ ν = (1 / 2 : ℂ) * Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β => epsilon4 μ ν α β * F a α β)))
-    (hG : ∀ μ ν, g μ ν = (-1 / 6 : ℂ) * Finset.sum Finset.univ (fun a => Finset.sum Finset.univ (fun b => Finset.sum Finset.univ (fun c => 
-      Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β => 
+    (hG : ∀ μ ν, g μ ν = (-1 / 6 : ℂ) * Finset.sum Finset.univ (fun a => Finset.sum Finset.univ (fun b => Finset.sum Finset.univ (fun c =>
+      Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β =>
         epsilon3 a c b * F a μ α * F_dual c α β * F b β ν))))))
     (hM : ∀ a b, M a b = Finset.sum Finset.univ (fun μ => Finset.sum Finset.univ (fun ν => F_dual a μ ν * F b μ ν))) :
     (Matrix.det M ≠ 0 ↔ Matrix.det (Matrix.of g) ≠ 0)
@@ -161,9 +161,9 @@ Litlib.equation "urbantke1984integrability"
 class Eq10_Symmetry where
   /--
   Urbantke Metric Symmetry Identity:
-  Demonstrates that the Urbantke quasimetric g_μν, when constructed from an 
+  Demonstrates that the Urbantke quasimetric g_μν, when constructed from an
   antisymmetric curvature tensor F and its dual, is inherently symmetric (g_μν = g_νμ).
-  This algebraic property is a foundational requirement for g_μν to act as a 
+  This algebraic property is a foundational requirement for g_μν to act as a
   valid pseudo-Riemannian conformal metric.
   -/
   symmetricQuasimetric
@@ -174,9 +174,35 @@ class Eq10_Symmetry where
     (hF_anti : ∀ a μ ν, F a μ ν = - F a ν μ)
     (hF_dual_anti : ∀ a μ ν, F_dual a μ ν = - F_dual a ν μ)
     (hepsilon3_anti : ∀ a b c, epsilon3 a b c = - epsilon3 b a c ∧ epsilon3 a b c = - epsilon3 a c b)
-    (hg_def : ∀ μ ν, g μ ν = (-1 / 6 : ℂ) * Finset.sum Finset.univ (fun a => Finset.sum Finset.univ (fun b => Finset.sum Finset.univ (fun c => 
-      Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β => 
+    (hg_def : ∀ μ ν, g μ ν = (-1 / 6 : ℂ) * Finset.sum Finset.univ (fun a => Finset.sum Finset.univ (fun b => Finset.sum Finset.univ (fun c =>
+      Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β =>
         epsilon3 a c b * F a μ α * F_dual c α β * F b β ν)))))) :
     ∀ μ ν, g μ ν = g ν μ
+
+Litlib.equation "urbantke1984integrability"
+  eq "unnumbered"
+  page "2322"
+  kind "theorem"
+class Theorem_F_AntiSelfDuality where
+  /--
+  Anti-Self-Duality of the Field Strength: Paragraph (3) after Eq (16) (page 2322).
+  States that the SU(2) Yang-Mills field strengths F^a_{μν} are anti-self-dual
+  with respect to the induced Urbantke quasimetric g. Formulated with explicit
+  index contractions to enforce rigid metric Hodge duality geometry.
+  -/
+  antiSelfDual
+    (F : Fin 3 → Fin 4 → Fin 4 → ℂ)
+    (g_inv : Fin 4 → Fin 4 → ℂ)
+    (sqrt_det_g : ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) : Prop
+
+  antiSelfDual_iff : ∀ F g_inv sqrt_det_g epsilon4,
+    antiSelfDual F g_inv sqrt_det_g epsilon4 ↔
+    ∀ a μ ν,
+      (1 / 2 : ℂ) * sqrt_det_g * Finset.sum Finset.univ (fun α =>
+        Finset.sum Finset.univ (fun β =>
+          Finset.sum Finset.univ (fun ρ =>
+            Finset.sum Finset.univ (fun σ =>
+              epsilon4 μ ν α β * g_inv α ρ * g_inv β σ * F a ρ σ)))) = - F a μ ν
 
 end Litlib.Y1984.urbantke1984integrability
