@@ -32,23 +32,23 @@ def scanForExistingBibKeys (dir : System.FilePath) : IO (Array String) := do
 def generateBibtexString (globalData : GlobalData) (existingKeys : Array String) : IO String := do
   let mut out := ""
   let mut generatedKeys : Array String := #[]
-  
+
   for paper in globalData.papers do
     let bib := if paper.data.bibtex.isEmpty then paper.paperId.toString else paper.data.bibtex
-    
+
     -- Check against user's manual .bib files
     if existingKeys.contains bib then
       IO.println s!"  [BibTeX] Suppressed '{bib}' (already defined in user .bib file)"
       continue
-      
+
     -- Deduplicate internally
     if generatedKeys.contains bib then
       continue
     generatedKeys := generatedKeys.push bib
-    
+
     let t := paper.data.entryType
     out := out ++ "@" ++ t ++ "{" ++ bib ++ "},\n"
-    
+
     if !paper.data.title.isEmpty then out := out ++ "  title = {" ++ paper.data.title ++ "},\n"
     if !paper.data.authors.isEmpty then out := out ++ "  author = {" ++ String.intercalate " and " paper.data.authors ++ "},\n"
     if !paper.data.journal.isEmpty then out := out ++ "  journal = {" ++ paper.data.journal ++ "},\n"
@@ -58,9 +58,9 @@ def generateBibtexString (globalData : GlobalData) (existingKeys : Array String)
     if !paper.data.year.isEmpty then out := out ++ "  year = {" ++ paper.data.year ++ "},\n"
     if !paper.data.publisher.isEmpty then out := out ++ "  publisher = {" ++ paper.data.publisher ++ "},\n"
     if !paper.data.doi.isEmpty then out := out ++ "  doi = {" ++ paper.data.doi ++ "},\n"
-    
+
     out := out ++ "}\n\n"
-      
+
   return out
 
 def runBibtex (globalData : GlobalData) : IO UInt32 := do

@@ -11,33 +11,33 @@ def escapeLatex (s : String) : String :=
 
 def injectLabelsAndLinks (code : String) (declName : Name) (nameMap : Array (String × Name)) (isLatex : Bool) : String := Id.run do
   if !isLatex then return code
-  
+
   let chars := code.toList.toArray
   let mut out := ""
   let mut i := 0
   let mut inString := false
   let mut inLineComment := false
   let mut blockCommentDepth := 0
-  
+
   let mut firstIdentReplaced := false
   let shortName := declName.getString!
-  
+
   let mut citeStr := ""
   let nameParts := declName.toString.splitOn "."
   if nameParts.length >= 3 && nameParts[0]! == "Litlib" && nameParts[1]!.startsWith "Y" then
     let bibKey := nameParts[2]!
     citeStr := "§\\textsuperscript{\\pdftooltip{\\cite{" ++ bibKey ++ "}}{Reference: " ++ bibKey ++ "}}§"
-  
+
   while i < chars.size do
     let c := chars[i]!
     let nextC := if i + 1 < chars.size then chars[i+1]! else ' '
-    
+
     if inLineComment then
       out := out.push c
       if c == '\n' then inLineComment := false
       i := i + 1
       continue
-      
+
     if blockCommentDepth > 0 then
       out := out.push c
       if c == '/' && nextC == '-' then
@@ -52,14 +52,14 @@ def injectLabelsAndLinks (code : String) (declName : Name) (nameMap : Array (Str
         continue
       i := i + 1
       continue
-      
+
     if inString then
       out := out.push c
       if c == '"' && (i == 0 || chars[i-1]! != '\\') then
         inString := false
       i := i + 1
       continue
-      
+
     if c == '"' then
       inString := true
       out := out.push c
@@ -77,7 +77,7 @@ def injectLabelsAndLinks (code : String) (declName : Name) (nameMap : Array (Str
       out := out.push nextC
       i := i + 2
       continue
-      
+
     if c.isAlpha || c == '_' then
       let mut identChars := ""
       while i < chars.size do
@@ -87,7 +87,7 @@ def injectLabelsAndLinks (code : String) (declName : Name) (nameMap : Array (Str
           i := i + 1
         else
           break
-      
+
       if !firstIdentReplaced && identChars == shortName then
         -- Close the escape around the label, let minted print the name normally, then inject the citeStr
         out := out ++ "§\\phantomsection\\label{lean:" ++ declName.toString ++ "}§" ++ declName.toString ++ citeStr
@@ -100,15 +100,15 @@ def injectLabelsAndLinks (code : String) (declName : Name) (nameMap : Array (Str
           out := out ++ "§\\hyperref[lean:" ++ linkedName.toString ++ "]{\\detokenize{" ++ identChars ++ "}}§"
       else
         out := out ++ identChars
-        
+
       continue
-      
+
     out := out.push c
     i := i + 1
-    
+
   if !firstIdentReplaced then
     return "§\\phantomsection\\label{lean:" ++ declName.toString ++ "}§" ++ out
-    
+
   return out
 
 def generateLitlibSty (dir : System.FilePath) : IO Unit := do
@@ -153,9 +153,9 @@ def generateLitlibSty (dir : System.FilePath) : IO Unit := do
                 \\string\\dotfill\\space Line \\string\\ref{lean:#1}\\string\\par\\string\\vspace{0.5em}%
             }%
         \\fi
-        \\ifmmode 
+        \\ifmmode
             {}^{\\textnormal{\\hyperref[lean:#1]{[L\\csname lean@ref@id@\\detokenize{#1}\\endcsname]}}}%
-        \\else 
+        \\else
             \\textsuperscript{\\hyperref[lean:#1]{\\pdftooltip{[L\\csname lean@ref@id@\\detokenize{#1}\\endcsname]}{\\detokenize{#1}}}}%
         \\fi
     \\fi
@@ -181,7 +181,7 @@ This directory contains automatically generated files to seamlessly integrate yo
 
 ## 1. Setup
 
-If you generated this inside your `paper/` directory, the files are already in place! 
+If you generated this inside your `paper/` directory, the files are already in place!
 
 In your LaTeX preamble, include the `litlib` package:
 ```latex
@@ -204,7 +204,7 @@ You do **not** need to manually copy and paste the generated citations into your
 \\bibliography{my-references,litlib-references}
 ```
 
-**Smart Deduplication:** 
+**Smart Deduplication:**
 `litlib4` automatically scans your target directory for any existing `.bib` files (e.g. your manual bibliography database). If it finds that you have already defined a specific BibTeX key manually, it will gracefully suppress that key from `litlib-references.bib` so that BibLaTeX/BibTeX will never complain about duplicate definitions!
 
 ## 3. The Code Summary Appendix

@@ -17,13 +17,6 @@ def sanitizePathToModule (val : String) : String :=
   let cleanVal := if cleanVal.endsWith ".lean" then (cleanVal.dropEnd 5).toString else cleanVal
   cleanVal.replace "/" "."
 
-def getFlagValue (arg : String) : String :=
-  let parts := arg.splitOn "="
-  if parts.length >= 2 then
-    String.intercalate "=" (parts.drop 1)
-  else
-    ""
-
 def parseArgs (args : List String) : CliContext := Id.run do
   let mut ctx : CliContext := {}
   for arg in args do
@@ -32,53 +25,54 @@ def parseArgs (args : List String) : CliContext := Id.run do
     else if arg == "--dashboard" then
       ctx := { ctx with action := "dashboard" }
     else if arg.startsWith "--dashboard=" then
-      let globs := (getFlagValue arg).splitOn "," |>.map (fun s => sanitizePathToModule s.trimAscii.toString)
-      ctx := { ctx with action := "dashboard", targetTheorems := true, theoremGlobs := globs, targetReferences := true, referenceGlobs := globs, explicitFilters := true }
-    else if arg.startsWith "--latex" then
-      let dir := if arg.startsWith "--latex=" then getFlagValue arg else "latex-artifacts"
+      let globs := (arg.drop 12).toString.splitOn "," |>.map (fun s => sanitizePathToModule s.trimAscii.toString)
+      ctx := { ctx with action := "dashboard", targetTheorems := true, theoremGlobs := ctx.theoremGlobs ++ globs, targetReferences := true, referenceGlobs := ctx.referenceGlobs ++ globs, explicitFilters := true }
+    else if arg.startsWith "--latex=" then
+      let dir := (arg.drop 8).toString
       ctx := { ctx with action := "code-summary", latexDir := some dir }
-    else if arg.startsWith "--code-summary" then
+    else if arg == "--latex" then
+      ctx := { ctx with action := "code-summary", latexDir := some "latex-artifacts" }
+    else if arg.startsWith "--code-summary=" then
       ctx := { ctx with action := "code-summary" }
-      let val := if arg.startsWith "--code-summary=" then getFlagValue arg else "all"
-      let cleanVal := sanitizePathToModule val
-
-      if cleanVal == "all" || cleanVal == "" then
-        ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"], explicitFilters := true }
-      else if cleanVal == "litlib_track" then
-        ctx := { ctx with litlibTheoremsOnly := true, targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"], explicitFilters := true }
-      else if cleanVal == "theorem" || cleanVal == "theorems" then
+      let val := sanitizePathToModule (arg.drop 15).toString
+      if val == "all" || val == "" then
+        ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
+      else if val == "litlib_track" then
+        ctx := { ctx with litlibTheoremsOnly := true, targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
+      else if val == "theorem" || val == "theorems" then
         ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := false, explicitFilters := true }
-      else if cleanVal == "reference" || cleanVal == "references" then
+      else if val == "reference" || val == "references" then
         ctx := { ctx with targetTheorems := false, targetReferences := true, referenceGlobs := ["all"], explicitFilters := true }
       else
-        let globs := val.splitOn "," |>.map (fun s => sanitizePathToModule s.trimAscii.toString)
-        ctx := { ctx with targetTheorems := true, theoremGlobs := globs, targetReferences := true, referenceGlobs := globs, explicitFilters := true }
+        let globs := val.splitOn "," |>.map (fun s => s.trimAscii.toString)
+        ctx := { ctx with targetTheorems := true, theoremGlobs := ctx.theoremGlobs ++ globs, targetReferences := true, referenceGlobs := ctx.referenceGlobs ++ globs, explicitFilters := true }
+    else if arg == "--code-summary" then
+      ctx := { ctx with action := "code-summary" }
     else if arg == "--bibtex" then
       ctx := { ctx with action := "bibtex" }
     else if arg.startsWith "--bibtex=" then
-      let globs := (getFlagValue arg).splitOn "," |>.map (fun s => sanitizePathToModule s.trimAscii.toString)
-      ctx := { ctx with action := "bibtex", targetReferences := true, referenceGlobs := globs, explicitFilters := true }
+      let globs := (arg.drop 9).toString.splitOn "," |>.map (fun s => sanitizePathToModule s.trimAscii.toString)
+      ctx := { ctx with action := "bibtex", targetReferences := true, referenceGlobs := ctx.referenceGlobs ++ globs, explicitFilters := true }
     else if arg.startsWith "--theorem=" then
-      let globs := (getFlagValue arg).splitOn "," |>.map (fun s => sanitizePathToModule s.trimAscii.toString)
+      let globs := (arg.drop 10).toString.splitOn "," |>.map (fun s => sanitizePathToModule s.trimAscii.toString)
       ctx := { ctx with targetTheorems := true, theoremGlobs := ctx.theoremGlobs ++ globs, explicitFilters := true }
     else if arg == "--theorem" then
-      ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], explicitFilters := true }
+      ctx := { ctx with targetTheorems := true, theoremGlobs := ctx.theoremGlobs ++ ["all"], explicitFilters := true }
     else if arg.startsWith "--reference=" then
-      let globs := (getFlagValue arg).splitOn "," |>.map (fun s => sanitizePathToModule s.trimAscii.toString)
+      let globs := (arg.drop 12).toString.splitOn "," |>.map (fun s => sanitizePathToModule s.trimAscii.toString)
       ctx := { ctx with targetReferences := true, referenceGlobs := ctx.referenceGlobs ++ globs, explicitFilters := true }
     else if arg == "--reference" then
-      ctx := { ctx with targetReferences := true, referenceGlobs := ["all"], explicitFilters := true }
+      ctx := { ctx with targetReferences := true, referenceGlobs := ctx.referenceGlobs ++ ["all"], explicitFilters := true }
     else if arg == "--all" then
       ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"], explicitFilters := true }
 
-  if ctx.action == "code-summary" && !ctx.explicitFilters then
-    if ctx.latexDir.isSome then
-      -- Handled in runCli by searching for .leanrefs
-      pure ()
+  if ctx.action == "code-summary" && !ctx.targetTheorems && !ctx.targetReferences then
+    if ctx.latexDir.isSome || ctx.litlibTheoremsOnly then
+      ctx := { ctx with litlibTheoremsOnly := true, targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
     else
       ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
 
-  if !ctx.targetTheorems && !ctx.targetReferences && !ctx.explicitFilters then
+  if !ctx.targetTheorems && !ctx.targetReferences then
     if ctx.action == "bibtex" then
       ctx := { ctx with targetReferences := true, referenceGlobs := ["all"] }
     else if ctx.action == "dashboard" then
@@ -126,21 +120,25 @@ def discoverModules (rootModule : Name) : IO (Array Name) := do
 
   if allMods.isEmpty then return #[rootModule] else return allMods
 
-/-- Safely extracts bare names from both plain-text line endings and LaTeX-generated `.leanrefs` macros -/
-def parseLeanrefLine (line : String) : Option String :=
-  let trimmed := line.trimAscii.toString
-  if trimmed == "" then none
-  else if trimmed.startsWith "\\" then
-    let parts := trimmed.splitOn "\\hyperref[lean:"
-    if parts.length > 1 then
-      let afterRef := parts[1]!
-      let nameParts := afterRef.splitOn "]"
-      if nameParts.length > 0 then
-        some nameParts[0]!
-      else none
-    else none
-  else
-    some trimmed
+/-- Safely extracts lean identifiers from either raw text or LaTeX markup in a .leanrefs file -/
+def parseLeanRefs (path : System.FilePath) : IO (List String) := do
+  let mut refs : List String := []
+  if ← path.pathExists then
+    try
+      let lines ← IO.FS.lines path
+      for line in lines do
+        let cleanLine := if line.contains "\\detokenize{" then
+          let parts := line.splitOn "\\detokenize{"
+          if parts.length > 1 then
+            let subparts := parts[1]!.splitOn "}"
+            subparts[0]!
+          else line
+        else line
+        let trimmed := cleanLine.trimAscii.toString
+        if !trimmed.isEmpty && !trimmed.startsWith "\\" && !trimmed.startsWith "%" then
+          refs := refs ++ [trimmed]
+    catch _ => pure ()
+  return refs
 
 def runCli (rootModule : Name) (args : List String) : IO UInt32 := do
   let mut ctx := parseArgs args
@@ -148,24 +146,22 @@ def runCli (rootModule : Name) (args : List String) : IO UInt32 := do
   if ctx.action == "help" then
     return ← printHelp
 
-  if ctx.action == "code-summary" && ctx.latexDir.isSome && !ctx.explicitFilters then
-    let dir := System.FilePath.mk ctx.latexDir.get!
-    let mut foundRefs : Array String := #[]
+  -- Consult .leanrefs file ONLY if in LaTeX mode to gracefully filter cited theorems
+  if let some dirStr := ctx.latexDir then
+    let dir := System.FilePath.mk dirStr
     if ← dir.isDir then
       try
         for entry in ← dir.readDir do
           if entry.path.extension == some "leanrefs" then
-            let content ← IO.FS.readFile entry.path
-            let lines := content.splitOn "\n"
-            for line in lines do
-              if let some ref := parseLeanrefLine line then
-                if !foundRefs.contains ref then
-                  foundRefs := foundRefs.push ref
+            let refs ← parseLeanRefs entry.path
+            if !refs.isEmpty then
+              ctx := { ctx with
+                targetTheorems := true, theoremGlobs := refs,
+                targetReferences := true, referenceGlobs := refs,
+                litlibTheoremsOnly := false, explicitFilters := true
+              }
+            break
       catch _ => pure ()
-    if !foundRefs.isEmpty then
-      ctx := { ctx with targetTheorems := true, theoremGlobs := foundRefs.toList, targetReferences := true, referenceGlobs := foundRefs.toList, explicitFilters := true }
-    else
-      ctx := { ctx with litlibTheoremsOnly := true, targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"], explicitFilters := true }
 
   Lean.initSearchPath (← Lean.findSysroot)
   let mut sp ← Lean.searchPathRef.get
