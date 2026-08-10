@@ -353,6 +353,27 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
 
   let (roots, _) ← (gatherRoots rootModule globalData ctx).toIO ctxCore state
 
+  -- WARNING SYSTEM: Check for unmatched filters/designators
+  if ctx.explicitFilters then
+    let allGlobs := (ctx.theoremGlobs ++ ctx.referenceGlobs).filter (fun g => g != "all" && g != "")
+    let mut uniqueGlobs : List String := []
+    for g in allGlobs do if !uniqueGlobs.contains g then uniqueGlobs := uniqueGlobs ++ [g]
+
+    for glob in uniqueGlobs do
+      let mut matched := false
+      for n in roots.toList do
+        if globMatch glob n.toString then
+          matched := true
+          break
+        let modNameStr := match env.getModuleIdxFor? n with
+          | some idx => env.header.moduleNames[idx.toNat]!.toString
+          | none => rootModule.toString
+        if globMatch glob modNameStr then
+          matched := true
+          break
+      if !matched then
+        IO.println s!"[WARNING] The filter or .leanrefs designator '{glob}' did not match any tracked theorems."
+
   if roots.isEmpty then
     if !isLatex then appendLine "\n  [No items found matching the filter.]\n"
     return 0

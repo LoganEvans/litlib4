@@ -151,16 +151,19 @@ def runCli (rootModule : Name) (args : List String) : IO UInt32 := do
     let dir := System.FilePath.mk dirStr
     if ← dir.isDir then
       try
+        let mut aggregateRefs : List String := []
         for entry in ← dir.readDir do
           if entry.path.extension == some "leanrefs" then
             let refs ← parseLeanRefs entry.path
             if !refs.isEmpty then
-              ctx := { ctx with
-                targetTheorems := true, theoremGlobs := refs,
-                targetReferences := true, referenceGlobs := refs,
-                litlibTheoremsOnly := false, explicitFilters := true
-              }
-            break
+              aggregateRefs := aggregateRefs ++ refs
+
+        if !aggregateRefs.isEmpty then
+          ctx := { ctx with
+            targetTheorems := true, theoremGlobs := aggregateRefs,
+            targetReferences := true, referenceGlobs := aggregateRefs,
+            litlibTheoremsOnly := false, explicitFilters := true
+          }
       catch _ => pure ()
 
   Lean.initSearchPath (← Lean.findSysroot)
