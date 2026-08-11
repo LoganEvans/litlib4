@@ -185,10 +185,8 @@ Litlib.equation "urbantke1984integrability"
   kind "theorem"
 class Theorem_F_AntiSelfDuality where
   /--
-  Anti-Self-Duality of the Field Strength: Paragraph (3) after Eq (16) (page 2322).
-  States that the SU(2) Yang-Mills field strengths F^a_{μν} are anti-self-dual
-  with respect to the induced Urbantke quasimetric g. Formulated with explicit
-  index contractions to enforce rigid metric Hodge duality geometry.
+  Anti-Self-Duality of the Field Strength Definition.
+  Defines what it means for F^a_{μν} to be anti-self-dual with respect to g.
   -/
   antiSelfDual
     (F : Fin 3 → Fin 4 → Fin 4 → ℂ)
@@ -204,5 +202,29 @@ class Theorem_F_AntiSelfDuality where
           Finset.sum Finset.univ (fun ρ =>
             Finset.sum Finset.univ (fun σ =>
               epsilon4 μ ν α β * g_inv α ρ * g_inv β σ * F a ρ σ)))) = - F a μ ν
+
+  /--
+  The literature result: Constructing the quasimetric from F guarantees F is Anti-Self-Dual.
+  Explicit expansions for g_μν, g^μν, and F_dual are enforced to block degenerate implementations.
+  -/
+  urbantke_implies_asd
+    (F F_dual : Fin 3 → Fin 4 → Fin 4 → ℂ)
+    (epsilon3 : Fin 3 → Fin 3 → Fin 3 → ℂ)
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
+    (g g_inv : Fin 4 → Fin 4 → ℂ)
+    (sqrt_det_g : ℂ)
+    (hF_anti : ∀ a μ ν, F a μ ν = - F a ν μ)
+    (hF_dual : ∀ a μ ν, F_dual a μ ν = (1 / 2 : ℂ) *
+      Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β =>
+        epsilon4 μ ν α β * F a α β)))
+    (hg_def : ∀ μ ν, g μ ν = (-1 / 6 : ℂ) *
+      Finset.sum Finset.univ (fun a => Finset.sum Finset.univ (fun b =>
+        Finset.sum Finset.univ (fun c => Finset.sum Finset.univ (fun α =>
+          Finset.sum Finset.univ (fun β =>
+            epsilon3 a c b * F a μ α * F_dual c α β * F b β ν))))))
+    (hg_inv : ∀ μ ν, Finset.sum Finset.univ (fun α => g μ α * g_inv α ν) =
+      if μ = ν then 1 else 0)
+    (hsqrt : sqrt_det_g ^ 2 = Matrix.det (Matrix.of g)) :
+    antiSelfDual F g_inv sqrt_det_g epsilon4
 
 end Litlib.Y1984.urbantke1984integrability
