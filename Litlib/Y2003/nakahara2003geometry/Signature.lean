@@ -34,4 +34,5 @@ import Litlib.Y2003.nakahara2003geometry.Chapter10.Sec05_GaugeTheories
 import Litlib.Y2003.nakahara2003geometry.Chapter10.Sec06_BerryPhase
 
 -- Chapter 11
-import Litlib.Y2003.nakahara2003geometry.Chapter11.Sec01_Pontryagin
+import Litlib.Y2003.nakahara2003geometry.Chapter11.Sec01_InvariantPolynomials
+import Litlib.Y2003.nakahara2003geometry.Chapter11.Sec04_PontrjaginAndEulerClasses
