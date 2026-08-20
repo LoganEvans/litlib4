@@ -21,8 +21,8 @@ def runTest : CoreM Unit := do
   let roots ← gatherRoots `Tests data ctx
   let deps ← collectLocalDepsRec `Tests roots.toList roots
 
-  -- NEGATIVE CHECK: The crawler must block any dependency with .Math. in its name
-  if deps.contains ``CGK.Math.mock_plumbing then
-    throwError "FAIL: Crawler captured a plumbing definition from a Math namespace!"
+  -- POSITIVE CHECK: The crawler must capture math dependencies by default now.
+  if !deps.contains ``CGK.Math.mock_plumbing then
+    throwError "FAIL: Crawler failed to capture a math definition from a Math namespace!"
 
 #eval runTest

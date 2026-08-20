@@ -178,6 +178,95 @@ private def stripProofToSignature (s : String) (isInst : Bool) : String := Id.ru
 
   return s
 
+/-- Safely checks if a token exists as a distinct word in a string to avoid substring matches. -/
+private def containsToken (s : String) (tok : String) : Bool := Id.run do
+  let chars := s.toList.toArray
+  let tokLen := tok.length
+  if tokLen == 0 then return false
+  let mut i := 0
+  while i + tokLen <= chars.size do
+    let slice := String.ofList (chars.extract i (i + tokLen)).toList
+    if slice == tok then
+      let prevOk := if i == 0 then true else !chars[i-1]!.isAlphanum && chars[i-1]! != '_'
+      let nextIdx := i + tokLen
+      let nextOk := if nextIdx == chars.size then true else !chars[nextIdx]!.isAlphanum && chars[nextIdx]! != '_'
+      if prevOk && nextOk then return true
+    i := i + 1
+  return false
+
+/-- Parses the raw code to find which variables the user explicitly typed, then splices in missing ones from the AST -/
+private def injectMissingVariables (rawCode : String) (info : ConstantInfo) : MetaM String := do
+  let shortName := info.name.getString!
+  let chars := rawCode.toList.toArray
+
+  let mut level := 0
+  let mut inString := false
+  let mut inLineComment := false
+  let mut blockCommentDepth := 0
+  let mut lastColonLevelZero : Int := -1
+
+  let mut i := 0
+  while i < chars.size do
+    let c := chars[i]!
+    let nextC := if i + 1 < chars.size then chars[i+1]! else ' '
+
+    if inLineComment then
+      if c == '\n' then inLineComment := false
+      i := i + 1; continue
+    if blockCommentDepth > 0 then
+      if c == '/' && nextC == '-' then blockCommentDepth := blockCommentDepth + 1; i := i + 2; continue
+      if c == '-' && nextC == '/' then blockCommentDepth := blockCommentDepth - 1; i := i + 2; continue
+      i := i + 1; continue
+    if inString then
+      if c == '"' && (i == 0 || chars[i-1]! != '\\') then inString := false
+      i := i + 1; continue
+    if c == '"' then inString := true; i := i + 1; continue
+    if c == '-' && nextC == '-' then inLineComment := true; i := i + 2; continue
+    if c == '/' && nextC == '-' then blockCommentDepth := 1; i := i + 2; continue
+
+    if c == '(' || c == '[' || c == '{' || c == '⦃' || c == '⟨' then level := level + 1
+    else if c == ')' || c == ']' || c == '}' || c == '⦄' || c == '⟩' then level := level - 1
+
+    if level == 0 && c == ':' && nextC != '=' then
+      lastColonLevelZero := i
+
+    i := i + 1
+
+  let explicitBindersStr := if lastColonLevelZero > 0 then
+    String.ofList (chars.extract 0 lastColonLevelZero.toNat).toList
+  else rawCode
+
+  let (missingBinders, _) ← Meta.forallTelescope info.type fun xs _ => do
+    let mut missing : Array String := #[]
+    for x in xs do
+      let localDecl ← x.fvarId!.getDecl
+      let varName := localDecl.userName.toString
+
+      let isExplicit := containsToken explicitBindersStr varName
+      let isMacro := containsToken varName "✝"
+
+      if !isExplicit && !isMacro then
+        let typeStr ← ppExpr localDecl.type
+        let bInfo := localDecl.binderInfo
+        let (l, r) := if bInfo.isImplicit then ("{", "}")
+                      else if bInfo.isInstImplicit then ("[", "]")
+                      else ("(", ")")
+        missing := missing.push s!"{l}{varName} : {typeStr}{r}"
+    return (missing, ())
+
+  if missingBinders.isEmpty then
+    return rawCode
+  else
+    let declKeywords := ["def ", "theorem ", "class ", "structure ", "instance ", "lemma ", "abbrev ", "noncomputable def "]
+    let mut injected := rawCode
+    for kw in declKeywords do
+      let target := kw ++ shortName
+      if (rawCode.splitOn target).length > 1 then
+        let injectionStr := " " ++ String.intercalate " " missingBinders.toList
+        injected := rawCode.replace target (target ++ injectionStr)
+        break
+    return injected
+
 def withPPOptions {α} (x : MetaM α) : MetaM α := do
   let opts := (← getOptions)
     |>.insert `maxHeartbeats (Lean.DataValue.ofNat 5000000)
@@ -219,7 +308,7 @@ partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet
           | some _ => modStr.startsWith "Litlib" || modStr.startsWith rootModule.toString
           | none => true -- Test Compatibility
 
-        let isProj := (← Lean.getProjectionFnInfo? c).isSome
+        let projInfoOpt ← Lean.getProjectionFnInfo? c
 
         let isTracked := (litlibTrackExt.find? env c).isSome || (litlibEqExt.find? env c).isSome
         let isThm := match env.find? c with | some (.thmInfo _) => true | _ => false
@@ -235,14 +324,32 @@ partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet
             else false
           | none => false
 
-        let isMath := c.toString.contains ".Math." || modStr.contains ".Math."
+        -- THE SURGICAL RULE: Theorems and Instances MUST be explicitly tracked to be crawled.
+        let allowedByLitlib := if isThm || isInst then isTracked else true
 
-        -- THE SURGICAL RULE: Theorems, Instances, and Math plumbing MUST be explicitly tracked to be crawled.
-        let allowedByLitlib := if isThm || isInst || isMath then isTracked else true
+        if isLocalMod && !isAuto c && c != curr then
+          if let some projInfo := projInfoOpt then
+            let parent := projInfo.ctorName.getPrefix
+            if !newV.contains parent then
+              let parentModStr := match env.getModuleIdxFor? parent with
+                | some idx => env.header.moduleNames[idx.toNat]!.toString
+                | none => rootModule.toString
+              let parentIsLocal := match env.getModuleIdxFor? parent with
+                | some _ => parentModStr.startsWith "Litlib" || parentModStr.startsWith rootModule.toString
+                | none => true
 
-        if !newV.contains c && isLocalMod && !isAuto c && !isProj && allowedByLitlib && c != curr then
-          newV := newV.insert c
-          newQ := c :: newQ
+              if parentIsLocal then
+                newV := newV.insert parent
+                newQ := parent :: newQ
+
+            -- CRITICAL FIX: Projections must also be added to the queue to be printed!
+            if allowedByLitlib && !newV.contains c then
+              newV := newV.insert c
+              newQ := c :: newQ
+          else if allowedByLitlib then
+            if !newV.contains c then
+              newV := newV.insert c
+              newQ := c :: newQ
 
       collectLocalDepsRec rootModule newQ newV
     else
@@ -253,14 +360,19 @@ def ppDecl (env : Environment) (name : Name) : IO String := do
   let state : Core.State := { env := env }
   let (res, _) ← (MetaM.run' (withPPOptions do
     let isThm := match env.find? name with | some (ConstantInfo.thmInfo _) => true | _ => false
+    let infoOpt := env.find? name
 
     if let some src ← extractSourceCode env name then
       let isInst := src.trimAscii.toString.startsWith "instance"
+      let mut sig := src
       if isThm || isInst then
-        return (stripProofToSignature src isInst).trimAsciiEnd.toString
-      else
-        return src.trimAsciiEnd.toString
-    else if let some info := env.find? name then
+        sig := stripProofToSignature src isInst
+
+      if let some info := infoOpt then
+        sig ← injectMissingVariables sig info
+
+      return sig.trimAsciiEnd.toString
+    else if let some info := infoOpt then
       match info with
       | ConstantInfo.inductInfo i =>
         if isStructure env name then
@@ -407,8 +519,15 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
   sortedMods := sortedMods.qsort fun a b => a.toString < b.toString
 
   for modName in sortedMods do
-    appendLine s!"\n-- MODULE: {modName}"
+    let modPath := modName.toString.replace "." "/"
+    appendLine s!"\n-- SUMMARY: {modPath}.lean"
     appendLine s!"--------------------------------------------------------------------"
+
+    let parts := modName.toString.splitOn "."
+    let ns := if parts.length > 1 then String.intercalate "." (parts.take (parts.length - 1)) else modName.toString
+    if !ns.isEmpty then
+      appendLine s!"namespace {ns}\n"
+
     let names := (byModule.find? modName).getD #[]
     let sortedNames := names.qsort fun a b => a.toString < b.toString
     for n in sortedNames do
@@ -416,6 +535,9 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
       let formattedCode := injectLabelsAndLinks codeStr n nameMap isLatex
       appendLine formattedCode
       appendLine ""
+
+    if !ns.isEmpty then
+      appendLine s!"end {ns}"
 
   if isLatex then
     outStrRef.modify (fun out => out ++ "\\end{minted}\n")
