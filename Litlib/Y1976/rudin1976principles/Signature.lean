@@ -2,7 +2,6 @@
 
 import Litlib.Core
 import Litlib.Y1976.rudin1976principles.Chapter09.Sec02_Differentiation
-import Litlib.Y1976.rudin1976principles.Chapter09.Sec08_DerivativesOfHigherOrder
 import Litlib.Y1976.rudin1976principles.Chapter11.LebesgueIntegral
 
 namespace Litlib.Y1976.rudin1976principles
