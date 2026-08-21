@@ -1,5 +1,6 @@
 -- FILENAME: Litlib/Math/Dirac.lean
 
+import Litlib.Core
 import Litlib.Math.SU2
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Matrix.Block
@@ -18,27 +19,19 @@ namespace Litlib.Math.Dirac
 -- ==============================================================================
 
 /--
-Physical Interpretation:
 Transforms a direct sum of 2-spinors (left/right chiral components) into a unified 4-dimensional Dirac index.
-
-Mathematical Boundaries:
 A pure type bijection applicable only to 4D index spaces.
-
-Literature:
-Follows the chiral/Weyl basis representation conventions in quantum field theory.
 -/
 def chiralIsoTo (x : Fin 2 ⊕ Fin 2) : Fin 4 :=
   match x with | Sum.inl i => if i.val = 0 then 0 else 1 | Sum.inr i => if i.val = 0 then 2 else 3
 
 /--
-Physical Interpretation:
 Inverse map splitting a 4D index into its constituent left and right 2-spinor spaces.
 -/
 def chiralIsoInv (k : Fin 4) : Fin 2 ⊕ Fin 2 :=
   match k.val with | 0 => Sum.inl 0 | 1 => Sum.inl 1 | 2 => Sum.inr 0 | _ => Sum.inr 1
 
 /--
-Physical Interpretation:
 Full equivalence structure mapping chiral spinors to a Dirac vector index.
 -/
 def chiralIso : Fin 2 ⊕ Fin 2 ≃ Fin 4 where
@@ -48,7 +41,6 @@ def chiralIso : Fin 2 ⊕ Fin 2 ≃ Fin 4 where
   right_inv := by intro k; fin_cases k <;> rfl
 
 /--
-Physical Interpretation:
 Categorizes indices into light-like/chiral representations (left-handed) versus heavy ones (right-handed).
 -/
 def isLight (k : Fin 4) : Bool :=
@@ -57,21 +49,18 @@ def isLight (k : Fin 4) : Bool :=
   | Sum.inr _ => false
 
 /--
-Physical Interpretation:
 A matrix operator is "Even" if it preserves the chiral parity of the spinor it acts upon (e.g., maps left-to-left and right-to-right).
 -/
 def isEven (M : Matrix (Fin 4) (Fin 4) Complex) : Prop :=
   ∀ i j, isLight i ≠ isLight j → M i j = 0
 
 /--
-Physical Interpretation:
 A matrix operator is "Odd" if it flips the chiral parity of the spinor it acts upon (e.g., mapping left-to-right).
 -/
 def isOdd (M : Matrix (Fin 4) (Fin 4) Complex) : Prop :=
   ∀ i j, isLight i = isLight j → M i j = 0
 
 /--
-Physical Interpretation:
 Promotes a 3D index into its respective 2x2 Pauli matrix.
 -/
 noncomputable def sigmaToMatrix (i : Fin 3) : Matrix (Fin 2) (Fin 2) Complex :=
@@ -81,7 +70,6 @@ noncomputable def sigmaToMatrix (i : Fin 3) : Matrix (Fin 2) (Fin 2) Complex :=
   | 2 => s3
 
 /--
-Physical Interpretation:
 The temporal Dirac Gamma matrix $\gamma^0$ in the Weyl/Chiral basis. Flips parity.
 -/
 noncomputable def gamma0 : Matrix (Fin 4) (Fin 4) Complex :=
@@ -90,7 +78,6 @@ noncomputable def gamma0 : Matrix (Fin 4) (Fin 4) Complex :=
   Matrix.reindex chiralIso chiralIso m
 
 /--
-Physical Interpretation:
 The spatial Dirac Gamma matrices $\gamma^i$ in the Weyl/Chiral basis.
 -/
 noncomputable def gammaSpatial (i : Fin 3) : Matrix (Fin 4) (Fin 4) Complex :=
@@ -100,7 +87,6 @@ noncomputable def gammaSpatial (i : Fin 3) : Matrix (Fin 4) (Fin 4) Complex :=
   Matrix.reindex chiralIso chiralIso m
 
 /--
-Physical Interpretation:
 The covariant 4-vector of Gamma matrices $\gamma^\mu$.
 -/
 noncomputable def gammaVec (mu : Fin 4) : Matrix (Fin 4) (Fin 4) Complex :=
@@ -112,7 +98,6 @@ noncomputable def gammaVec (mu : Fin 4) : Matrix (Fin 4) (Fin 4) Complex :=
   | _ => 0
 
 /--
-Physical Interpretation:
 The Feynman slash operator $\not{A} = A_\mu \gamma^\mu$, representing the contraction of a 4-vector with the Clifford algebra.
 -/
 noncomputable def aSlash (A : Fin 4 → Complex) : Matrix (Fin 4) (Fin 4) Complex :=
@@ -123,7 +108,6 @@ noncomputable def aSlash (A : Fin 4 → Complex) : Matrix (Fin 4) (Fin 4) Comple
 -- ==============================================================================
 
 /--
-Physical Interpretation:
 Algebraic parity conservation. The product of an Odd chiral operator and an Even chiral operator is Odd.
 -/
 lemma odd_mul_even (A B : Matrix (Fin 4) (Fin 4) Complex) (hA : isOdd A) (hB : isEven B) : isOdd (A * B) := by
@@ -142,7 +126,6 @@ lemma odd_mul_even (A B : Matrix (Fin 4) (Fin 4) Complex) (hA : isOdd A) (hB : i
     rw [this, mul_zero]
 
 /--
-Physical Interpretation:
 Algebraic parity conservation. The product of an Even chiral operator and an Odd chiral operator is Odd.
 -/
 lemma even_mul_odd (A B : Matrix (Fin 4) (Fin 4) Complex) (hA : isEven A) (hB : isOdd B) : isOdd (A * B) := by
@@ -160,7 +143,6 @@ lemma even_mul_odd (A B : Matrix (Fin 4) (Fin 4) Complex) (hA : isEven A) (hB : 
     rw [this, zero_mul]
 
 /--
-Physical Interpretation:
 The temporal Gamma matrix flips chirality, acting as an Odd operator.
 -/
 lemma is_odd_gamma0 : isOdd gamma0 := by
@@ -180,7 +162,6 @@ lemma is_odd_gamma0 : isOdd gamma0 := by
   · rfl
 
 /--
-Physical Interpretation:
 The spatial Gamma matrices flip chirality, acting as Odd operators.
 -/
 lemma is_odd_gamma_spatial (idx : Fin 3) : isOdd (gammaSpatial idx) := by
@@ -200,16 +181,9 @@ lemma is_odd_gamma_spatial (idx : Fin 3) : isOdd (gammaSpatial idx) := by
   · rfl
 
 /--
-Physical Interpretation:
-Hestenes' Isomorphism theorem ensuring that all Dirac Gamma matrices natively possess odd parity under spatial/chiral inversion in the Weyl basis.
-
-Mathematical Boundaries:
-Proven explicitly for the given 4x4 matrix representation over Complex numbers.
-
-Literature:
-Hestenes, D. (1966). Space-Time Algebra.
+Algebraic parity classification. Evaluates that all Dirac Gamma matrices natively possess odd parity under chiral inversion in the Weyl basis.
 -/
-theorem hestenesIsomorphism (mu : Fin 4) :
+theorem gammaVec_isOdd (mu : Fin 4) :
   isOdd (gammaVec mu) := by
   fin_cases mu
   · change isOdd gamma0; exact is_odd_gamma0
@@ -238,16 +212,10 @@ lemma trace_gamma_vec (mu : Fin 4) : Matrix.trace (gammaVec mu) = 0 := by
         Matrix.reindex, Matrix.fromBlocks, chiralIso, chiralIsoInv]
 
 /--
-Physical Interpretation:
-Trace of any single contraction of Gamma matrices with a 4-vector field (Feynman slash) vanishes. This algebraically reflects the traceless nature of single leptons in the Standard Model.
-
-Mathematical Boundaries:
+Trace of any single contraction of Gamma matrices with a 4-vector field (Feynman slash) vanishes.
 Valid for all continuous 4-vector fields evaluated over the complex numbers.
-
-Literature:
-Standard identity in Dirac algebra (e.g., Peskin & Schroeder, An Introduction to Quantum Field Theory).
 -/
-theorem leptonUniversality (A : Fin 4 → Complex) :
+theorem trace_aSlash_eq_zero (A : Fin 4 → Complex) :
   Matrix.trace (aSlash A) = 0 := by
   dsimp [aSlash]
   rw [trace_add_lemma, trace_add_lemma, trace_add_lemma]
@@ -265,34 +233,26 @@ lemma eval_mul_4x4 (A B : Matrix (Fin 4) (Fin 4) Complex) (i j : Fin 4) :
   rw [Matrix.mul_apply, sum_fin_4]
 
 set_option linter.unusedSimpArgs false
+set_option maxHeartbeats 2000000
 
 /--
-Physical Interpretation:
-Calculates the commutator of spatial Gamma matrices $[\gamma^1, \gamma^2]$. The explicit factor of `4` 
-relating the commutator to the half-spin generator $(1/2)\gamma^1\gamma^2$ directly yields the $g=2$ 
-gyromagnetic ratio proportionality mathematically native to fundamental spin-1/2 Dirac particles.
-
-Mathematical Boundaries:
-Evaluated specifically for spatial indices 1 and 2 in the chiral basis. The non-zero property of constants like 2 is natively handled by Lean.
-
-Literature:
-Dirac, P. A. M. (1928). The Quantum Theory of the Electron.
+The Clifford relation for the Weyl-basis gamma matrices: {γᵃ, γᵇ} = 2ηᵃᵇ.
 -/
-theorem gFactorIsTwo :
-  gammaVec 1 * gammaVec 2 - gammaVec 2 * gammaVec 1 = 4 • ((1 / 2 : Complex) • (gammaVec 1 * gammaVec 2)) := by
-  
-  have h_anti : gammaVec 2 * gammaVec 1 = - (gammaVec 1 * gammaVec 2) := by
-    ext i j
-    fin_cases i <;> fin_cases j
-    all_goals {
-      simp [gammaVec, gammaSpatial, sigmaToMatrix, s1, s2,
-            Matrix.fromBlocks, Matrix.reindex, chiralIso, chiralIsoTo, chiralIsoInv,
-            Matrix.submatrix, Sum.elim, eval_mul_4x4]
-    }
-
-  rw [h_anti]
+@[litlib_track "Clifford Algebra relation for Gamma Matrices"]
+theorem gamma_clifford (eta : Fin 4 → Fin 4 → ℂ)
+    (h_eta : ∀ a b, eta a b = if a = 0 ∧ b = 0 then 1 else if a = b then -1 else 0)
+    (a b : Fin 4) :
+    gammaVec a * gammaVec b + gammaVec b * gammaVec a =
+    (2 * eta a b) • (1 : Matrix (Fin 4) (Fin 4) ℂ) := by
   ext i j
-  simp [Matrix.sub_apply, Matrix.smul_apply, Matrix.neg_apply]
-  ring
+  fin_cases a <;> fin_cases b <;> fin_cases i <;> fin_cases j
+  all_goals {
+    rw [h_eta]
+    simp [gammaVec, gammaSpatial, gamma0, sigmaToMatrix, s1, s2, s3,
+          Matrix.fromBlocks, Matrix.reindex, chiralIso, chiralIsoTo, chiralIsoInv,
+          Matrix.submatrix, Sum.elim, eval_mul_4x4, Matrix.one_apply,
+          Matrix.smul_apply, Matrix.add_apply]
+    try norm_num
+  }
 
 end Litlib.Math.Dirac
