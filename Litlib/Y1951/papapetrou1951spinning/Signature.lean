@@ -38,6 +38,7 @@ test particle, and it is covariantly conserved with respect to the background co
 -/
 class Eq2_12
     (M : Type*) [TopologicalSpace M]
+    (U : Set M)
     (F : Type*) [Field F] [CharZero F]
     (Metric : M → Matrix (Fin 4) (Fin 4) F)
     (invMetric : M → Matrix (Fin 4) (Fin 4) F)
@@ -49,11 +50,12 @@ class Eq2_12
     (du_up_ds : ℝ → (Fin 4 → F))
     (isSinglePole : (Fin 4 → Fin 4 → M → F) → (ℝ → M) → Prop)
     where
-  metric_nondegenerate : ∀ p, (Metric p).det ≠ 0
-  invMetric_prop : ∀ p, Metric p * invMetric p = 1
+  metric_nondegenerate : ∀ p ∈ U, (Metric p).det ≠ 0
+  invMetric_prop : ∀ p ∈ U, Metric p * invMetric p = 1
+  worldline_in_domain : ∀ s, worldline s ∈ U
   u_norm_nonzero : ∀ s, ∑ μ, ∑ ν, Metric (worldline s) μ ν * u_up s μ * u_up s ν ≠ 0
   single_pole_eom :
-    (∀ x b, ∑ a : Fin 4, ∑ c : Fin 4, invMetric x a c * (
+    (∀ x ∈ U, ∀ b, ∑ a : Fin 4, ∑ c : Fin 4, invMetric x a c * (
       partialDeriv c (fun p => T a b p) x -
       ∑ d : Fin 4, (Christoffel x d c a * T d b x + Christoffel x d c b * T a d x)
     ) = 0) →
@@ -72,6 +74,7 @@ strictly derived from the covariant conservation of the internal covariant stres
 -/
 class Eq5_3
     (M : Type*) [TopologicalSpace M]
+    (U : Set M)
     (F : Type*) [Field F] [CharZero F]
     (Metric : M → Matrix (Fin 4) (Fin 4) F)
     (invMetric : M → Matrix (Fin 4) (Fin 4) F)
@@ -85,13 +88,14 @@ class Eq5_3
     (CovDerivS_up : ℝ → Matrix (Fin 4) (Fin 4) F)
     (isPoleDipole : (Fin 4 → Fin 4 → M → F) → (ℝ → M) → Prop)
     where
-  metric_nondegenerate : ∀ p, (Metric p).det ≠ 0
-  invMetric_prop : ∀ p, Metric p * invMetric p = 1
+  metric_nondegenerate : ∀ p ∈ U, (Metric p).det ≠ 0
+  invMetric_prop : ∀ p ∈ U, Metric p * invMetric p = 1
+  worldline_in_domain : ∀ s, worldline s ∈ U
   u_norm_nonzero : ∀ s, ∑ μ, ∑ ν, Metric (worldline s) μ ν * u_up s μ * u_up s ν ≠ 0
   u_lowering : ∀ s ρ, u_down s ρ = ∑ σ, Metric (worldline s) ρ σ * u_up s σ
   S_antisymmetric : ∀ s α β, S_up s α β = - S_up s β α
   spin_eom :
-    (∀ x b, ∑ a : Fin 4, ∑ c : Fin 4, invMetric x a c * (
+    (∀ x ∈ U, ∀ b, ∑ a : Fin 4, ∑ c : Fin 4, invMetric x a c * (
       partialDeriv c (fun p => T a b p) x -
       ∑ d : Fin 4, (Christoffel x d c a * T d b x + Christoffel x d c b * T a d x)
     ) = 0) →
@@ -115,6 +119,7 @@ the conservation of the particle's internal covariant stress-energy tensor.
 -/
 class Eq5_7
     (M : Type*) [TopologicalSpace M]
+    (U : Set M)
     (F : Type*) [Field F] [CharZero F]
     (Metric : M → Matrix (Fin 4) (Fin 4) F)
     (invMetric : M → Matrix (Fin 4) (Fin 4) F)
@@ -132,14 +137,15 @@ class Eq5_7
     (CovDerivP_up : ℝ → (Fin 4 → F))
     (isPoleDipole : (Fin 4 → Fin 4 → M → F) → (ℝ → M) → Prop)
     where
-  metric_nondegenerate : ∀ p, (Metric p).det ≠ 0
-  invMetric_prop : ∀ p, Metric p * invMetric p = 1
+  metric_nondegenerate : ∀ p ∈ U, (Metric p).det ≠ 0
+  invMetric_prop : ∀ p ∈ U, Metric p * invMetric p = 1
+  worldline_in_domain : ∀ s, worldline s ∈ U
   u_norm_nonzero : ∀ s, ∑ μ, ∑ ν, Metric (worldline s) μ ν * u_up s μ * u_up s ν ≠ 0
   mass_nonzero : ∀ s, m s ≠ 0
   u_lowering : ∀ s ρ, u_down s ρ = ∑ σ, Metric (worldline s) ρ σ * u_up s σ
   P_def : ∀ s α, P_up s α = m s * u_up s α + ∑ β, u_down s β * CovDerivS_up s α β
   pole_dipole_eom :
-    (∀ x b, ∑ a : Fin 4, ∑ c : Fin 4, invMetric x a c * (
+    (∀ x ∈ U, ∀ b, ∑ a : Fin 4, ∑ c : Fin 4, invMetric x a c * (
       partialDeriv c (fun p => T a b p) x -
       ∑ d : Fin 4, (Christoffel x d c a * T d b x + Christoffel x d c b * T a d x)
     ) = 0) →

@@ -90,12 +90,11 @@ noncomputable def gammaSpatial (i : Fin 3) : Matrix (Fin 4) (Fin 4) Complex :=
 The covariant 4-vector of Gamma matrices $\gamma^\mu$.
 -/
 noncomputable def gammaVec (mu : Fin 4) : Matrix (Fin 4) (Fin 4) Complex :=
-  match mu.val with
+  match mu with
   | 0 => gamma0
   | 1 => gammaSpatial 0
   | 2 => gammaSpatial 1
   | 3 => gammaSpatial 2
-  | _ => 0
 
 /--
 The Feynman slash operator $\not{A} = A_\mu \gamma^\mu$, representing the contraction of a 4-vector with the Clifford algebra.
