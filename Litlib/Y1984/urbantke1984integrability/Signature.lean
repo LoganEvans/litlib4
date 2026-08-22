@@ -181,13 +181,14 @@ class Theorem_F_AntiSelfDuality where
   /--
   The literature result: Constructing the quasimetric from F guarantees F is Anti-Self-Dual.
   Explicit expansions for g_μν, g^μν, and F_dual are enforced to block degenerate implementations.
+  The theorem explicitly asserts the existence of a specific orientation branch (sqrt_det_g)
+  rather than universally quantifying over all roots, preventing the F ≡ 0 mathematical collapse.
   -/
   urbantke_implies_asd
     (F F_dual : Fin 3 → Fin 4 → Fin 4 → ℂ)
     (epsilon3 : Fin 3 → Fin 3 → Fin 3 → ℂ)
     (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
     (g g_inv : Fin 4 → Fin 4 → ℂ)
-    (sqrt_det_g : ℂ)
     (hF_anti : ∀ a μ ν, F a μ ν = - F a ν μ)
     (hF_dual : ∀ a μ ν, F_dual a μ ν = (1 / 2 : ℂ) *
       Finset.sum Finset.univ (fun α => Finset.sum Finset.univ (fun β =>
@@ -198,8 +199,8 @@ class Theorem_F_AntiSelfDuality where
           Finset.sum Finset.univ (fun β =>
             epsilon3 a c b * F a μ α * F_dual c α β * F b β ν))))))
     (hg_inv : ∀ μ ν, Finset.sum Finset.univ (fun α => g μ α * g_inv α ν) =
-      if μ = ν then 1 else 0)
-    (hsqrt : sqrt_det_g ^ 2 = Matrix.det (Matrix.of g)) :
-    antiSelfDual F g_inv sqrt_det_g epsilon4
+      if μ = ν then 1 else 0) :
+    ∃ sqrt_det_g : ℂ, sqrt_det_g ^ 2 = Matrix.det (Matrix.of g) ∧
+      antiSelfDual F g_inv sqrt_det_g epsilon4
 
 end Litlib.Y1984.urbantke1984integrability
