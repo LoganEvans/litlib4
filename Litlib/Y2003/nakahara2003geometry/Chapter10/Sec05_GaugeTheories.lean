@@ -71,14 +71,14 @@ Litlib.equation "nakahara2003geometry"
   eq "10.111"
   page "32"
   kind "equation"
-class InstantonCondition 
+class InstantonCondition
     (Index Point : Type _) [TopologicalSpace Point] [Nonempty Point] [Nonempty Index]
     (F : Index → Index → Point → ℝ)
     (hodgeStarF : Index → Index → Point → ℝ)
     (isInstanton : Point → Prop) where
-  is_instanton_iff : 
-    ∀ p, isInstanton p ↔ 
-      (∀ mu nu, F mu nu p = hodgeStarF mu nu p) ∨ 
+  is_instanton_iff :
+    ∀ p, isInstanton p ↔
+      (∀ mu nu, F mu nu p = hodgeStarF mu nu p) ∨
       (∀ mu nu, F mu nu p = - hodgeStarF mu nu p)
 
 Litlib.equation "nakahara2003geometry"
@@ -93,6 +93,15 @@ class PureGaugeAsymptotic
     (pureGauge : GroupElement → GaugePotential)
     (limit_at_inf : (Point → GaugePotential) → (Point → GaugePotential) → Prop) where
   asymptotic_condition : limit_at_inf A (fun x => pureGauge (g x))
+
+Litlib.equation "nakahara2003geometry"
+  eq "10.117a"
+  page "33"
+  kind "equation"
+class VacuumWindingNumber
+    (GroupMap : Type _) [One GroupMap]
+    (windingNumber : GroupMap → ℤ) where
+  vacuum_winding : windingNumber 1 = 0
 
 Litlib.equation "nakahara2003geometry"
   eq "10.120"
@@ -112,7 +121,7 @@ Litlib.equation "nakahara2003geometry"
   eq "10.128"
   page "36"
   kind "theorem"
-class CartanMaurerTopology 
+class CartanMaurerTopology
     (GroupMap : Type _) [TopologicalSpace GroupMap] [Nonempty GroupMap]
     (isSmooth : GroupMap → Prop)
     (windingNumber : GroupMap → ℤ)
@@ -138,7 +147,7 @@ class InstantonTopologicalCharge
     (integral4D : (Bulk4D → ℝ) → ℝ)
     (windingNumber : GaugeMap → ℤ) where
   topologicalCharge :
-    ∀ (A : GaugePotential), 
+    ∀ (A : GaugePotential),
       isAsymptoticallyPureGauge A (asymptoticBoundaryMap A) →
       integral4D (trF2 (curvature A)) = - 8 * (Real.pi ^ 2) * (windingNumber (asymptoticBoundaryMap A) : ℝ)
 
