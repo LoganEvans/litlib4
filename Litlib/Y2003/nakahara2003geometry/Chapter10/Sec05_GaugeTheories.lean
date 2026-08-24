@@ -1,10 +1,12 @@
 -- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter10/Sec05_GaugeTheories.lean
 
+
 import Litlib.Core
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Complex.Basic
 import Mathlib.Topology.Basic
 import Mathlib.MeasureTheory.Measure.MeasureSpace
+import Mathlib.MeasureTheory.Function.L1Space.Integrable
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 open BigOperators
@@ -149,6 +151,7 @@ class InstantonTopologicalCharge
   topologicalCharge :
     ∀ (A : GaugePotential),
       isAsymptoticallyPureGauge A (asymptoticBoundaryMap A) →
+      MeasureTheory.Integrable (trF2 (curvature A)) →
       integral4D (trF2 (curvature A)) = - 8 * (Real.pi ^ 2) * (windingNumber (asymptoticBoundaryMap A) : ℝ)
 
 end Litlib.Y2003.nakahara2003geometry
