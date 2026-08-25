@@ -43,8 +43,25 @@ class Eq3_98
   metric_10 : ∀ τ θ φ, g τ θ φ 1 0 = 0
   metric_12 : ∀ τ θ φ, g τ θ φ 1 2 = 0
   metric_21 : ∀ τ θ φ, g τ θ φ 2 1 = 0
-  
+
   -- Geometric Non-Degeneracy Constraint: The metric patch is non-degenerate inside the bounds 0 < θ < π
   metric_non_degenerate : ∀ τ θ φ, 0 < θ → θ < Real.pi → Matrix.det (g τ θ φ) ≠ 0
+
+Litlib.equation "bengtsson2017geometry"
+  eq "3.102"
+  page "80"
+  kind "definition"
+/--
+Physical Interpretation: The metric on the base 2-sphere of the Hopf fibration (space of Clifford parallels), equal to one-quarter of the standard round 2-sphere metric.
+Mathematical Boundaries: Expressed in polar coordinates (θ, φ) on the sphere S², where 0 < θ < π.
+-/
+class Eq3_102
+    (gS2 : ℝ → ℝ → Matrix (Fin 2) (Fin 2) ℝ) where
+  -- The coordinates in Fin 2 are 0=θ, 1=φ
+  metric_theta_theta : ∀ θ φ, gS2 θ φ 0 0 = 1 / 4
+  metric_phi_phi : ∀ θ φ, gS2 θ φ 1 1 = (Real.sin θ ^ 2) / 4
+  metric_theta_phi : ∀ θ φ, gS2 θ φ 0 1 = 0
+  metric_phi_theta : ∀ θ φ, gS2 θ φ 1 0 = 0
+  metric_non_degenerate : ∀ θ φ, 0 < θ → θ < Real.pi → Matrix.det (gS2 θ φ) ≠ 0
 
 end Litlib.Y2017.bengtsson2017geometry
