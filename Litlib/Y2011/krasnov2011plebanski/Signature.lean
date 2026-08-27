@@ -536,10 +536,6 @@ class RealityConditions
       (∀ (a : Fin 3) (i : Fin 4), i ≠ 0 →
         (pauliProject (h * F 0 i * h⁻¹) a).im = 0) ∧
       (∀ (a : Fin 3) (i j : Fin 4), i ≠ 0 → j ≠ 0 →
-        (pauliProject (h * F i j * h⁻¹) a).re = 0) ∧
-      (∀ (a : Fin 3) (i j : Fin 4), i ≠ 0 → j ≠ 0 →
-        (pauliProject (h * F i j * h⁻¹) a).re = 0) ∧
-      (∀ (a : Fin 3) (i j : Fin 4), i ≠ 0 → j ≠ 0 →
         (pauliProject (h * F i j * h⁻¹) a).re = 0)
 
 end Litlib.Y2011.krasnov2011plebanski
