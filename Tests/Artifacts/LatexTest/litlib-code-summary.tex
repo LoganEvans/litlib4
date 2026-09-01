@@ -1,0 +1,31 @@
+\printleanrefs
+\vspace{2em}
+\begin{minted}{lean}
+
+-- SUMMARY: Tests/Fixtures/LiteratureMock.lean
+--------------------------------------------------------------------
+namespace Tests.Fixtures
+
+class §\phantomsection\label{lean:Tests.Fixtures.LiteratureMock.Eq3_1_EmergentMetric}§Tests.Fixtures.LiteratureMock.Eq3_1_EmergentMetric (dim : Nat) (g : Fin dim → Fin dim → Nat) where
+  metric_symm : ∀ i j, g i j = g j i
+
+class §\phantomsection\label{lean:Tests.Fixtures.LiteratureMock.Eq3_2_CurvatureContraction}§Tests.Fixtures.LiteratureMock.Eq3_2_CurvatureContraction (dim : Nat) (g : Fin dim → Fin dim → Nat) where
+  contract_pos : ∀ i, g i i ≥ 0
+
+/-- Standalone theorem consuming literature equations -/
+@[litlib_track "Emergent Spacetime Metric Soundness"]
+theorem §\phantomsection\label{lean:Tests.Fixtures.LiteratureMock.mockMetricSoundness}§Tests.Fixtures.LiteratureMock.mockMetricSoundness (dim : Nat) (g : Fin dim → Fin dim → Nat)
+    [hMetric : §\hyperref[lean:Tests.Fixtures.LiteratureMock.Eq3_1_EmergentMetric]{\detokenize{Eq3_1_EmergentMetric}}§ dim g]
+    [hCurv : §\hyperref[lean:Tests.Fixtures.LiteratureMock.Eq3_2_CurvatureContraction]{\detokenize{Eq3_2_CurvatureContraction}}§ dim g] :
+    ∀ i, g i i ≥ 0
+
+/-- Concrete proved instance of Equation 3.1 -/
+instance §\phantomsection\label{lean:Tests.Fixtures.LiteratureMock.provedEq3_1}§Tests.Fixtures.LiteratureMock.provedEq3_1 : §\hyperref[lean:Tests.Fixtures.LiteratureMock.Eq3_1_EmergentMetric]{\detokenize{Eq3_1_EmergentMetric}}§ 2 (fun _ _ => 1) where
+  metric_symm _ _
+
+/-- Concrete proved instance of Equation 3.2 -/
+instance §\phantomsection\label{lean:Tests.Fixtures.LiteratureMock.provedEq3_2}§Tests.Fixtures.LiteratureMock.provedEq3_2 : §\hyperref[lean:Tests.Fixtures.LiteratureMock.Eq3_2_CurvatureContraction]{\detokenize{Eq3_2_CurvatureContraction}}§ 2 (fun _ _ => 1) where
+  contract_pos _
+
+end Tests.Fixtures
+\end{minted}

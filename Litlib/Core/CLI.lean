@@ -96,7 +96,12 @@ partial def findOleans (dir : System.FilePath) (pref : Name) : IO (Array Name) :
       else if entry.path.extension == some "olean" then
         if let some stem := entry.path.fileStem then
           let modName := if pref == Name.anonymous then Name.mkSimple stem else pref ++ Name.mkSimple stem
-          arr := arr.push modName
+          let relPath := (nameToFilePath modName).withExtension "lean"
+          let isPkg := dir.toString.contains ".lake/packages"
+          let srcExists := (← relPath.pathExists) || (← (System.FilePath.mk "src" / relPath).pathExists) ||
+                           (← (System.FilePath.mk "Tests" / relPath).pathExists) || isPkg
+          if srcExists then
+            arr := arr.push modName
   catch _ => pure ()
   return arr
 
@@ -107,12 +112,13 @@ def discoverModules (rootModule : Name) : IO (Array Name) := do
   let targetRoots := if rootModule == `Litlib then #[`Litlib] else #[`Litlib, rootModule]
 
   for targetRoot in targetRoots do
+    let rootPath := nameToFilePath targetRoot
     for p in sp do
-      let rootOlean := p / s!"{targetRoot}.olean"
+      let rootOlean := (p / rootPath).withExtension "olean"
       if ← rootOlean.pathExists then
         if !allMods.contains targetRoot then allMods := allMods.push targetRoot
 
-      let rootDir := p / targetRoot.toString
+      let rootDir := p / rootPath
       if ← rootDir.isDir then
         let mods ← findOleans rootDir targetRoot
         for m in mods do
@@ -120,7 +126,6 @@ def discoverModules (rootModule : Name) : IO (Array Name) := do
 
   if allMods.isEmpty then return #[rootModule] else return allMods
 
-/-- Safely extracts lean identifiers from either raw text or LaTeX markup in a .leanrefs file -/
 def parseLeanRefs (path : System.FilePath) : IO (List String) := do
   let mut refs : List String := []
   if ← path.pathExists then
@@ -146,7 +151,6 @@ def runCli (rootModule : Name) (args : List String) : IO UInt32 := do
   if ctx.action == "help" then
     return ← printHelp
 
-  -- Consult .leanrefs file ONLY if in LaTeX mode to gracefully filter cited theorems
   if let some dirStr := ctx.latexDir then
     let dir := System.FilePath.mk dirStr
     if ← dir.isDir then

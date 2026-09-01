@@ -15,6 +15,10 @@ private def nameToFilePath : Name → System.FilePath
   | .str p s => nameToFilePath p / s
   | .num p _ => nameToFilePath p
 
+/-- Substring check helper -/
+private def stringContains (s sub : String) : Bool :=
+  (s.splitOn sub).length > 1
+
 /-- Strictly pattern matches the tail of the Name to filter auto-generated junk -/
 def isAuto (n : Name) : Bool :=
   n.isInternal ||
@@ -94,6 +98,29 @@ private def extractSourceCode (env : Environment) (n : Name) : CoreM (Option Str
         code := s!"/--\n{doc.trimAscii.toString}\n-/\n" ++ code
     return some code
   return none
+
+/-- Strips tactical proofs (`:= by ...`) from field assignments in `def ... where` blocks -/
+private def stripWhereTacticProofs (s : String) : String := Id.run do
+  let lines := s.splitOn "\n"
+  let mut newLines : Array String := #[]
+  let mut inTacticField := false
+
+  for line in lines do
+    let trimmed := line.trimAscii.toString
+    if inTacticField then
+      if stringContains trimmed ":=" || !line.startsWith "    " then
+        inTacticField := false
+      else
+        continue
+
+    if stringContains trimmed ":= by" || (stringContains trimmed ":=" && trimmed.endsWith "by") then
+      let parts := line.splitOn ":="
+      newLines := newLines.push (parts[0]! ++ ":= by ...")
+      inTacticField := true
+    else
+      newLines := newLines.push line
+
+  String.intercalate "\n" newLines.toList
 
 /-- Safely strips the `:= ...` or `where ...` proof block from theorems and instances. -/
 private def stripProofToSignature (s : String) (isInst : Bool) : String := Id.run do
@@ -194,7 +221,12 @@ private def containsToken (s : String) (tok : String) : Bool := Id.run do
     i := i + 1
   return false
 
-/-- Parses the raw code to find which variables the user explicitly typed, then splices in missing ones from the AST -/
+/-- Determines if an identifier name is a compiler hygiene artifact -/
+private def isHygieneName (n : Name) : Bool :=
+  let s := n.toString
+  stringContains s "_@" || stringContains s "_hyg" || stringContains s "_internal" || stringContains s "✝" || n.isInternal
+
+/-- Parses raw code to determine missing explicit variables while filtering hygiene noise -/
 private def injectMissingVariables (rawCode : String) (info : ConstantInfo) : MetaM String := do
   let shortName := info.name.getString!
   let chars := rawCode.toList.toArray
@@ -236,22 +268,48 @@ private def injectMissingVariables (rawCode : String) (info : ConstantInfo) : Me
     String.ofList (chars.extract 0 lastColonLevelZero.toNat).toList
   else rawCode
 
+  -- Count actual definition lambda parameters to avoid peeling off return type arrows
+  let maxExplicitArgs : Option Nat := match info.value? with
+    | some v =>
+      let rec countLambdas (e : Expr) : Nat :=
+        match e with | .lam _ _ b _ => 1 + countLambdas b | _ => 0
+      some (countLambdas v)
+    | none => none
+
   let (missingBinders, _) ← Meta.forallTelescope info.type fun xs _ => do
     let mut missing : Array String := #[]
+    let mut argIdx := 0
     for x in xs do
       let localDecl ← x.fvarId!.getDecl
       let varName := localDecl.userName.toString
+      let isHygiene := isHygieneName localDecl.userName
 
-      let isExplicit := containsToken explicitBindersStr varName
-      let isMacro := containsToken varName "✝"
+      if let some maxArgs := maxExplicitArgs then
+        if argIdx >= maxArgs && !localDecl.binderInfo.isInstImplicit && !localDecl.binderInfo.isImplicit then
+          argIdx := argIdx + 1
+          continue
 
-      if !isExplicit && !isMacro then
-        let typeStr ← ppExpr localDecl.type
+      argIdx := argIdx + 1
+
+      let typeFmt ← ppExpr localDecl.type
+      let typeStr := s!"{typeFmt}"
+      let typeShortStr := (typeStr.splitOn ".").getLast!
+
+      let alreadyInSource :=
+        containsToken explicitBindersStr varName ||
+        containsToken explicitBindersStr typeStr ||
+        containsToken explicitBindersStr typeShortStr
+
+      if !alreadyInSource && !isHygiene then
         let bInfo := localDecl.binderInfo
         let (l, r) := if bInfo.isImplicit then ("{", "}")
                       else if bInfo.isInstImplicit then ("[", "]")
                       else ("(", ")")
         missing := missing.push s!"{l}{varName} : {typeStr}{r}"
+      else if !alreadyInSource && isHygiene && localDecl.binderInfo.isInstImplicit then
+        if !containsToken explicitBindersStr typeStr && !containsToken explicitBindersStr typeShortStr then
+          missing := missing.push s!"[{typeStr}]"
+
     return (missing, ())
 
   if missingBinders.isEmpty then
@@ -306,14 +364,13 @@ partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet
 
         let isLocalMod := match env.getModuleIdxFor? c with
           | some _ => modStr.startsWith "Litlib" || modStr.startsWith rootModule.toString
-          | none => true -- Test Compatibility
+          | none => true
 
         let projInfoOpt ← Lean.getProjectionFnInfo? c
 
         let isTracked := (litlibTrackExt.find? env c).isSome || (litlibEqExt.find? env c).isSome
         let isThm := match env.find? c with | some (.thmInfo _) => true | _ => false
 
-        -- Recursively strip Pi (∀) types to reliably detect parameterized instances
         let rec getRetType (e : Expr) : Expr :=
           match e with | .forallE _ _ b _ => getRetType b | _ => e
 
@@ -324,7 +381,6 @@ partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet
             else false
           | none => false
 
-        -- THE SURGICAL RULE: Theorems and Instances MUST be explicitly tracked to be crawled.
         let allowedByLitlib := if isThm || isInst then isTracked else true
 
         if isLocalMod && !isAuto c && c != curr then
@@ -341,11 +397,6 @@ partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet
               if parentIsLocal then
                 newV := newV.insert parent
                 newQ := parent :: newQ
-
-            -- CRITICAL FIX: Projections must also be added to the queue to be printed!
-            if allowedByLitlib && !newV.contains c then
-              newV := newV.insert c
-              newQ := c :: newQ
           else if allowedByLitlib then
             if !newV.contains c then
               newV := newV.insert c
@@ -367,6 +418,8 @@ def ppDecl (env : Environment) (name : Name) : IO String := do
       let mut sig := src
       if isThm || isInst then
         sig := stripProofToSignature src isInst
+      else if stringContains src " where" && stringContains src ":= by" then
+        sig := stripWhereTacticProofs src
 
       if let some info := infoOpt then
         sig ← injectMissingVariables sig info
@@ -395,7 +448,6 @@ def ppDecl (env : Environment) (name : Name) : IO String := do
       return s!"-- {name} <not found>"
   )).toIO ctx state
 
-  -- Prevent LaTeX fonts from crashing on Mathlib's mathcal nhds symbol
   return res.replace "𝓝" "nhds "
 
 def gatherRoots (rootModule : Name) (globalData : GlobalData) (ctx : CliContext) : CoreM NameSet := do
@@ -407,7 +459,7 @@ def gatherRoots (rootModule : Name) (globalData : GlobalData) (ctx : CliContext)
     | some idx =>
       let modName := env.header.moduleNames[idx.toNat]!
       modName.toString.startsWith rootModule.toString
-    | none => true -- Test Compatibility
+    | none => true
 
   for paper in globalData.papers do
     for eq in paper.equations do
@@ -465,7 +517,6 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
 
   let (roots, _) ← (gatherRoots rootModule globalData ctx).toIO ctxCore state
 
-  -- WARNING SYSTEM: Check for unmatched filters/designators
   if ctx.explicitFilters then
     let allGlobs := (ctx.theoremGlobs ++ ctx.referenceGlobs).filter (fun g => g != "all" && g != "")
     let mut uniqueGlobs : List String := []
