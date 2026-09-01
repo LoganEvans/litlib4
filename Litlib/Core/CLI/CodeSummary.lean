@@ -99,31 +99,40 @@ private def extractSourceCode (env : Environment) (n : Name) : CoreM (Option Str
     return some code
   return none
 
-/-- Strips tactical proofs (`:= by ...`) from field assignments in `def ... where` blocks -/
+/-- Calculates the leading whitespace indentation count of a line -/
+private def lineIndent (line : String) : Nat :=
+  let chars := line.toList
+  (chars.takeWhile (fun c => c == ' ')).length
+
+/-- Strips tactical proofs (`:= by ...`) from field assignments in `def ... where` blocks using indentation -/
 private def stripWhereTacticProofs (s : String) : String := Id.run do
   let lines := s.splitOn "\n"
   let mut newLines : Array String := #[]
-  let mut inTacticField := false
+  let mut inTacticIndent : Option Nat := none
 
   for line in lines do
     let trimmed := line.trimAscii.toString
-    if inTacticField then
-      if stringContains trimmed ":=" || !line.startsWith "    " then
-        inTacticField := false
-      else
+    let curIndent := lineIndent line
+
+    if let some baseIndent := inTacticIndent then
+      if trimmed.isEmpty then
         continue
+      if curIndent > baseIndent then
+        continue
+      else
+        inTacticIndent := none
 
     if stringContains trimmed ":= by" || (stringContains trimmed ":=" && trimmed.endsWith "by") then
       let parts := line.splitOn ":="
       newLines := newLines.push (parts[0]! ++ ":= by ...")
-      inTacticField := true
+      inTacticIndent := some curIndent
     else
       newLines := newLines.push line
 
   String.intercalate "\n" newLines.toList
 
-/-- Safely strips the `:= ...` or `where ...` proof block from theorems and instances. -/
-private def stripProofToSignature (s : String) (isInst : Bool) : String := Id.run do
+/-- Safely strips the `:= ...` or `where ...` proof block from theorems, instances, and tactic-mode definitions. -/
+private def stripProofToSignature (s : String) (isInst : Bool) (isThm : Bool) : String := Id.run do
   let chars := s.toList.toArray
   let mut level := 0
   let mut inString := false
@@ -192,6 +201,7 @@ private def stripProofToSignature (s : String) (isInst : Bool) : String := Id.ru
     if validWheres.size > 0 then
       return String.ofList (chars.extract 0 validWheres[0]!).toList
 
+  -- For theorems, find the actual proof assignment (prioritize `:= by`, or fall back to last assignment)
   for idx in validAssigns do
     let mut j := idx + 2
     while j < chars.size && chars[j]!.isWhitespace do j := j + 1
@@ -200,8 +210,9 @@ private def stripProofToSignature (s : String) (isInst : Bool) : String := Id.ru
       if nextW.isWhitespace || nextW == '\n' || j + 2 == chars.size then
         return String.ofList (chars.extract 0 idx).toList
 
-  if let some lastIdx := validAssigns.back? then
-    return String.ofList (chars.extract 0 lastIdx).toList
+  if isThm then
+    if let some lastIdx := validAssigns.back? then
+      return String.ofList (chars.extract 0 lastIdx).toList
 
   return s
 
@@ -268,7 +279,6 @@ private def injectMissingVariables (rawCode : String) (info : ConstantInfo) : Me
     String.ofList (chars.extract 0 lastColonLevelZero.toNat).toList
   else rawCode
 
-  -- Count actual definition lambda parameters to avoid peeling off return type arrows
   let maxExplicitArgs : Option Nat := match info.value? with
     | some v =>
       let rec countLambdas (e : Expr) : Nat :=
@@ -293,12 +303,15 @@ private def injectMissingVariables (rawCode : String) (info : ConstantInfo) : Me
 
       let typeFmt ← ppExpr localDecl.type
       let typeStr := s!"{typeFmt}"
-      let typeShortStr := (typeStr.splitOn ".").getLast!
+
+      let headConstStr := match localDecl.type.getAppFn.constName? with
+        | some cn => cn.getString!
+        | none => (typeStr.splitOn " ").head!
 
       let alreadyInSource :=
-        containsToken explicitBindersStr varName ||
+        containsToken rawCode varName ||
         containsToken explicitBindersStr typeStr ||
-        containsToken explicitBindersStr typeShortStr
+        containsToken explicitBindersStr headConstStr
 
       if !alreadyInSource && !isHygiene then
         let bInfo := localDecl.binderInfo
@@ -307,7 +320,7 @@ private def injectMissingVariables (rawCode : String) (info : ConstantInfo) : Me
                       else ("(", ")")
         missing := missing.push s!"{l}{varName} : {typeStr}{r}"
       else if !alreadyInSource && isHygiene && localDecl.binderInfo.isInstImplicit then
-        if !containsToken explicitBindersStr typeStr && !containsToken explicitBindersStr typeShortStr then
+        if !containsToken explicitBindersStr headConstStr then
           missing := missing.push s!"[{typeStr}]"
 
     return (missing, ())
@@ -406,6 +419,12 @@ partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet
     else
       collectLocalDepsRec rootModule rest v
 
+/-- Checks whether code outside of docstrings contains a top-level `where` block -/
+private def codeHasTopLevelWhere (s : String) : Bool := Id.run do
+  let parts := s.splitOn "-/"
+  let codeOnly := if parts.length > 1 then parts.getLast! else s
+  containsToken codeOnly "where"
+
 def ppDecl (env : Environment) (name : Name) : IO String := do
   let ctx : Core.Context := { fileName := "<litlib>", fileMap := default }
   let state : Core.State := { env := env }
@@ -416,10 +435,13 @@ def ppDecl (env : Environment) (name : Name) : IO String := do
     if let some src ← extractSourceCode env name then
       let isInst := src.trimAscii.toString.startsWith "instance"
       let mut sig := src
-      if isThm || isInst then
-        sig := stripProofToSignature src isInst
-      else if stringContains src " where" && stringContains src ":= by" then
+
+      if isThm then
+        sig := stripProofToSignature src isInst true
+      else if !isInst && codeHasTopLevelWhere src && stringContains src ":= by" then
         sig := stripWhereTacticProofs src
+      else
+        sig := stripProofToSignature src isInst false
 
       if let some info := infoOpt then
         sig ← injectMissingVariables sig info
@@ -439,16 +461,16 @@ def ppDecl (env : Environment) (name : Name) : IO String := do
         else
           return s!"inductive {name} :\n  {← ppExpr i.type}"
       | ConstantInfo.thmInfo t => return s!"theorem {name} :\n  {← ppExpr t.type}"
-      | ConstantInfo.defnInfo d => return s!"def {name} :\n  {← ppExpr d.type} :=\n  {← ppExpr d.value}"
+      | ConstantInfo.defnInfo d => return s!"def {name} :=\n  {← ppExpr d.value}"
       | ConstantInfo.axiomInfo a => return s!"axiom {name} :\n  {← ppExpr a.type}"
-      | ConstantInfo.opaqueInfo o => return s!"opaque {name} :\n  {← ppExpr o.type} :=\n  {← ppExpr o.value}"
+      | ConstantInfo.opaqueInfo o => return s!"opaque {name} :=\n  {← ppExpr o.value}"
       | ConstantInfo.ctorInfo c => return s!"constructor {name} :\n  {← ppExpr c.type}"
       | _ => return s!"declaration {name} :\n  {← ppExpr info.type}"
     else
       return s!"-- {name} <not found>"
   )).toIO ctx state
 
-  return res.replace "𝓝" "nhds "
+  return res.replace "𝓝" "nhds"
 
 def gatherRoots (rootModule : Name) (globalData : GlobalData) (ctx : CliContext) : CoreM NameSet := do
   let env ← getEnv
