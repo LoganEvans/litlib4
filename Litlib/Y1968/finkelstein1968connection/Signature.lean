@@ -1,9 +1,12 @@
 -- FILENAME: Litlib/Y1968/finkelstein1968connection/Signature.lean
 
+
 import Litlib.Core
 import Mathlib.Topology.Homotopy.Basic
 import Mathlib.Topology.ContinuousMap.Basic
 import Mathlib.Topology.UnitInterval
+
+open scoped BigOperators Topology
 
 /-!
 # Connection between Spin, Statistics, and Kinks (Finkelstein & Rubinstein, 1968)
@@ -17,6 +20,7 @@ Formalizes the topological foundation of spin-statistics for kinks in nonlinear 
 - Section V: Theorem V.1: Homotopy equivalence between exchange Xᵐ and 2π rotation Wᵉ (Xᵐ ~ Wᵉ),
   establishing that a kink sector admits half-odd extrinsic spin iff it admits odd statistics.
 - Section V.5: Even kink states have strictly integer spin.
+- FinkelsteinRubinsteinZ2: Mapping degree Q and 2π rotation loop parity p satisfy p ≡ Q (mod 2).
 -/
 
 namespace Litlib.Y1968.finkelstein1968connection
@@ -110,5 +114,20 @@ class Theorem_EvenKinkIntegerSpin {Φ : Type*} [TopologicalSpace Φ] {ϕ₀ : Φ
     (We_even : FieldLoop evenKinkField) : Prop where
   even_kinks_nullhomotopic_spin_loop :
     loopsHomotopic We_even (constantLoop evenKinkField)
+
+Litlib.equation "finkelstein1968connection" eq "Theorem_V.1" page "1771" kind "theorem"
+/-- Theorem V.1 & Section V.5 (Finkelstein & Rubinstein, 1968, pp. 1771-1775):
+A 2π spatial rotation on a configuration `u` of topological degree `windingNumber u = Q`
+induces a closed loop in configuration space whose ℤ₂ loop parity `pathParity` satisfies:
+  `pathParity (spatial2piRotation u) % 2 = (windingNumber u).natAbs % 2`.
+Soliton states with odd topological charge possess half-odd extrinsic spin (fermions),
+while solitons with even topological charge possess integer spin (bosons). -/
+class FinkelsteinRubinsteinZ2
+    (Config : Type*)
+    (windingNumber : Config → ℤ)
+    (spatial2piRotation : Config → (unitInterval → Config))
+    (pathParity : (unitInterval → Config) → ℕ) : Prop where
+  rotation_parity_eq_degree_mod_two :
+    ∀ (u : Config), pathParity (spatial2piRotation u) % 2 = (windingNumber u).natAbs % 2
 
 end Litlib.Y1968.finkelstein1968connection
