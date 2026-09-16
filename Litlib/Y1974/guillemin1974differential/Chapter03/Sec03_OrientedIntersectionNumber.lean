@@ -1,9 +1,13 @@
 -- FILENAME: Litlib/Y1974/guillemin1974differential/Chapter03/Sec03_OrientedIntersectionNumber.lean
 
+
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fintype.BigOperators
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Real.Basic
+import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Topology.Basic
 import Litlib.Core
 
 namespace Litlib.Y1974.guillemin1974differential
@@ -12,8 +16,9 @@ namespace Litlib.Y1974.guillemin1974differential
 # Chapter 3, Section 3: Oriented Intersection Number (pp. 107–119)
 
 Defines the oriented intersection number $I(f, Z)$, proves homotopy invariance, introduces
-the degree of a map, the Fundamental Theorem of Algebra, intersections of arbitrary maps
-$I(f, g)$, and the Euler characteristic $\chi(Y) = I(\Delta, \Delta)$.
+the degree of a map, the Fundamental Theorem of Algebra, Jordan-Brouwer point containment and
+winding numbers, intersections of arbitrary maps $I(f, g)$, and the Euler characteristic
+$\chi(Y) = I(\Delta, \Delta)$.
 -/
 
 Litlib.equation "guillemin1974differential"
@@ -104,6 +109,24 @@ class Proposition_PolynomialZerosDegree
     (totalZerosWithMultiplicity : ℕ)
     (degreeNormalized : ℤ) where
   zeros_equal_degree : (totalZerosWithMultiplicity : ℤ) = degreeNormalized
+
+Litlib.equation "guillemin1974differential"
+  eq "Theorem_JordanBrouwerWinding" page "110" kind "theorem"
+/-- Winding Numbers and Jordan-Brouwer Point Containment (Chapter 3, §3, p. 110 & §6, p. 144):
+For an open bounded domain $D \subset \mathbb{R}^n$ with smooth boundary $\partial D$, the radial
+direction map $u_z(x) = (x - z) / \|x - z\|$ from $\partial D$ to $S^{n-1}$ has topological
+degree $1$ if $z \in D$ (interior) and $0$ if $z \notin \overline{D}$ (exterior). -/
+class Theorem_JordanBrouwerWinding
+    (n : ℕ) [NeZero n]
+    (D : Set (EuclideanSpace ℝ (Fin n)))
+    (bdryD : Set (EuclideanSpace ℝ (Fin n)))
+    (radialMap :
+      EuclideanSpace ℝ (Fin n) → bdryD → Metric.sphere (0 : EuclideanSpace ℝ (Fin n)) 1)
+    (h_radial : ∀ (z : EuclideanSpace ℝ (Fin n)) (x : bdryD),
+      (radialMap z x).1 = (‖x.1 - z‖)⁻¹ • (x.1 - z))
+    (deg : (bdryD → Metric.sphere (0 : EuclideanSpace ℝ (Fin n)) 1) → ℤ) where
+  deg_interior : ∀ z ∈ D, deg (radialMap z) = 1
+  deg_exterior : ∀ z, z ∉ closure D → deg (radialMap z) = 0
 
 Litlib.equation "guillemin1974differential"
   eq "Proposition_IntersectionProductDiagonal" page "114" kind "proposition"

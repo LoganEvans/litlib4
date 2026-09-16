@@ -1,5 +1,6 @@
 -- FILENAME: Litlib/Y1974/guillemin1974differential/Chapter04/Sec03_DegreeAndIntegration.lean
 
+
 import Mathlib.Data.Real.Basic
 import Mathlib.Topology.Connected.Basic
 import Litlib.Core
@@ -7,14 +8,17 @@ import Litlib.Core
 namespace Litlib.Y1974.guillemin1974differential
 
 /-!
-# Chapter 4, Section 3: Integration on Manifolds (pp. 165–173)
+# Chapter 4: Integration on Manifolds (§7 Stokes' Theorem & §8 Integration and Mappings)
 
-Formalizes the connection between differential forms and intersection theory:
-1. Stokes' Theorem: $\int_{\partial W} \omega = \int_W d\omega$.
-2. The Degree-Integral Formula: $\int_X f^* \omega = \deg(f) \int_Y \omega$.
-3. Vanishing of boundary pullback integrals for maps extending across a compact manifold.
-4. Jordan-Brouwer / Winding Number containment: $z \in \operatorname{int}(D) \implies W = 1$.
-5. The topological boundary crossing bridge linking aperture de Rham integrals to integer charge.
+Formalizes the connection between differential forms, integration, and mapping degree:
+1. Stokes' Theorem (§7, p. 183): $\int_{\partial X} \omega = \int_X d\omega$.
+2. The Degree-Integral Formula (§8, p. 188): $\int_X f^* \omega = \deg(f) \int_Y \omega$.
+3. Normalized Degree Formula (§8, p. 188): $\int_Y \omega = 1 \implies \int_X f^* \omega = \deg(f)$.
+4. Boundary Extension Vanishing (§8, p. 189): $X = \partial W \implies \int_X f^* \omega = 0$.
+5. Point Containment and Winding (§8, p. 192, Exercise 2):
+   $z \in \operatorname{int}(D) \implies W = 1$ and $z \notin \bar{D} \implies W = 0$.
+6. Topological Boundary Crossing Bridge (§8, p. 188): linking mapping degree on the boundary
+   to normalized form integrals.
 -/
 
 Litlib.equation "guillemin1974differential"
