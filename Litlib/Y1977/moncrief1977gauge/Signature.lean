@@ -1,10 +1,11 @@
 -- FILENAME: Litlib/Y1977/moncrief1977gauge/Signature.lean
 
 import Litlib.Core
-import Mathlib.Data.Real.Basic
-import Mathlib.Data.Fin.Basic
-import Mathlib.Data.Fintype.Basic
-import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+import Mathlib.Data.Matrix.Basic
+import Mathlib.Data.Complex.Basic
+import Mathlib.MeasureTheory.Measure.MeasureSpace
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Mathlib.MeasureTheory.Function.L1Space.Integrable
 
 open BigOperators
 
@@ -15,146 +16,152 @@ Litlib.paper "moncrief1977gauge"
   title "Gauge Symmetries of Yang-Mills Fields"
   authors ["Moncrief, Vincent"]
   journal "Annals of Physics"
-  volume "108"
-  pages "387--400"
   year "1977"
-  publisher "Academic Press, Inc."
 
-/-- Spacetime index in 3+1 dimensions (0 = time, 1,2,3 = spatial). -/
-abbrev SpacetimeIndex := Fin 4
+/-!
+### General Formalism: Lie Algebra and Representations (Section 2)
+-/
 
-/-- Spatial Cauchy hypersurface index in 3 dimensions (1,2,3). -/
-abbrev SpatialIndex := Fin 3
+/- Equation (2.1), Page 388:
+Commutation relations for a faithful representation of a g-dimensional compact,
+semisimple Lie algebra in terms of purely imaginary, antisymmetric n × n matrices. -/
+Litlib.equation "moncrief1977gauge" eq "2.1" page "388" kind "definition"
+class Eq2_1 (g n : ℕ) (θ : Fin g → Matrix (Fin n) (Fin n) ℂ)
+    (C : Fin g → Fin g → Fin g → ℝ) where
+  antisymmetric_matrices : ∀ a i j, θ a i j = - θ a j i
+  purely_imaginary : ∀ a i j, (θ a i j).re = 0
+  structure_constants_antisymm : ∀ a b c, C a b c = - C b a c ∧ C a b c = - C a c b
+  commutation_relation : ∀ a b,
+    θ a * θ b - θ b * θ a = Complex.I • (∑ c : Fin g, (C c a b : ℂ) • θ c)
 
-/-- Embedding of spatial index into 4-spacetime (i ↦ i + 1). -/
-def spatialToSpacetime (i : SpatialIndex) : SpacetimeIndex :=
-  ⟨i.val + 1, Nat.succ_lt_succ i.isLt⟩
-
-/-- Minkowski metric signature η = diag(-1, 1, 1, 1) (page 389). -/
-def minkowskiMetric (μ ν : SpacetimeIndex) : ℝ :=
-  if μ = ν then
-    if μ.val = 0 then -1 else 1
-  else 0
-
-/-- Lie algebra representation data for compact semisimple Lie group 𝒢 (Eq. 2.1, page 388).
-`g` is the group dimension; `n` is the Higgs representation dimension.
-Generators θ_a are purely imaginary antisymmetric matrices satisfying
-[θ_a, θ_b] = i C^c_{ab} θ_c. -/
-structure LieAlgebraData (g n : ℕ) where
-  /-- Completely antisymmetric structure constants C^c_{ab} -/
-  C : Fin g → Fin g → Fin g → ℝ
-  /-- Purely imaginary antisymmetric generator matrices (θ_a)_{kl} -/
-  theta : Fin g → Fin n → Fin n → ℝ
-  /-- Antisymmetry in lower indices C^c_{ab} = - C^c_{ba} -/
-  c_antisymm_lower : ∀ a b c, C c a b = - C c b a
-  /-- Complete cyclic antisymmetry C^c_{ab} = - C^a_{cb} -/
-  c_antisymm_cyclic : ∀ a b c, C c a b = - C a c b
-  /-- Antisymmetry of generator matrices θ_a^T = - θ_a -/
-  theta_antisymm : ∀ a k l, theta a k l = - theta a l k
-
-Litlib.equation "moncrief1977gauge" eq "2.3" page "389" kind "definition"
-/-- Yang-Mills field strength tensor F^{(a)}_{μν} (Eq. 2.3, page 389):
-F^{(a)}_{μν} = ∂_μ A^{(a)}_ν - ∂_ν A^{(a)}_μ - C^a_{bc} A^{(b)}_μ A^{(c)}_ν. -/
-def fieldStrength {g n : ℕ} (data : LieAlgebraData g n)
-    (A : SpacetimeIndex → Fin g → ℝ)
-    (derivA : SpacetimeIndex → SpacetimeIndex → Fin g → ℝ)
-    (μ ν : SpacetimeIndex) (a : Fin g) : ℝ :=
-  derivA μ ν a - derivA ν μ a - ∑ b, ∑ c, data.C a b c * A μ b * A ν c
-
-Litlib.equation "moncrief1977gauge" eq "2.4" page "389" kind "definition"
-/-- Gauge-covariant derivative of Higgs field D_μ φ (Eq. 2.4, page 389):
-(D_μ φ)_κ = ∂_μ φ_κ + ∑_a (θ_a φ)_κ A^{(a)}_μ. -/
-def covariantDerivativeHiggs {g n : ℕ} (data : LieAlgebraData g n)
-    (phi : Fin n → ℝ) (derivPhi : SpacetimeIndex → Fin n → ℝ)
-    (A : SpacetimeIndex → Fin g → ℝ) (μ : SpacetimeIndex) (k : Fin n) : ℝ :=
-  derivPhi μ k + ∑ a, ∑ l, data.theta a k l * phi l * A μ a
-
+/- Equation (2.12), Page 390:
+The initial value Gauss constraint function C_{(a)}(q, p) for the Yang-Mills-Higgs system
+on a 3-dimensional spatial slice Σ. -/
 Litlib.equation "moncrief1977gauge" eq "2.12" page "390" kind "definition"
-/-- Initial value Gauss law constraint functions C_{(a)}(q, p) (Eq. 2.12, page 390):
-C_{(a)} = - ∂_j E^j_{(a)} - C^a_{bc} E^j_{(c)} A^{(b)}_j - π · (θ_a φ). -/
-def gaussConstraint {g n : ℕ} (data : LieAlgebraData g n)
-    (A : SpatialIndex → Fin g → ℝ)
-    (E : SpatialIndex → Fin g → ℝ)
-    (divE : Fin g → ℝ)
-    (phi : Fin n → ℝ)
-    (pi : Fin n → ℝ)
-    (a : Fin g) : ℝ :=
-  - divE a - (∑ b, ∑ c, ∑ j, data.C a b c * E j c * A j b)
-  - (∑ k, ∑ l, pi k * data.theta a k l * phi l)
+class Eq2_12 (g n : ℕ) («Σ» : Type*)
+    (C_struct : Fin g → Fin g → Fin g → ℝ)
+    (θ : Fin g → Matrix (Fin n) (Fin n) ℂ)
+    (divE : Fin g → «Σ» → ℝ)
+    (E : Fin g → Fin 3 → «Σ» → ℝ)
+    (A : Fin g → Fin 3 → «Σ» → ℝ)
+    (π : «Σ» → Fin n → ℂ)
+    (ϕ : «Σ» → Fin n → ℂ)
+    (C_constraint : Fin g → «Σ» → ℂ) where
+  constraint_eq : ∀ (a : Fin g) (x : «Σ»),
+    C_constraint a x =
+      - (divE a x : ℂ) -
+      ∑ c : Fin g, ∑ b : Fin g, ∑ j : Fin 3,
+        (C_struct a b c : ℂ) * (E c j x : ℂ) * (A b j x : ℂ) +
+      Complex.I * (∑ k : Fin n, (π x k) * (∑ l : Fin n, θ a k l * ϕ x l))
 
+/-!
+### Gauge Symmetries (Section 3)
+-/
+
+/- Equation (3.5), Page 391:
+Infinitesimal generator ω of a gauge symmetry leaving the background configuration (A_μ, ϕ) fixed. -/
 Litlib.equation "moncrief1977gauge" eq "3.5" page "391" kind "definition"
-/-- Infinitesimal gauge symmetry conditions (Eq. 3.5 & Eq. 3.7, page 391):
-A background solution (A_μ, φ) admits a gauge symmetry generated by ω^{(a)}(x) iff:
-1) δ_ω φ = θ_a φ ω^{(a)} = 0,
-2) δ_ω A_μ = ∂_μ ω^{(a)} - C^a_{bc} ω^{(b)} A^{(c)}_μ = 0. -/
-structure GaugeSymmetryGenerator {g n : ℕ} (data : LieAlgebraData g n)
-    (A : SpacetimeIndex → Fin g → ℝ)
-    (phi : Fin n → ℝ)
-    (omega : Fin g → ℝ)
-    (derivOmega : SpacetimeIndex → Fin g → ℝ) : Prop where
-  /-- Non-trivial generator (not identically zero) -/
-  nontrivial : ∃ a, omega a ≠ 0
-  /-- Higgs background remains fixed: δ_ω φ = 0 -/
-  higgs_fixed : ∀ k : Fin n, (∑ a, ∑ l, data.theta a k l * phi l * omega a) = 0
-  /-- Gauge connection background remains fixed: δ_ω A_μ = 0 -/
-  gauge_fixed : ∀ (μ : SpacetimeIndex) (a : Fin g),
-    derivOmega μ a - (∑ b, ∑ c, data.C a b c * omega b * A μ c) = 0
+class Eq3_5 (g n : ℕ) (M : Type*)
+    (θ : Fin g → Matrix (Fin n) (Fin n) ℂ)
+    (dω : Fin g → Fin 4 → M → ℝ)
+    (ω : Fin g → M → ℝ)
+    (A : Fin g → Fin 4 → M → ℝ)
+    (C_struct : Fin g → Fin g → Fin g → ℝ)
+    (ϕ : M → Fin n → ℂ)
+    (δ_ω_ϕ : M → Fin n → ℂ)
+    (δ_ω_A : Fin g → Fin 4 → M → ℝ) where
+  delta_phi : ∀ (x : M) (k : Fin n),
+    δ_ω_ϕ x k = Complex.I * ∑ a : Fin g, (ω a x : ℂ) * (∑ l : Fin n, θ a k l * ϕ x l)
+  delta_phi_vanishes : ∀ x k, δ_ω_ϕ x k = 0
+  delta_A : ∀ (a : Fin g) (μ : Fin 4) (x : M),
+    δ_ω_A a μ x = dω a μ x + ∑ b : Fin g, ∑ c : Fin g, C_struct a b c * ω b x * A c μ x
+  delta_A_vanishes : ∀ a μ x, δ_ω_A a μ x = 0
 
-/-- A first-order perturbation (δA, δE, δφ, δπ) is tangent to an exact 1-parameter
-curve of solutions of the constraint equations C_{(a)}(q(λ), p(λ)) = 0 (Eqs. 4.1–4.3, page 394). -/
-structure IsTangentToExactCurve {g n : ℕ}
-    (deltaA deltaE : SpatialIndex → Fin g → ℝ)
-    (deltaPhi deltaPi : Fin n → ℝ) : Prop where
-  /-- Tangency to a smooth 1-parameter family of exact initial value solutions -/
-  tangent : ∃ (_curve : ℝ → (SpatialIndex → Fin g → ℝ) × (SpatialIndex → Fin g → ℝ) ×
-    (Fin n → ℝ) × (Fin n → ℝ)), True
+/- Equation (3.7), Page 391:
+Necessary and sufficient Cauchy data conditions on a spatial hypersurface Σ for the
+existence of a gauge symmetry. -/
+Litlib.equation "moncrief1977gauge" eq "3.7" page "391" kind "theorem"
+class Eq3_7 (g n : ℕ) («Σ» : Type*)
+    (θ : Fin g → Matrix (Fin n) (Fin n) ℂ)
+    (C_struct : Fin g → Fin g → Fin g → ℝ)
+    (ω : Fin g → «Σ» → ℝ)
+    (dω_spatial : Fin g → Fin 3 → «Σ» → ℝ)
+    (ϕ : «Σ» → Fin n → ℂ)
+    (π : «Σ» → Fin n → ℂ)
+    (A : Fin g → Fin 3 → «Σ» → ℝ)
+    (E : Fin g → Fin 3 → «Σ» → ℝ) where
+  omega_nontrivial : ∃ a x, ω a x ≠ 0
+  symm_phi : ∀ (x : «Σ») (k : Fin n),
+    Complex.I * ∑ a : Fin g, (ω a x : ℂ) * (∑ l : Fin n, θ a k l * ϕ x l) = 0
+  symm_pi : ∀ (x : «Σ») (k : Fin n),
+    Complex.I * ∑ a : Fin g, (ω a x : ℂ) * (∑ l : Fin n, θ a k l * π x l) = 0
+  symm_A : ∀ (a : Fin g) (j : Fin 3) (x : «Σ»),
+    dω_spatial a j x + ∑ b : Fin g, ∑ c : Fin g, C_struct a b c * ω b x * A c j x = 0
+  symm_E : ∀ (a : Fin g) (j : Fin 3) (x : «Σ»),
+    ∑ b : Fin g, ∑ c : Fin g, C_struct a b c * ω b x * E c j x = 0
 
+/-!
+### Linearization Instabilities & Second-Order Constraints (Section 4 & 5)
+-/
+
+/- Equation (4.8), Page 394:
+Second Fréchet derivative of the constraint D²C_{(a)}(q, p)((δq, δp), (δq, δp)) acting on
+first-order perturbation data. -/
 Litlib.equation "moncrief1977gauge" eq "4.8" page "394" kind "definition"
-/-- Second derivative of the constraint function D²C_{(a)}(δq, δp) (Eq. 4.8, page 394):
-D²C_{(a)} = -2 C^c_{ab} δE^j_{(c)} δA^{(b)}_j - 2 δπ · (θ_a δφ). -/
-def secondVariationGauss {g n : ℕ} (data : LieAlgebraData g n)
-    (deltaA : SpatialIndex → Fin g → ℝ)
-    (deltaE : SpatialIndex → Fin g → ℝ)
-    (deltaPhi : Fin n → ℝ)
-    (deltaPi : Fin n → ℝ)
-    (a : Fin g) : ℝ :=
-  - 2 * (∑ b, ∑ c, ∑ j, data.C c a b * deltaE j c * deltaA j b)
-  - 2 * (∑ k, ∑ l, deltaPi k * data.theta a k l * deltaPhi l)
+class Eq4_8 (g n : ℕ) («Σ» : Type*)
+    (C_struct : Fin g → Fin g → Fin g → ℝ)
+    (θ : Fin g → Matrix (Fin n) (Fin n) ℂ)
+    (δE : Fin g → Fin 3 → «Σ» → ℝ)
+    (δA : Fin g → Fin 3 → «Σ» → ℝ)
+    (δπ : «Σ» → Fin n → ℂ)
+    (δϕ : «Σ» → Fin n → ℂ)
+    (D2C : Fin g → «Σ» → ℂ) where
+  d2c_formula : ∀ (a : Fin g) (x : «Σ»),
+    D2C a x =
+      - 2 * (∑ c : Fin g, ∑ b : Fin g, ∑ j : Fin 3,
+          (C_struct a b c : ℂ) * (δE c j x : ℂ) * (δA b j x : ℂ)) +
+      2 * Complex.I * (∑ k : Fin n, δπ x k * (∑ l : Fin n, θ a k l * δϕ x l))
 
+/- Equation (4.11), Page 395:
+The second-order integral constraint Q_ω^{(2)} on a compact boundaryless Cauchy surface Σ.
+First-order perturbations tangent to a curve of exact solutions must satisfy Q_ω^{(2)} = 0. -/
 Litlib.equation "moncrief1977gauge" eq "4.11" page "395" kind "theorem"
-/-- Second-Order Linearization Instability Constraint Q^{(2)}_ω (Eq. 4.11 / Eq. 5.13):
-Whenever a background solution admits an unbroken continuous gauge symmetry ω^{(a)},
-every first-order perturbation (δA, δE, δφ, δπ) tangent to an exact curve of solutions
-must satisfy the quadratic constraint:
-Q^{(2)}_ω = 2 ∫_Σ d³x ω^{(a)} [ - C^c_{ab} δE^j_{(c)} δA^{(b)}_j - δπ · (θ_a δφ) ] = 0.
-Solutions to the linear perturbation equations violating this constraint are spurious. -/
-class Eq4_11_LinearizationConstraint {g n : ℕ} (data : LieAlgebraData g n)
-    (A : SpacetimeIndex → Fin g → ℝ)
-    (phi : Fin n → ℝ) where
-  /-- Hypersurface integral functional of the second-order perturbation density -/
-  q2_functional :
-    (Fin g → ℝ) →
-    (SpatialIndex → Fin g → ℝ) →
-    (SpatialIndex → Fin g → ℝ) →
-    (Fin n → ℝ) →
-    (Fin n → ℝ) → ℝ
-  /-- Integrand matches the contraction of ω with the second variation D²C -/
-  q2_evaluation :
-    ∀ (omega : Fin g → ℝ) (deltaA deltaE : SpatialIndex → Fin g → ℝ)
-      (deltaPhi deltaPi : Fin n → ℝ),
-      q2_functional omega deltaA deltaE deltaPhi deltaPi =
-        ∑ a, omega a * (
-          - (∑ b, ∑ c, ∑ j,
-              data.C c a b * deltaE j c * deltaA j b)
-          - (∑ k, ∑ l, deltaPi k * data.theta a k l * deltaPhi l))
-  /-- Moncrief's Theorem: If ω is an unbroken gauge symmetry of the background,
-  any perturbation tangent to an exact solution curve satisfies Q^{(2)}_ω = 0. -/
-  exact_tangency_forces_q2_null :
-    ∀ (omega : Fin g → ℝ) (derivOmega : SpacetimeIndex → Fin g → ℝ)
-      (deltaA deltaE : SpatialIndex → Fin g → ℝ)
-      (deltaPhi deltaPi : Fin n → ℝ),
-      GaugeSymmetryGenerator data A phi omega derivOmega →
-      IsTangentToExactCurve deltaA deltaE deltaPhi deltaPi →
-      q2_functional omega deltaA deltaE deltaPhi deltaPi = 0
+class Eq4_11 (g n : ℕ) («Σ» : Type*) [MeasureTheory.MeasureSpace «Σ»]
+    (C_struct : Fin g → Fin g → Fin g → ℝ)
+    (θ : Fin g → Matrix (Fin n) (Fin n) ℂ)
+    (ω : Fin g → «Σ» → ℝ)
+    (δE : Fin g → Fin 3 → «Σ» → ℝ)
+    (δA : Fin g → Fin 3 → «Σ» → ℝ)
+    (δπ : «Σ» → Fin n → ℂ)
+    (δϕ : «Σ» → Fin n → ℂ) where
+  integrand (x : «Σ») : ℂ :=
+    ∑ a : Fin g, (ω a x : ℂ) * (
+      - (∑ c : Fin g, ∑ b : Fin g, ∑ j : Fin 3,
+          (C_struct a b c : ℂ) * (δE c j x : ℂ) * (δA b j x : ℂ)) +
+      Complex.I * (∑ k : Fin n, δπ x k * (∑ l : Fin n, θ a k l * δϕ x l))
+    )
+  integrable_integrand : MeasureTheory.Integrable integrand
+  second_order_constraint : 2 * ∫ x, integrand x = 0
+
+/- Equation (5.13), Page 398:
+The second-order constraint in Minkowski space under the superselection rule that the conserved
+charge Q_ω remains fixed under perturbation. -/
+Litlib.equation "moncrief1977gauge" eq "5.13" page "398" kind "theorem"
+class Eq5_13 (g n : ℕ) («Σ» : Type*) [MeasureTheory.MeasureSpace «Σ»]
+    (C_struct : Fin g → Fin g → Fin g → ℝ)
+    (θ : Fin g → Matrix (Fin n) (Fin n) ℂ)
+    (ω : Fin g → «Σ» → ℝ)
+    (δE : Fin g → Fin 3 → «Σ» → ℝ)
+    (δA : Fin g → Fin 3 → «Σ» → ℝ)
+    (δπ : «Σ» → Fin n → ℂ)
+    (δϕ : «Σ» → Fin n → ℂ) where
+  minkowski_integrand (x : «Σ») : ℂ :=
+    ∑ b : Fin g, (ω b x : ℂ) * (
+      - (∑ a : Fin g, ∑ c : Fin g, ∑ j : Fin 3,
+          (C_struct b c a : ℂ) * (δE a j x : ℂ) * (δA c j x : ℂ)) +
+      Complex.I * (∑ k : Fin n, δπ x k * (∑ l : Fin n, θ b k l * δϕ x l))
+    )
+  integrable_integrand : MeasureTheory.Integrable minkowski_integrand
+  superselection_constraint : 2 * ∫ x, minkowski_integrand x = 0
 
 end Litlib.Y1977.moncrief1977gauge
