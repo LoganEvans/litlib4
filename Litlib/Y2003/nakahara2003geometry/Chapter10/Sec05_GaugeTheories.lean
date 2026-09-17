@@ -5,6 +5,8 @@ import Litlib.Core
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Complex.Basic
 import Mathlib.Topology.Basic
+import Mathlib.Topology.ContinuousMap.Basic
+import Mathlib.Topology.UnitInterval
 import Mathlib.MeasureTheory.Measure.MeasureSpace
 import Mathlib.MeasureTheory.Function.L1Space.Integrable
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
@@ -101,9 +103,10 @@ Litlib.equation "nakahara2003geometry"
   page "33"
   kind "equation"
 class VacuumWindingNumber
-    (GroupMap : Type _) [One GroupMap]
-    (windingNumber : GroupMap → ℤ) where
-  vacuum_winding : windingNumber 1 = 0
+    (BoundaryManifold Group : Type*)
+    [TopologicalSpace BoundaryManifold] [TopologicalSpace Group] [One Group]
+    (windingNumber : C(BoundaryManifold, Group) → ℤ) where
+  vacuum_winding : windingNumber ⟨fun _ ↦ 1, continuous_const⟩ = 0
 
 Litlib.equation "nakahara2003geometry"
   eq "10.120"
@@ -124,16 +127,18 @@ Litlib.equation "nakahara2003geometry"
   page "36"
   kind "theorem"
 class CartanMaurerTopology
-    (GroupMap : Type _) [TopologicalSpace GroupMap] [Nonempty GroupMap]
-    (isSmooth : GroupMap → Prop)
-    (windingNumber : GroupMap → ℤ)
-    (cartanMaurerIntegral : GroupMap → ℝ) where
+    (BoundaryManifold Group : Type*)
+    [TopologicalSpace BoundaryManifold] [TopologicalSpace Group]
+    [Nonempty BoundaryManifold] [Nonempty Group]
+    (isSmooth : C(BoundaryManifold, Group) → Prop)
+    (windingNumber : C(BoundaryManifold, Group) → ℤ)
+    (cartanMaurerIntegral : C(BoundaryManifold, Group) → ℝ) where
   degreeTheorem :
-    ∀ g : GroupMap, isSmooth g → cartanMaurerIntegral g = (windingNumber g : ℝ)
-  homotopyInvariance
-    (H : ℝ → GroupMap)
-    (hCont : Continuous H) :
-    ∀ t1 t2 : ℝ, windingNumber (H t1) = windingNumber (H t2)
+    ∀ g : C(BoundaryManifold, Group), isSmooth g → cartanMaurerIntegral g = (windingNumber g : ℝ)
+  homotopyInvariance :
+    ∀ (g₀ g₁ : C(BoundaryManifold, Group)) (H : C(unitInterval × BoundaryManifold, Group)),
+      (∀ x, H (0, x) = g₀ x) → (∀ x, H (1, x) = g₁ x) →
+      windingNumber g₀ = windingNumber g₁
 
 Litlib.equation "nakahara2003geometry"
   eq "10.127"

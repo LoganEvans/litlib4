@@ -2,6 +2,7 @@
 
 import Litlib.Core
 import Mathlib.Topology.Basic
+import Mathlib.Topology.ContinuousMap.Basic
 import Litlib.Y2003.nakahara2003geometry.Chapter10.Sec05_GaugeTheories
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Real.Sqrt
@@ -54,14 +55,14 @@ class Eq8
     (BoundaryManifold Group : Type*)
     [TopologicalSpace BoundaryManifold] [TopologicalSpace Group]
     [Nonempty BoundaryManifold] [Nonempty Group]
-    (isSmooth : (BoundaryManifold → Group) → Prop)
-    (windingNumber : (BoundaryManifold → Group) → ℤ)
-    (cartanMaurerIntegral : (BoundaryManifold → Group) → ℝ)
+    (isSmooth : C(BoundaryManifold, Group) → Prop)
+    (windingNumber : C(BoundaryManifold, Group) → ℤ)
+    (cartanMaurerIntegral : C(BoundaryManifold, Group) → ℝ)
     [Litlib.Y2003.nakahara2003geometry.CartanMaurerTopology
-      (BoundaryManifold → Group) isSmooth windingNumber cartanMaurerIntegral] where
-  h_exists_degree_one : ∃ (g : BoundaryManifold → Group), windingNumber g = 1
-  degree_of_homeomorph : ∀ (f : BoundaryManifold → Group),
-    IsHomeomorphism f → windingNumber f = 1 ∨ windingNumber f = -1
+      BoundaryManifold Group isSmooth windingNumber cartanMaurerIntegral] where
+  h_exists_degree_one : ∃ (g : C(BoundaryManifold, Group)), windingNumber g = 1
+  degree_of_homeomorph : ∀ (f : C(BoundaryManifold, Group)),
+    IsHomeomorphism (f : BoundaryManifold → Group) → windingNumber f = 1 ∨ windingNumber f = -1
 
 Litlib.equation "belavin1975pseudoparticle" eq "1" page "85" kind "definition"
 class Eq1_FieldStrength (A : (Fin 4 → ℝ) → Fin 4 → Matrix (Fin 2) (Fin 2) ℂ)
