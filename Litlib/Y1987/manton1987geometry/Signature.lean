@@ -29,7 +29,7 @@ class HedgehogAnsatz
   n_hat : (Fin 3 → ℝ) → Fin 3 → ℝ
   n_hat_def : ∀ (x : Fin 3 → ℝ) (a : Fin 3),
     n_hat x a = x a / Real.sqrt (∑ i : Fin 3, x i ^ 2)
-  
+
   -- 2. The Isospin (Pauli) Vector is given by tau
   -- 3. The Hedgehog Mapping (Topological Lock between Spatial and Internal Indices)
   hedgehog_map : ∀ (x : Fin 3 → ℝ),
@@ -45,6 +45,17 @@ class Eq2_11
   (volSigma : ℝ)
   where
   fadeev_bound : E ≥ 6 * degPi * volSigma
+
+Litlib.equation "manton1987geometry" eq "2.11.S3" page "472" kind "bound"
+class Theorem_SkyrmeBogomolnyEnergyBound
+  (E : ℝ)
+  (B : ℝ)
+  where
+  bogomolny_bound : E ≥ 12 * Real.pi ^ 2 * |B|
+
+def Theorem_SkyrmeBogomolnyEnergyBound.fadeev_bound
+  {E B : ℝ} (h : Theorem_SkyrmeBogomolnyEnergyBound E B) : E ≥ 12 * Real.pi ^ 2 * |B| :=
+  h.bogomolny_bound
 
 Litlib.equation "manton1987geometry" eq "4.1" page "474" kind "ansatz"
 class Eq4_1
