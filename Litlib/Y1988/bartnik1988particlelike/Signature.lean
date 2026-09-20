@@ -90,7 +90,6 @@ class BoundaryConditions (m w T : ℝ → ℝ) (M : ℝ) where
   asymptotic_m : Filter.Tendsto m Filter.atTop (nhds M)
   asymptotic_w : Filter.Tendsto (fun r ↦ |w r|) Filter.atTop (nhds 1)
   asymptotic_T : Filter.Tendsto T Filter.atTop (nhds 1)
-  positive_mass : M > 0
 
 -- The complete static spherically symmetric Einstein-Yang-Mills system
 structure BartnikMcKinnonSystem (m w T R BL BT T00 : ℝ → ℝ) (M : ℝ) where
