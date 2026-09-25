@@ -6,6 +6,7 @@ import Litlib.Core.CLI.Bibtex
 import Litlib.Core.CLI.CodeSummary
 import Litlib.Core.CLI.Dashboard
 import Litlib.Core.CLI.Help
+import Litlib.Core.CLI.Dependencies
 
 open Lean
 
@@ -65,6 +66,16 @@ def parseArgs (args : List String) : CliContext := Id.run do
       ctx := { ctx with targetReferences := true, referenceGlobs := ctx.referenceGlobs ++ ["all"], explicitFilters := true }
     else if arg == "--all" then
       ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"], explicitFilters := true }
+    else if arg == "--dependencies" then
+      ctx := { ctx with action := "dependencies", dependenciesOut := some "dependencies.dot", dependenciesFormat := "dot" }
+    else if arg.startsWith "--dependencies=" then
+      let path := (arg.drop 15).toString
+      if path.endsWith ".dot" then
+        ctx := { ctx with action := "dependencies", dependenciesOut := some path, dependenciesFormat := "dot" }
+      else if path.endsWith ".json" then
+        ctx := { ctx with action := "dependencies", dependenciesOut := some path, dependenciesFormat := "json" }
+      else
+        ctx := { ctx with action := "error" }
 
   if ctx.action == "code-summary" && !ctx.targetTheorems && !ctx.targetReferences then
     if ctx.latexDir.isSome || ctx.litlibTheoremsOnly then
@@ -75,7 +86,7 @@ def parseArgs (args : List String) : CliContext := Id.run do
   if !ctx.targetTheorems && !ctx.targetReferences then
     if ctx.action == "bibtex" then
       ctx := { ctx with targetReferences := true, referenceGlobs := ["all"] }
-    else if ctx.action == "dashboard" then
+    else if ctx.action == "dashboard" || ctx.action == "dependencies" then
       ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
 
   return ctx
@@ -210,6 +221,11 @@ def runCli (rootModule : Name) (args : List String) : IO UInt32 := do
     return ← runCodeSummary rootModule env globalData ctx
   else if ctx.action == "bibtex" then
     return ← runBibtex globalData
+  else if ctx.action == "dependencies" then
+    return ← runDependencies rootModule env globalData ctx
+  else if ctx.action == "error" then
+    IO.println "Error: Invalid argument passed to CLI."
+    return 1
   else
     IO.println s!"Unknown action: {ctx.action}"
     return 1

@@ -54,6 +54,8 @@ structure CliContext where
   litlibTheoremsOnly : Bool := false
   latexDir : Option String := none
   explicitFilters : Bool := false
+  dependenciesOut : Option String := none
+  dependenciesFormat : String := "dot"
 
 def myDropRight (s : String) (n : Nat) : String :=
   let chars := s.toList

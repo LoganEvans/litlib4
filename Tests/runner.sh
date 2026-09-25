@@ -48,7 +48,7 @@ if [ -d "Tests/Fixtures" ]; then
     echo "Compiling test fixtures..."
     mkdir -p .lake/build/lib/lean/Tests/Fixtures
     mkdir -p .lake/build/lib/Tests/Fixtures
-    for f in $(find Tests/Fixtures -type f -name "*.lean"); do
+    for f in $(find Tests/Fixtures -type f -name "*.lean" | sort); do
         rel="${f#Tests/Fixtures/}"
         dir=$(dirname "$rel")
         mkdir -p ".lake/build/lib/lean/Tests/Fixtures/$dir"
@@ -56,7 +56,7 @@ if [ -d "Tests/Fixtures" ]; then
         stem=$(basename "$f" .lean)
         target1=".lake/build/lib/lean/Tests/Fixtures/${dir}/${stem}.olean"
         target2=".lake/build/lib/Tests/Fixtures/${dir}/${stem}.olean"
-        lake env lean -R . -o "$target1" "$f" > /dev/null 2>&1
+        lake env env LEAN_PATH=".lake/build/lib/lean:.lake/build/lib${LEAN_PATH:+:$LEAN_PATH}" lean -R . -o "$target1" "$f"
         cp "$target1" "$target2" 2>/dev/null || true
     done
 fi

@@ -31,7 +31,7 @@ instance provedEq3_2 : Eq3_2_CurvatureContraction 2 (fun _ _ => 1) where
 /-- Standalone theorem consuming literature equations -/
 @[litlib_track "Emergent Spacetime Metric Soundness"]
 theorem mockMetricSoundness (dim : Nat) (g : Fin dim → Fin dim → Nat)
-    [hMetric : Eq3_1_EmergentMetric dim g]
+    [_hMetric : Eq3_1_EmergentMetric dim g]
     [hCurv : Eq3_2_CurvatureContraction dim g] :
     ∀ i, g i i ≥ 0 :=
   hCurv.contract_pos

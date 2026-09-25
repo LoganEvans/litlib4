@@ -1,0 +1,37 @@
+{
+  "Tests.Fixtures.DependencyGraph.BaseDefs.BaseCell": [],
+  "Tests.Fixtures.DependencyGraph.BaseDefs.BaseConfig": [],
+  "Tests.Fixtures.DependencyGraph.BaseDefs.baseCompute": [
+    "Tests.Fixtures.DependencyGraph.BaseDefs.BaseConfig"
+  ],
+  "Tests.Fixtures.DependencyGraph.BaseDefs.baseHelper": [],
+  "Tests.Fixtures.DependencyGraph.BaseDefs.baseTheoremZ": [],
+  "Tests.Fixtures.DependencyGraph.MidDefs.Eq1_1_MetricTensor": [],
+  "Tests.Fixtures.DependencyGraph.MidDefs.MidConfig": [],
+  "Tests.Fixtures.DependencyGraph.MidDefs.midCompute": [
+    "Tests.Fixtures.DependencyGraph.BaseDefs.BaseCell",
+    "Tests.Fixtures.DependencyGraph.BaseDefs.baseCompute",
+    "Tests.Fixtures.DependencyGraph.MidDefs.MidConfig"
+  ],
+  "Tests.Fixtures.DependencyGraph.MidDefs.midTheoremA": [
+    "Tests.Fixtures.DependencyGraph.BaseDefs.baseTheoremZ"
+  ],
+  "Tests.Fixtures.DependencyGraph.MidDefs.midTheoremB": [
+    "Tests.Fixtures.DependencyGraph.BaseDefs.baseHelper"
+  ],
+  "Tests.Fixtures.DependencyGraph.TopTheorems.topIncompleteSorry": [],
+  "Tests.Fixtures.DependencyGraph.TopTheorems.topLitlibConsumer": [
+    "Tests.Fixtures.DependencyGraph.MidDefs.Eq1_1_MetricTensor"
+  ],
+  "Tests.Fixtures.DependencyGraph.TopTheorems.topMathlibBoundary": [
+    "Tests.Fixtures.DependencyGraph.MidDefs.midTheoremA"
+  ],
+  "Tests.Fixtures.DependencyGraph.TopTheorems.topSignatureProofSeparation": [
+    "Tests.Fixtures.DependencyGraph.MidDefs.MidConfig",
+    "Tests.Fixtures.DependencyGraph.MidDefs.midTheoremA"
+  ],
+  "Tests.Fixtures.DependencyGraph.TopTheorems.topTheoremC": [
+    "Tests.Fixtures.DependencyGraph.MidDefs.midTheoremA",
+    "Tests.Fixtures.DependencyGraph.MidDefs.midTheoremB"
+  ]
+}
