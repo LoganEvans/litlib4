@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Crawl/TestTheoremDependency.lean
+-- FILENAME: @litlib4/Tests/CLI/Crawl/TestTheoremDependency.lean
 
 import Litlib.Core.CLI.Engine
 import Litlib.Core.CLI.CodeSummary

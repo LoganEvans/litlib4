@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Summary/TestStructureSafety.lean
+-- FILENAME: @litlib4/Tests/CLI/Summary/TestStructureSafety.lean
 
 import Lean
 import Litlib.Core.CLI

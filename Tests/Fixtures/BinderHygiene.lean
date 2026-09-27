@@ -1,4 +1,4 @@
--- FILENAME: Tests/Fixtures/BinderHygiene.lean
+-- FILENAME: @litlib4/Tests/Fixtures/BinderHygiene.lean
 
 import Litlib.Core
 

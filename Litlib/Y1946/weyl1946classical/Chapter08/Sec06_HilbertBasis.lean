@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y1946/weyl1946classical/Chapter08/Sec06_HilbertBasis.lean
+-- FILENAME: @litlib4/Litlib/Y1946/weyl1946classical/Chapter08/Sec06_HilbertBasis.lean
 
 import Mathlib
 import Litlib.Core

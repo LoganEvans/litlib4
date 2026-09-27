@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Summary/TestIndentedWhereTactics.lean
+-- FILENAME: @litlib4/Tests/CLI/Summary/TestIndentedWhereTactics.lean
 
 import Lean
 import Litlib.Core.CLI

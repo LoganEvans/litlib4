@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Math/LeviCivita.lean
+-- FILENAME: @litlib4/Litlib/Math/LeviCivita.lean
 
 -- Master import file for the fragmented LeviCivita namespace.
 import Litlib.Math.LeviCivita.Basic

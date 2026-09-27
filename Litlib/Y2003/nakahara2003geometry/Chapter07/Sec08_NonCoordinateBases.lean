@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter07/Sec08_NonCoordinateBases.lean
+-- FILENAME: @litlib4/Litlib/Y2003/nakahara2003geometry/Chapter07/Sec08_NonCoordinateBases.lean
 
 import Litlib.Core
 import Mathlib.Algebra.Group.Basic

@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Math/EpsilonDeterminant.lean
+-- FILENAME: @litlib4/Litlib/Math/EpsilonDeterminant.lean
 
 import Litlib.Math.Matrix4
 import Litlib.Math.LeviCivita

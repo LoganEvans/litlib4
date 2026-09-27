@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Crawl/TestTransitive.lean
+-- FILENAME: @litlib4/Tests/CLI/Crawl/TestTransitive.lean
 
 import Litlib.Core.CLI.Engine
 import Litlib.Core.CLI.CodeSummary

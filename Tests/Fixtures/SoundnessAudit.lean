@@ -1,4 +1,4 @@
--- FILENAME: Tests/Fixtures/SoundnessAudit.lean
+-- FILENAME: @litlib4/Tests/Fixtures/SoundnessAudit.lean
 
 import Litlib.Core
 

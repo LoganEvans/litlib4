@@ -1,5 +1,4 @@
--- FILENAME: Litlib/Y1982/manton1982remark/Signature.lean
-
+-- FILENAME: @litlib4/Litlib/Y1982/manton1982remark/Signature.lean
 
 import Litlib.Core
 import Mathlib.Topology.Basic

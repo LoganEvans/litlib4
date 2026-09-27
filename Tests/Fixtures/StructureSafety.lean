@@ -1,4 +1,4 @@
--- FILENAME: Tests/Fixtures/StructureSafety.lean
+-- FILENAME: @litlib4/Tests/Fixtures/StructureSafety.lean
 
 import Litlib.Core
 

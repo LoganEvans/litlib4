@@ -1,4 +1,4 @@
--- FILENAME: Tests/TestParseLeanRefs.lean
+-- FILENAME: @litlib4/Tests/TestParseLeanRefs.lean
 
 import Litlib.Core.CLI
 import Lean

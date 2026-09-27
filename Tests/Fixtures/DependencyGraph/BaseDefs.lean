@@ -1,5 +1,4 @@
--- FILENAME: Tests/Fixtures/DependencyGraph/BaseDefs.lean
-
+-- FILENAME: @litlib4/Tests/Fixtures/DependencyGraph/BaseDefs.lean
 
 import Litlib.Core
 

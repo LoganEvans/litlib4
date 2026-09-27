@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Math/LinearAlgebra.lean
+-- FILENAME: @litlib4/Litlib/Math/LinearAlgebra.lean
 
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Mathlib.LinearAlgebra.Dimension.Finrank

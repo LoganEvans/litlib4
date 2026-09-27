@@ -1,5 +1,4 @@
--- FILENAME: Litlib/Y1968/finkelstein1968connection/Signature.lean
-
+-- FILENAME: @litlib4/Litlib/Y1968/finkelstein1968connection/Signature.lean
 
 import Litlib.Core
 import Mathlib.Topology.Homotopy.Basic

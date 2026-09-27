@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y1969/kobayashi1969foundations/Paper.lean
+-- FILENAME: @litlib4/Litlib/Y1969/kobayashi1969foundations/Paper.lean
 
 import Litlib.Core
 

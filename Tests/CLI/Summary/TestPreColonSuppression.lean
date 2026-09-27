@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Summary/TestPreColonSuppression.lean
+-- FILENAME: @litlib4/Tests/CLI/Summary/TestPreColonSuppression.lean
 
 import Lean
 import Litlib.Core.CLI

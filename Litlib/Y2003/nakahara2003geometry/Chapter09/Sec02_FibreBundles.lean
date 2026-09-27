@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter09/Sec02_FibreBundles.lean
+-- FILENAME: @litlib4/Litlib/Y2003/nakahara2003geometry/Chapter09/Sec02_FibreBundles.lean
 
 import Litlib.Core
 import Litlib.Y2003.nakahara2003geometry.Paper

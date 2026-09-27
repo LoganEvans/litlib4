@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter11/Sec01_InvariantPolynomials.lean
+-- FILENAME: @litlib4/Litlib/Y2003/nakahara2003geometry/Chapter11/Sec01_InvariantPolynomials.lean
 
 import Litlib.Core
 import Mathlib.Data.Matrix.Basic

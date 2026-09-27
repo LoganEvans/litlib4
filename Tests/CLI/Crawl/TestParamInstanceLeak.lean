@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Crawl/TestParamInstanceLeak.lean
+-- FILENAME: @litlib4/Tests/CLI/Crawl/TestParamInstanceLeak.lean
 
 import Litlib.Core.CLI.Engine
 import Litlib.Core.CLI.CodeSummary

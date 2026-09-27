@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Latex/TestLatexArtifacts.lean
+-- FILENAME: @litlib4/Tests/CLI/Latex/TestLatexArtifacts.lean
 
 import Lean
 import Litlib.Core.CLI

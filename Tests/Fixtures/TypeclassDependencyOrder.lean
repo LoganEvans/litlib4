@@ -1,4 +1,4 @@
--- FILENAME: Tests/Fixtures/TypeclassDependencyOrder.lean
+-- FILENAME: @litlib4/Tests/Fixtures/TypeclassDependencyOrder.lean
 
 import Litlib.Core
 

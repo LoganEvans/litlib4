@@ -1,4 +1,4 @@
--- FILENAME: Tests/Fixtures/LetBindingStatement.lean
+-- FILENAME: @litlib4/Tests/Fixtures/LetBindingStatement.lean
 
 import Litlib.Core
 

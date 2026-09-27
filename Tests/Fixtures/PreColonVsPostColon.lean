@@ -1,4 +1,4 @@
--- FILENAME: Tests/Fixtures/PreColonVsPostColon.lean
+-- FILENAME: @litlib4/Tests/Fixtures/PreColonVsPostColon.lean
 
 import Litlib.Core
 

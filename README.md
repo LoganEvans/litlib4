@@ -1,4 +1,4 @@
-<!-- FILENAME: README.md -->
+<!-- FILENAME: @litlib4/README.md -->
 
 # Litlib: A Lean4 Library of Scientific Literature
 

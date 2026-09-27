@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2011/sakurai2011modern/Paper.lean
+-- FILENAME: @litlib4/Litlib/Y2011/sakurai2011modern/Paper.lean
 
 import Litlib.Core
 

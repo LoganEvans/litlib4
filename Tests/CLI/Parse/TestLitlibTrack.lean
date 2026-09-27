@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Parse/TestLitlibTrack.lean
+-- FILENAME: @litlib4/Tests/CLI/Parse/TestLitlibTrack.lean
 
 import Litlib.Core.CLI
 open Litlib.Core.CLI

@@ -1,5 +1,4 @@
--- FILENAME: Tests/CLI/Dependencies/TestDependencyGraph.lean
-
+-- FILENAME: @litlib4/Tests/CLI/Dependencies/TestDependencyGraph.lean
 
 import Lean
 import Litlib.Core.CLI

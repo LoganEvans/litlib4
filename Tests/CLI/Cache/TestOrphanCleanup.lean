@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Cache/TestOrphanCleanup.lean
+-- FILENAME: @litlib4/Tests/CLI/Cache/TestOrphanCleanup.lean
 
 import Lean
 import Litlib.Core.CLI

@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2024/gielen2024unimodular/Proofs/PureConnectionMatrixSolution.lean
+-- FILENAME: @litlib4/Litlib/Y2024/gielen2024unimodular/Proofs/PureConnectionMatrixSolution.lean
 
 import Litlib.Y2024.gielen2024unimodular.Signature
 import Mathlib.Data.Matrix.Basic

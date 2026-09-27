@@ -1,5 +1,4 @@
--- FILENAME: Litlib/Core/CLI/Dependencies.lean
-
+-- FILENAME: @litlib4/Litlib/Core/CLI/Dependencies.lean
 
 import Lean
 import Litlib.Core

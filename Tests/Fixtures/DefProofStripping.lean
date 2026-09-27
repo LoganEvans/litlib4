@@ -1,4 +1,4 @@
--- FILENAME: Tests/Fixtures/DefProofStripping.lean
+-- FILENAME: @litlib4/Tests/Fixtures/DefProofStripping.lean
 
 import Litlib.Core
 

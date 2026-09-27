@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Summary/TestDefTacticStripping.lean
+-- FILENAME: @litlib4/Tests/CLI/Summary/TestDefTacticStripping.lean
 
 import Lean
 import Litlib.Core.CLI

@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Core/CLI/Bibtex.lean
+-- FILENAME: @litlib4/Litlib/Core/CLI/Bibtex.lean
 
 import Lean
 import Litlib.Core.CLI.Engine

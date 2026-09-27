@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Math/LeviCivita/ContractThree.lean
+-- FILENAME: @litlib4/Litlib/Math/LeviCivita/ContractThree.lean
 
 import Litlib.Math.LeviCivita.Basic
 import Mathlib.Tactic.FinCases

@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Audit/TestSoundnessAudit.lean
+-- FILENAME: @litlib4/Tests/CLI/Audit/TestSoundnessAudit.lean
 
 import Lean
 import Litlib.Core.CLI

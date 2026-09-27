@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Summary/TestDefProofLeak.lean
+-- FILENAME: @litlib4/Tests/CLI/Summary/TestDefProofLeak.lean
 
 import Lean
 import Litlib.Core.CLI

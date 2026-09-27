@@ -1,4 +1,4 @@
--- FILENAME: litlib_report.lean
+-- FILENAME: @litlib4/litlib_report.lean
 
 import Lean
 import Litlib.Core.CLI

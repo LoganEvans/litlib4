@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y1989/arnold1989mathematical/Paper.lean
+-- FILENAME: @litlib4/Litlib/Y1989/arnold1989mathematical/Paper.lean
 
 import Litlib.Core
 

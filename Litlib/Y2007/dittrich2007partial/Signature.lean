@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2007/dittrich2007partial/Signature.lean
+-- FILENAME: @litlib4/Litlib/Y2007/dittrich2007partial/Signature.lean
 
 import Litlib.Core
 import Mathlib.Data.Real.Basic

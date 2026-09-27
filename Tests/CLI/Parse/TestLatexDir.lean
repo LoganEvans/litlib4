@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Parse/TestLatexDir.lean
+-- FILENAME: @litlib4/Tests/CLI/Parse/TestLatexDir.lean
 
 import Litlib.Core.CLI
 open Litlib.Core.CLI

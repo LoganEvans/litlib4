@@ -1,5 +1,4 @@
--- FILENAME: Litlib/Y1964/bell1964einstein/Proofs/BellsTheorem.lean
-
+-- FILENAME: @litlib4/Litlib/Y1964/bell1964einstein/Proofs/BellsTheorem.lean
 
 import Litlib.Y1964.bell1964einstein.Signature
 import Mathlib.MeasureTheory.Integral.Bochner.Basic

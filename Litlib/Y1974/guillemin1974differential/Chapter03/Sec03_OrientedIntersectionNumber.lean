@@ -1,5 +1,4 @@
--- FILENAME: Litlib/Y1974/guillemin1974differential/Chapter03/Sec03_OrientedIntersectionNumber.lean
-
+-- FILENAME: @litlib4/Litlib/Y1974/guillemin1974differential/Chapter03/Sec03_OrientedIntersectionNumber.lean
 
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fintype.BigOperators

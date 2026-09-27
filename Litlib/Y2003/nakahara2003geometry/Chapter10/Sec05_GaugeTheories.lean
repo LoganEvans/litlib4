@@ -1,5 +1,4 @@
--- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter10/Sec05_GaugeTheories.lean
-
+-- FILENAME: @litlib4/Litlib/Y2003/nakahara2003geometry/Chapter10/Sec05_GaugeTheories.lean
 
 import Litlib.Core
 import Mathlib.Data.Real.Basic

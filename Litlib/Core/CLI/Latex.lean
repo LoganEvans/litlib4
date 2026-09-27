@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Core/CLI/Latex.lean
+-- FILENAME: @litlib4/Litlib/Core/CLI/Latex.lean
 
 import Lean
 

@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y1946/weyl1946classical/Chapter03/Sec01_SchursLemma.lean
+-- FILENAME: @litlib4/Litlib/Y1946/weyl1946classical/Chapter03/Sec01_SchursLemma.lean
 
 import Mathlib
 import Litlib.Core

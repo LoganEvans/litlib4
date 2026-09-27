@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y1969/wasserman1969equivariant/Signature.lean
+-- FILENAME: @litlib4/Litlib/Y1969/wasserman1969equivariant/Signature.lean
 
 import Litlib.Core
 import Mathlib

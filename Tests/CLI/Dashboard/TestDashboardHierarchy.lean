@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Dashboard/TestDashboardHierarchy.lean
+-- FILENAME: @litlib4/Tests/CLI/Dashboard/TestDashboardHierarchy.lean
 
 import Lean
 import Litlib.Core.CLI

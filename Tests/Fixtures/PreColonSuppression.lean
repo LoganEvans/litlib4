@@ -1,4 +1,4 @@
--- FILENAME: Tests/Fixtures/PreColonSuppression.lean
+-- FILENAME: @litlib4/Tests/Fixtures/PreColonSuppression.lean
 
 import Litlib.Core
 

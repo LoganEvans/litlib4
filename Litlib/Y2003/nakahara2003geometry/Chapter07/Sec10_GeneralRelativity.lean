@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter07/Sec10_GeneralRelativity.lean
+-- FILENAME: @litlib4/Litlib/Y2003/nakahara2003geometry/Chapter07/Sec10_GeneralRelativity.lean
 
 import Litlib.Core
 import Mathlib.Data.Real.Basic

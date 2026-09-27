@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2003/hall2003lie/Chapter07/Sec04_PeterWeyl.lean
+-- FILENAME: @litlib4/Litlib/Y2003/hall2003lie/Chapter07/Sec04_PeterWeyl.lean
 
 import Litlib.Core
 import Litlib.Y2003.hall2003lie.Paper

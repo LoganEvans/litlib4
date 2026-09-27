@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y1989/arnold1989mathematical/Chapter02/Sec07_AngularMomentum.lean
+-- FILENAME: @litlib4/Litlib/Y1989/arnold1989mathematical/Chapter02/Sec07_AngularMomentum.lean
 
 import Litlib.Core
 import Litlib.Y1989.arnold1989mathematical.Paper

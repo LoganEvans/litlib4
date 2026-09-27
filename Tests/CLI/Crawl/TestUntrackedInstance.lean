@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Crawl/TestUntrackedInstance.lean
+-- FILENAME: @litlib4/Tests/CLI/Crawl/TestUntrackedInstance.lean
 
 import Litlib.Core.CLI.Engine
 import Litlib.Core.CLI.CodeSummary

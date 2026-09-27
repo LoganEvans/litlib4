@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Parse/TestFlags.lean
+-- FILENAME: @litlib4/Tests/CLI/Parse/TestFlags.lean
 
 import Litlib.Core.CLI
 open Litlib.Core.CLI

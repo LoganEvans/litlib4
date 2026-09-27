@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Summary/TestBinderHygiene.lean
+-- FILENAME: @litlib4/Tests/CLI/Summary/TestBinderHygiene.lean
 
 import Lean
 import Litlib.Core.CLI

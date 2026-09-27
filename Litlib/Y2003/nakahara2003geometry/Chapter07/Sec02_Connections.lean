@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter07/Sec02_Connections.lean
+-- FILENAME: @litlib4/Litlib/Y2003/nakahara2003geometry/Chapter07/Sec02_Connections.lean
 
 import Litlib.Core
 import Mathlib.Data.Real.Basic

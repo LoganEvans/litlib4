@@ -1,5 +1,4 @@
--- FILENAME: Litlib/Y1974/guillemin1974differential/Chapter04/Sec03_DegreeAndIntegration.lean
-
+-- FILENAME: @litlib4/Litlib/Y1974/guillemin1974differential/Chapter04/Sec03_DegreeAndIntegration.lean
 
 import Mathlib.Data.Real.Basic
 import Mathlib.Topology.Connected.Basic

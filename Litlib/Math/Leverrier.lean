@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Math/Leverrier.lean
+-- FILENAME: @litlib4/Litlib/Math/Leverrier.lean
 
 import Litlib.Math.Matrix4
 import Mathlib.LinearAlgebra.Matrix.Trace

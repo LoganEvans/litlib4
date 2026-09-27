@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y1982/uhlenbeck1982connections/Signature.lean
+-- FILENAME: @litlib4/Litlib/Y1982/uhlenbeck1982connections/Signature.lean
 
 import Litlib.Core
 import Mathlib.Topology.Basic

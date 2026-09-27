@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Summary/TestLetBindingStatement.lean
+-- FILENAME: @litlib4/Tests/CLI/Summary/TestLetBindingStatement.lean
 
 import Lean
 import Litlib.Core.CLI

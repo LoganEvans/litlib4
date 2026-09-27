@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Core/CLI/Dashboard.lean
+-- FILENAME: @litlib4/Litlib/Core/CLI/Dashboard.lean
 
 import Lean
 import Litlib.Core.CLI.Engine

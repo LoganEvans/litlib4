@@ -1,5 +1,4 @@
--- FILENAME: Tests/Fixtures/DependencyGraph/TopTheorems.lean
-
+-- FILENAME: @litlib4/Tests/Fixtures/DependencyGraph/TopTheorems.lean
 
 import Litlib.Core
 import Tests.Fixtures.DependencyGraph.MidDefs

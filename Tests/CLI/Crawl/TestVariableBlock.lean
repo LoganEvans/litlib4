@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Crawl/TestVariableBlock.lean
+-- FILENAME: @litlib4/Tests/CLI/Crawl/TestVariableBlock.lean
 
 import Litlib.Core.CLI.CodeSummary
 

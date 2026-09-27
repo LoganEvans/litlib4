@@ -1,4 +1,4 @@
--- FILENAME: lakefile.lean
+-- FILENAME: @litlib4/lakefile.lean
 
 import Lake
 open Lake DSL

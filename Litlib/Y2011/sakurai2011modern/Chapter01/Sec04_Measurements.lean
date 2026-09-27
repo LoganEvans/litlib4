@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2011/sakurai2011modern/Chapter01/Sec04_Measurements.lean
+-- FILENAME: @litlib4/Litlib/Y2011/sakurai2011modern/Chapter01/Sec04_Measurements.lean
 
 import Litlib.Core
 import Mathlib.Data.Complex.Basic

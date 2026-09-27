@@ -1,5 +1,4 @@
--- FILENAME: Litlib/Y1991/capovilla1991self/Signature.lean
-
+-- FILENAME: @litlib4/Litlib/Y1991/capovilla1991self/Signature.lean
 
 import Litlib.Core
 import Mathlib.Topology.Basic

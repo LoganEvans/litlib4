@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Math/SU2.lean
+-- FILENAME: @litlib4/Litlib/Math/SU2.lean
 
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Complex.Basic

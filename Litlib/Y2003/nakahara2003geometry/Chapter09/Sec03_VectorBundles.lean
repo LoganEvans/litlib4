@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2003/nakahara2003geometry/Chapter09/Sec03_VectorBundles.lean
+-- FILENAME: @litlib4/Litlib/Y2003/nakahara2003geometry/Chapter09/Sec03_VectorBundles.lean
 
 import Litlib.Core
 import Litlib.Y2003.nakahara2003geometry.Paper

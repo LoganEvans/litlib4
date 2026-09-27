@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y1987/besse1987einstein/Paper.lean
+-- FILENAME: @litlib4/Litlib/Y1987/besse1987einstein/Paper.lean
 
 import Litlib.Core
 

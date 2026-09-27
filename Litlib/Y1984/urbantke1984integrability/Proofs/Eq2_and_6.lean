@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y1984/urbantke1984integrability/Proofs/Eq2_and_6.lean
+-- FILENAME: @litlib4/Litlib/Y1984/urbantke1984integrability/Proofs/Eq2_and_6.lean
 
 import Litlib.Y1984.urbantke1984integrability.Signature
 import Mathlib.Tactic.Ring

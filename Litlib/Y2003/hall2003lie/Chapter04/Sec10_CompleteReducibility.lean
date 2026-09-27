@@ -1,5 +1,4 @@
--- FILENAME: Litlib/Y2003/hall2003lie/Chapter04/Sec10_CompleteReducibility.lean
-
+-- FILENAME: @litlib4/Litlib/Y2003/hall2003lie/Chapter04/Sec10_CompleteReducibility.lean
 
 import Litlib.Core
 import Litlib.Y2003.hall2003lie.Paper

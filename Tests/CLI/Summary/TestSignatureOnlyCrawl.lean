@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Summary/TestSignatureOnlyCrawl.lean
+-- FILENAME: @litlib4/Tests/CLI/Summary/TestSignatureOnlyCrawl.lean
 
 import Lean
 import Litlib.Core.CLI

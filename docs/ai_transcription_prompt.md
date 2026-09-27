@@ -1,4 +1,4 @@
-<!-- FILENAME: docs/ai_transcription_prompt.md -->
+<!-- FILENAME: @litlib4/docs/ai_transcription_prompt.md -->
 
 # Litlib4 System Prompt: Transcription Agent
 

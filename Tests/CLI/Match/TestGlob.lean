@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Match/TestGlob.lean
+-- FILENAME: @litlib4/Tests/CLI/Match/TestGlob.lean
 
 import Litlib.Core.CLI.Engine
 open Litlib.Core.CLI

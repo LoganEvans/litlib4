@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Core/CLI.lean
+-- FILENAME: @litlib4/Litlib/Core/CLI.lean
 
 import Lean
 import Litlib.Core.CLI.Engine

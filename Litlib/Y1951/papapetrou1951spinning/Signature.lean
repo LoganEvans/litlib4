@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y1951/papapetrou1951spinning/Signature.lean
+-- FILENAME: @litlib4/Litlib/Y1951/papapetrou1951spinning/Signature.lean
 
 import Litlib.Core
 import Mathlib.Topology.Basic

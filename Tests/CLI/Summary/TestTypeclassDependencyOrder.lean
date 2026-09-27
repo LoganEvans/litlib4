@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Summary/TestTypeclassDependencyOrder.lean
+-- FILENAME: @litlib4/Tests/CLI/Summary/TestTypeclassDependencyOrder.lean
 
 import Lean
 import Litlib.Core.CLI

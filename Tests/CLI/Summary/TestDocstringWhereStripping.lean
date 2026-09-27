@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Summary/TestDocstringWhereStripping.lean
+-- FILENAME: @litlib4/Tests/CLI/Summary/TestDocstringWhereStripping.lean
 
 import Lean
 import Litlib.Core.CLI

@@ -1,5 +1,4 @@
--- FILENAME: Litlib/Y1995/peres1995quantum/Chapter02/Sec04_Consecutive.lean
-
+-- FILENAME: @litlib4/Litlib/Y1995/peres1995quantum/Chapter02/Sec04_Consecutive.lean
 
 import Litlib.Core
 import Mathlib.Data.Real.Basic

@@ -1,5 +1,4 @@
--- FILENAME: Litlib/Y1995/peres1995quantum/Chapter07/Sec01_Nonlocality.lean
-
+-- FILENAME: @litlib4/Litlib/Y1995/peres1995quantum/Chapter07/Sec01_Nonlocality.lean
 
 import Litlib.Core
 import Mathlib.Data.Real.Basic

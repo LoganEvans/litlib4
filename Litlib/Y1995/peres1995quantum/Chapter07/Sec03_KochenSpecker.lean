@@ -1,5 +1,4 @@
--- FILENAME: Litlib/Y1995/peres1995quantum/Chapter07/Sec03_KochenSpecker.lean
-
+-- FILENAME: @litlib4/Litlib/Y1995/peres1995quantum/Chapter07/Sec03_KochenSpecker.lean
 
 import Litlib.Core
 import Mathlib.Data.Real.Basic

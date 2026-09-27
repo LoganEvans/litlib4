@@ -1,6 +1,5 @@
-# FILENAME: Tests/runner.sh
-
 #!/bin/bash
+# FILENAME: @litlib4/Tests/runner.sh
 
 # Always execute from the project root, no matter where the script is called from
 cd "$(dirname "$0")/.."

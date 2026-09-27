@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2010/wald2010general/Paper.lean
+-- FILENAME: @litlib4/Litlib/Y2010/wald2010general/Paper.lean
 
 import Litlib.Core
 

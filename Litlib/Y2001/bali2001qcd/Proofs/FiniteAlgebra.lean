@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y2001/bali2001qcd/Proofs/FiniteAlgebra.lean
+-- FILENAME: @litlib4/Litlib/Y2001/bali2001qcd/Proofs/FiniteAlgebra.lean
 
 import Litlib.Y2001.bali2001qcd.Signature
 import Mathlib.Tactic.FieldSimp

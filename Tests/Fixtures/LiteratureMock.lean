@@ -1,4 +1,4 @@
--- FILENAME: Tests/Fixtures/LiteratureMock.lean
+-- FILENAME: @litlib4/Tests/Fixtures/LiteratureMock.lean
 
 import Litlib.Core
 

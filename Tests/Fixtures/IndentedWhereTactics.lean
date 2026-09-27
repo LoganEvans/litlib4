@@ -1,4 +1,4 @@
--- FILENAME: Tests/Fixtures/IndentedWhereTactics.lean
+-- FILENAME: @litlib4/Tests/Fixtures/IndentedWhereTactics.lean
 
 import Litlib.Core
 

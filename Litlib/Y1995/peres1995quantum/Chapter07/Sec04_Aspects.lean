@@ -1,5 +1,4 @@
--- FILENAME: Litlib/Y1995/peres1995quantum/Chapter07/Sec04_Aspects.lean
-
+-- FILENAME: @litlib4/Litlib/Y1995/peres1995quantum/Chapter07/Sec04_Aspects.lean
 
 import Litlib.Core
 import Mathlib.Data.Real.Basic

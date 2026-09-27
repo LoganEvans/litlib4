@@ -1,4 +1,4 @@
-<!-- FILENAME: docs/conventions.md -->
+<!-- FILENAME: @litlib4/docs/conventions.md -->
 
 # Litlib4 Conventions & Workflows
 

@@ -1,4 +1,4 @@
--- FILENAME: Litlib/Y1946/weyl1946classical/Chapter02/Sec09_OrthogonalInvariants.lean
+-- FILENAME: @litlib4/Litlib/Y1946/weyl1946classical/Chapter02/Sec09_OrthogonalInvariants.lean
 
 import Mathlib
 import Litlib.Core

@@ -1,4 +1,4 @@
--- FILENAME: Tests/CLI/Match/TestIsAuto.lean
+-- FILENAME: @litlib4/Tests/CLI/Match/TestIsAuto.lean
 
 import Litlib.Core.CLI.CodeSummary
 open Litlib.Core.CLI

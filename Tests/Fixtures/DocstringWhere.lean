@@ -1,4 +1,4 @@
--- FILENAME: Tests/Fixtures/DocstringWhere.lean
+-- FILENAME: @litlib4/Tests/Fixtures/DocstringWhere.lean
 
 import Litlib.Core
 
