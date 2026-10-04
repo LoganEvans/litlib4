@@ -1,11 +1,8 @@
--- FILENAME: @litlib4/Litlib/Y2011/krasnov2011plebanski/Signature.lean
+-- FILENAME: Litlib/Y2011/krasnov2011plebanski/Signature.lean
 
 import Litlib.Core
 import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Real.Basic
-import Mathlib.Data.Matrix.Basic
-import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
-import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 namespace Litlib.Y2011.krasnov2011plebanski
@@ -23,6 +20,49 @@ Litlib.paper "krasnov2011plebanski"
   doi "10.1007/s10714-010-1061-x"
 
 Litlib.equation "krasnov2011plebanski"
+  eq "1"
+  page "3"
+  kind "definition"
+/--
+Physical Interpretation: Defines the Hodge dual operator acting on bivectors (antisymmetric
+rank-two tensors) in a 4-dimensional semi-Riemannian manifold.
+Mathematical Boundaries: Enforces 4D spacetime indices (`Fin 4`), contraction over the upper
+indices of the Levi-Civita volume tensor density, and a factor of `1/2` preventing
+double-counting of antisymmetrized pairs.
+-/
+class Eq1
+    (epsilonUpDown : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ)
+    (hodgeDual : (Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → ℝ)) : Prop where
+  hodgeDualDef : ∀ (A : Fin 4 → Fin 4 → ℝ) (mu nu : Fin 4),
+    hodgeDual A mu nu =
+      (1 / 2 : ℝ) * ∑ rho : Fin 4, ∑ sigma : Fin 4,
+        epsilonUpDown mu nu rho sigma * A rho sigma
+
+Litlib.equation "krasnov2011plebanski"
+  eq "2"
+  page "3"
+  kind "definition"
+/--
+Physical Interpretation: Defines the left and right Hodge duals of the Riemann curvature tensor.
+The left dual acts on the first pair of bivector indices, while the right dual acts on the
+second pair of bivector indices.
+Mathematical Boundaries: Explicitly indexes 4D spacetime tensors, contracting with the
+Levi-Civita volume tensor density with proper normalization.
+-/
+class Eq2
+    (epsilonUpDown : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ)
+    (leftHodge : (Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ))
+    (rightHodge : (Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ)) : Prop where
+  leftHodgeDef : ∀ R mu nu rho sigma,
+    leftHodge R mu nu rho sigma =
+      (1 / 2 : ℝ) * ∑ alpha : Fin 4, ∑ beta : Fin 4,
+        epsilonUpDown mu nu alpha beta * R alpha beta rho sigma
+  rightHodgeDef : ∀ R mu nu rho sigma,
+    rightHodge R mu nu rho sigma =
+      (1 / 2 : ℝ) * ∑ alpha : Fin 4, ∑ beta : Fin 4,
+        R mu nu alpha beta * epsilonUpDown rho sigma alpha beta
+
+Litlib.equation "krasnov2011plebanski"
   eq "3"
   page "3"
   kind "theorem"
@@ -31,27 +71,17 @@ Physical Interpretation: Reformulates the Einstein vacuum field equations using 
 duality operator on the Riemann curvature tensor. A metric is an Einstein metric (its Ricci tensor
 is proportional to the metric) if and only if the left and right Hodge duals of the Riemann
 tensor coincide.
-Mathematical Boundaries: The metric `g` must be strictly invertible (`gInv`), which mathematically
-prevents topological collapse and rules out degenerate metrics (i.e. ensures `det g ≠ 0`). The
-curvature tensor `R` must be antisymmetric in its index pairs and satisfy the first Bianchi identity.
+Mathematical Boundaries: Metric invertibility (`gInv`) prevents topological collapse and rules out
+degenerate metrics. The curvature tensor `R` must be antisymmetric in its index pairs and satisfy
+the first algebraic Bianchi identity.
 -/
 class Eq3
     (g : Fin 4 → Fin 4 → ℝ)
     (gInv : Fin 4 → Fin 4 → ℝ)
     (gIsInv : ∀ mu nu, (∑ alpha : Fin 4, g mu alpha * gInv alpha nu) = if mu = nu then 1 else 0)
-    (epsilonUpDown : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ)
     (leftHodge : (Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ))
     (rightHodge : (Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ))
-    (ricciTensor : (Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → ℝ))
-    where
-  leftHodgeDef : ∀ R mu nu rho sigma,
-    leftHodge R mu nu rho sigma =
-      (1/2 : ℝ) * ∑ alpha : Fin 4, ∑ beta : Fin 4,
-        epsilonUpDown mu nu alpha beta * R alpha beta rho sigma
-  rightHodgeDef : ∀ R mu nu rho sigma,
-    rightHodge R mu nu rho sigma =
-      (1/2 : ℝ) * ∑ alpha : Fin 4, ∑ beta : Fin 4,
-        R mu nu alpha beta * epsilonUpDown alpha beta rho sigma
+    (ricciTensor : (Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → ℝ)) : Prop where
   ricciTensorDef : ∀ R mu nu,
     ricciTensor R mu nu = ∑ rho : Fin 4, ∑ sigma : Fin 4, gInv rho sigma * R rho mu sigma nu
   einsteinConditionIff : ∀ (R : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ),
@@ -69,47 +99,56 @@ Litlib.equation "krasnov2011plebanski"
 Physical Interpretation: Defines self-dual and anti-self-dual bivectors as the eigenspaces of the
 Hodge star operator with eigenvalues `i` and `-i` respectively.
 Mathematical Boundaries: Applies to complex-valued 2-forms over the 4-dimensional spacetime.
-The existence of imaginary eigenvalues requires the Hodge star operator to satisfy `HodgeStar^2 = -1`
-on 2-forms, strictly binding this formulation to Lorentzian metric signatures.
+The imaginary eigenvalues reflect the Lorentzian metric signature condition `*² = -1` on 2-forms.
 -/
 class Eq4
     (hodgeStar : (Fin 4 → Fin 4 → ℂ) → (Fin 4 → Fin 4 → ℂ))
     (isSelfDual : (Fin 4 → Fin 4 → ℂ) → Prop)
-    (isAntiSelfDual : (Fin 4 → Fin 4 → ℂ) → Prop)
-    where
+    (isAntiSelfDual : (Fin 4 → Fin 4 → ℂ) → Prop) : Prop where
   selfDualIff : ∀ (A : Fin 4 → Fin 4 → ℂ),
     isSelfDual A ↔ (∀ mu nu, hodgeStar A mu nu = Complex.I * A mu nu)
   antiSelfDualIff : ∀ (A : Fin 4 → Fin 4 → ℂ),
     isAntiSelfDual A ↔ (∀ mu nu, hodgeStar A mu nu = -(Complex.I * A mu nu))
 
 Litlib.equation "krasnov2011plebanski"
-  eq "5_6"
+  eq "6"
   page "4"
   kind "definition"
 /--
-Physical Interpretation: The Atiyah-Hitchin-Singer projectors onto the spaces of self-dual and
-anti-self-dual bivectors.
-Mathematical Boundaries: Defines the identity operator in the space of bivectors and algebraically
-constructs the chiral projection operators explicitly.
+Physical Interpretation: The identity operator in the linear space of bivectors, defined as
+the antisymmetrized product of Kronecker delta tensors.
+Mathematical Boundaries: Explicitly operates on rank-2 antisymmetric tensors in 4 dimensions.
 -/
-class Eq5_6
+class Eq6
     (delta : Fin 4 → Fin 4 → ℝ)
-    (epsilon : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ)
-    (identityBivector : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ)
-    (pPlus : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    (pMinus : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    where
+    (identityBivector : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ) : Prop where
   identityDef : ∀ mu nu rho sigma,
     identityBivector mu nu rho sigma =
-      (1/2 : ℝ) * (delta mu rho * delta nu sigma - delta mu sigma * delta nu rho)
+      (1 / 2 : ℝ) * (delta mu rho * delta nu sigma - delta mu sigma * delta nu rho)
+
+Litlib.equation "krasnov2011plebanski"
+  eq "5"
+  page "4"
+  kind "definition"
+/--
+Physical Interpretation: The Atiyah-Hitchin-Singer projectors `P±` onto the spaces of self-dual
+and anti-self-dual bivectors.
+Mathematical Boundaries: Explicitly constructs the chiral projection operators from the bivector
+identity operator and the Levi-Civita volume tensor.
+-/
+class Eq5
+    (identityBivector : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ)
+    (epsilonUpDown : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ)
+    (pPlus : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
+    (pMinus : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) : Prop where
   pPlusDef : ∀ mu nu rho sigma,
     pPlus mu nu rho sigma =
-      (1/2 : ℂ) * ((identityBivector mu nu rho sigma : ℂ) +
-                   (1 / (2 * Complex.I)) * (epsilon mu nu rho sigma : ℂ))
+      (1 / 2 : ℂ) * ((identityBivector mu nu rho sigma : ℂ) +
+        (1 / (2 * Complex.I)) * (epsilonUpDown mu nu rho sigma : ℂ))
   pMinusDef : ∀ mu nu rho sigma,
     pMinus mu nu rho sigma =
-      (1/2 : ℂ) * ((identityBivector mu nu rho sigma : ℂ) -
-                   (1 / (2 * Complex.I)) * (epsilon mu nu rho sigma : ℂ))
+      (1 / 2 : ℂ) * ((identityBivector mu nu rho sigma : ℂ) -
+        (1 / (2 * Complex.I)) * (epsilonUpDown mu nu rho sigma : ℂ))
 
 Litlib.equation "krasnov2011plebanski"
   eq "7"
@@ -117,17 +156,15 @@ Litlib.equation "krasnov2011plebanski"
   kind "theorem"
 /--
 Physical Interpretation: The Atiyah-Hitchin-Singer theorem applied to General Relativity.
-Vacuum Einstein conditions are mathematically identical to the condition that the mixed
-anti-self-dual / self-dual projection of the Riemann tensor vanishes.
-Mathematical Boundaries: Fully eliminates metric dependencies from the vacuum constraint equation,
-pushing GR purely into the algebraic constraints of chiral projections.
+Vacuum Einstein conditions are mathematically identical to the vanishing of the mixed
+anti-self-dual / self-dual projection of the Riemann curvature tensor: `P⁻ R P⁺ = 0`.
+Mathematical Boundaries: Fully contracts over all four 4-dimensional internal indices.
 -/
 class Eq7
     (g : Fin 4 → Fin 4 → ℝ)
     (ricci : Fin 4 → Fin 4 → ℝ)
     (rCurv : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    (pPlus pMinus : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ)
-    where
+    (pPlus pMinus : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℂ) : Prop where
   einsteinConditionIff :
     (∃ (c : ℝ), ∀ mu nu, ricci mu nu = c * g mu nu) ↔
     (∀ mu nu rho sigma,
@@ -135,50 +172,49 @@ class Eq7
         pMinus mu nu alpha beta * rCurv alpha beta gamma delta_ * pPlus gamma delta_ rho sigma = 0)
 
 Litlib.equation "krasnov2011plebanski"
-  eq "8"
+  eq "8_11"
   page "5"
   kind "definition"
 /--
-Physical Interpretation: Constructs the self-dual and anti-self-dual 2-form bases (`sigma` and
-`sigmaBar`) from the spacetime tetrad.
-Mathematical Boundaries: Explicitly expands the wedge product of the tetrad 1-forms into
-components to prevent the Opaque Function Exploit.
+Physical Interpretation: Constructs the self-dual (`sigma`) and anti-self-dual (`sigmaBar`)
+2-form bases from the spacetime tetrad 1-forms `theta0` and `thetaSpat`.
+Mathematical Boundaries: Expands the exterior wedge product of tetrad 1-forms into explicit
+spacetime components, preventing the Opaque Function Exploit.
 -/
 class Eq8_11
     (theta0 : Fin 4 → ℝ)
     (thetaSpat : Fin 3 → Fin 4 → ℝ)
     (epsilonIjk : Fin 3 → Fin 3 → Fin 3 → ℝ)
     (sigma : Fin 3 → Fin 4 → Fin 4 → ℂ)
-    (sigmaBar : Fin 3 → Fin 4 → Fin 4 → ℂ)
-    where
+    (sigmaBar : Fin 3 → Fin 4 → Fin 4 → ℂ) : Prop where
   sigmaDef : ∀ (i : Fin 3) (mu nu : Fin 4),
     sigma i mu nu =
       Complex.I * (theta0 mu * thetaSpat i nu - theta0 nu * thetaSpat i mu) -
-      (1/2 : ℂ) * ∑ j : Fin 3, ∑ k : Fin 3, (epsilonIjk i j k : ℂ) *
+      (1 / 2 : ℂ) * ∑ j : Fin 3, ∑ k : Fin 3, (epsilonIjk i j k : ℂ) *
         (thetaSpat j mu * thetaSpat k nu - thetaSpat j nu * thetaSpat k mu)
   sigmaBarDef : ∀ (i : Fin 3) (mu nu : Fin 4),
     sigmaBar i mu nu =
       Complex.I * (theta0 mu * thetaSpat i nu - theta0 nu * thetaSpat i mu) +
-      (1/2 : ℂ) * ∑ j : Fin 3, ∑ k : Fin 3, (epsilonIjk i j k : ℂ) *
+      (1 / 2 : ℂ) * ∑ j : Fin 3, ∑ k : Fin 3, (epsilonIjk i j k : ℂ) *
         (thetaSpat j mu * thetaSpat k nu - thetaSpat j nu * thetaSpat k mu)
 
 Litlib.equation "krasnov2011plebanski"
-  eq "9"
+  eq "9_10"
   page "5"
   kind "theorem"
 /--
-Physical Interpretation: Reality and orthogonality conditions for the constructed 2-forms.
-Mathematical Boundaries: Locks down the non-degeneracy of the basis using the Levi-Civita
-volume form, preventing the Trivial Type Exploit.
+Physical Interpretation: Reality and orthogonality relations for the constructed 2-forms:
+`(i/2) Σⁱ ∧ Σʲ = δⁱʲ √-g d⁴x` and `Σⁱ ∧ Σ̄ʲ = 0`.
+Mathematical Boundaries: Evaluated via contraction with the Levi-Civita volume tensor.
+Locks down the non-degeneracy of the basis and prevents the Trivial Type Exploit.
 -/
 class Eq9_10
     (sigma : Fin 3 → Fin 4 → Fin 4 → ℂ)
     (sigmaBar : Fin 3 → Fin 4 → Fin 4 → ℂ)
     (gDetSqrt : ℝ)
-    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ)
-    where
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ) : Prop where
   realityCond1 : ∀ (i j : Fin 3),
-    (Complex.I / 2) * ∑ mu : Fin 4, ∑ nu : Fin 4, ∑ rho : Fin 4, ∑ s : Fin 4,
+    (Complex.I / 8) * ∑ mu : Fin 4, ∑ nu : Fin 4, ∑ rho : Fin 4, ∑ s : Fin 4,
       (epsilon4 mu nu rho s : ℂ) * sigma i mu nu * sigma j rho s =
     if i = j then (gDetSqrt : ℂ) else 0
   realityCond2 : ∀ (i j : Fin 3),
@@ -190,18 +226,16 @@ Litlib.equation "krasnov2011plebanski"
   page "5"
   kind "definition"
 /--
-Physical Interpretation: Defines the connection `A` compatible with the self-dual 2-forms `sigma`.
-This is the Plebański analogue of the tetrad compatibility condition (vanishing torsion).
-Mathematical Boundaries: Explicitly enforces functional dependence for derivatives to prevent
-the Decoupled Derivative Exploit. The equation is evaluated component-wise to avoid Opaque
-Function exploits.
+Physical Interpretation: Defines the connection `A` compatible with the self-dual 2-forms `sigma`:
+`dΣⁱ + εⁱʲᵏ Aʲ ∧ Σᵏ = 0`. This is the Plebański analogue of the vanishing torsion condition.
+Mathematical Boundaries: Enforces functional dependence for derivatives (`deriv`), eliminating
+the Decoupled Derivative Exploit. Evaluated in full component expansion.
 -/
 class Eq12
     (sigma : (Fin 4 → ℝ) → Fin 3 → Fin 4 → Fin 4 → ℂ)
     (aConn : (Fin 4 → ℝ) → Fin 3 → Fin 4 → ℂ)
     (epsilonIjk : Fin 3 → Fin 3 → Fin 3 → ℝ)
-    (deriv : ((Fin 4 → ℝ) → ℂ) → (Fin 4 → ℝ) → Fin 4 → ℂ)
-    where
+    (deriv : ((Fin 4 → ℝ) → ℂ) → (Fin 4 → ℝ) → Fin 4 → ℂ) : Prop where
   compatibility : ∀ (x : Fin 4 → ℝ) (i : Fin 3) (mu nu rho : Fin 4),
     (deriv (fun y ↦ sigma y i nu rho) x mu +
      deriv (fun y ↦ sigma y i rho mu) x nu +
@@ -216,20 +250,20 @@ Litlib.equation "krasnov2011plebanski"
   page "5"
   kind "definition"
 /--
-Physical Interpretation: The curvature 2-form `F` of the compatible connection `A`.
-Mathematical Boundaries: Formulated strictly with functional dependencies for the connection
-to prevent metric or connection collapse exploits.
+Physical Interpretation: The curvature 2-form `F` of the compatible connection `A`:
+`Fⁱ = dAⁱ + (1/2) εⁱʲᵏ Aʲ ∧ Aᵏ`.
+Mathematical Boundaries: Explicitly computes the exterior derivative and non-abelian Lie algebra
+bracket in spacetime components.
 -/
 class Eq13
     (aConn : (Fin 4 → ℝ) → Fin 3 → Fin 4 → ℂ)
     (fCurv : (Fin 4 → ℝ) → Fin 3 → Fin 4 → Fin 4 → ℂ)
     (epsilonIjk : Fin 3 → Fin 3 → Fin 3 → ℝ)
-    (deriv : ((Fin 4 → ℝ) → ℂ) → (Fin 4 → ℝ) → Fin 4 → ℂ)
-    where
+    (deriv : ((Fin 4 → ℝ) → ℂ) → (Fin 4 → ℝ) → Fin 4 → ℂ) : Prop where
   curvatureDef : ∀ (x : Fin 4 → ℝ) (i : Fin 3) (mu nu : Fin 4),
     fCurv x i mu nu =
       (deriv (fun y ↦ aConn y i nu) x mu - deriv (fun y ↦ aConn y i mu) x nu) +
-      (1/2 : ℂ) * ∑ j : Fin 3, ∑ k : Fin 3, (epsilonIjk i j k : ℂ) *
+      (1 / 2 : ℂ) * ∑ j : Fin 3, ∑ k : Fin 3, (epsilonIjk i j k : ℂ) *
         (aConn x j mu * aConn x k nu - aConn x j nu * aConn x k mu)
 
 Litlib.equation "krasnov2011plebanski"
@@ -237,11 +271,10 @@ Litlib.equation "krasnov2011plebanski"
   page "5"
   kind "theorem"
 /--
-Physical Interpretation: Decomposes the curvature of the self-dual connection into self-dual (`fIj`)
-and anti-self-dual (`fBarIj`) components.
-Mathematical Boundaries: The decomposition strictly requires that the background self-dual (`sigma`)
-and anti-self-dual (`sigmaBar`) 2-forms constitute a complete basis for the space of all
-antisymmetric 2-forms (`formsBasis`).
+Physical Interpretation: Decomposes the curvature of the self-dual connection into self-dual
+(`Fⁱʲ`) and anti-self-dual (`F̄ⁱʲ`) components: `Fⁱ(A_Σ) = Fⁱʲ Σʲ + F̄ⁱʲ Σ̄ʲ`.
+Mathematical Boundaries: Requires that the background self-dual and anti-self-dual 2-forms span
+the space of antisymmetric 2-forms (`formsBasis`).
 -/
 class Eq14
     (sigma : Fin 3 → Fin 4 → Fin 4 → ℂ)
@@ -249,8 +282,7 @@ class Eq14
     (formsBasis : ∀ (f : Fin 4 → Fin 4 → ℂ),
       (∀ mu nu, f mu nu = - f nu mu) →
       ∃ (c cBar : Fin 3 → ℂ), ∀ mu nu,
-        f mu nu = (∑ j : Fin 3, c j * sigma j mu nu) + (∑ j : Fin 3, cBar j * sigmaBar j mu nu))
-    where
+        f mu nu = (∑ j : Fin 3, c j * sigma j mu nu) + (∑ j : Fin 3, cBar j * sigmaBar j mu nu)) : Prop where
   curvatureDecomposition : ∀ (fI : Fin 3 → Fin 4 → Fin 4 → ℂ),
     (∀ i mu nu, fI i mu nu = - fI i nu mu) →
     ∃ (fIj fBarIj : Fin 3 → Fin 3 → ℂ),
@@ -263,13 +295,13 @@ Litlib.equation "krasnov2011plebanski"
   page "6"
   kind "definition"
 /--
-Physical Interpretation: Formulates the vacuum Einstein equations in the Plebański formalism.
-The trace of the self-dual curvature matrix is strictly proportional to the cosmological
-constant, and its anti-self-dual part strictly vanishes.
+Physical Interpretation: Formulates the vacuum Einstein equations in the Plebański formalism:
+`Tr(F) = -Λ` and `F̄ⁱʲ = 0`.
+Mathematical Boundaries: Enforces the 10 independent vacuum Einstein conditions via 1 trace
+condition and 9 vanishing anti-self-dual curvature conditions.
 -/
 class Eq15
-    (plebanskiVacuum : ℂ → (Fin 3 → Fin 3 → ℂ) → (Fin 3 → Fin 3 → ℂ) → Prop)
-    where
+    (plebanskiVacuum : ℂ → (Fin 3 → Fin 3 → ℂ) → (Fin 3 → Fin 3 → ℂ) → Prop) : Prop where
   plebanskiVacuumIff : ∀ (lambda : ℂ) (fIj fBarIj : Fin 3 → Fin 3 → ℂ),
     plebanskiVacuum lambda fIj fBarIj ↔
     ((∑ i : Fin 3, fIj i i) = -lambda ∧ (∀ i j, fBarIj i j = 0))
@@ -279,36 +311,33 @@ Litlib.equation "krasnov2011plebanski"
   page "6"
   kind "definition"
 /--
-Physical Interpretation: Defines the self-dual Weyl curvature tensor components as the trace-free
-part of the self-dual curvature matrix `fIj`.
+Physical Interpretation: The self-dual Weyl curvature tensor components are given by the
+trace-free part of the self-dual curvature matrix `Fⁱʲ`: `Ψⁱʲ = (Fⁱʲ)_tf`.
 Mathematical Boundaries: Explicitly removes the scalar trace to isolate the conformally
 invariant Weyl curvature.
 -/
 class Eq15_Weyl
     (fIj : Fin 3 → Fin 3 → ℂ)
-    (psiIj : Fin 3 → Fin 3 → ℂ)
-    where
+    (psiIj : Fin 3 → Fin 3 → ℂ) : Prop where
   weylCurvatureDef : ∀ i j,
-    psiIj i j = fIj i j - (1/3 : ℂ) * (∑ k : Fin 3, fIj k k) * (if i = j then 1 else 0)
+    psiIj i j = fIj i j - (1 / 3 : ℂ) * (∑ k : Fin 3, fIj k k) * (if i = j then 1 else 0)
 
 Litlib.equation "krasnov2011plebanski"
   eq "16"
   page "6"
   kind "definition"
 /--
-Physical Interpretation: Defines the projection of the trace-free macroscopic stress-energy tensor
-onto the mixed self-dual/anti-self-dual basis. This term serves as the source coupling matter
-to the gravitational field in the Plebański formalism.
-Mathematical Boundaries: The construction explicitly requires raising the indices of the
-anti-self-dual basis forms (`sigmaBar`) using the inverse background metric (`gInv`).
+Physical Interpretation: Defines the projection of the trace-free stress-energy tensor
+`T̃_μν = T_μν - (1/4) g_μν T` onto the mixed self-dual/anti-self-dual 2-form basis:
+`Tⁱʲ = T̃^ρ_μ Σⁱ_νρ Σ̄^j μν`.
+Mathematical Boundaries: The construction explicitly raises indices with the inverse metric `gInv`.
 -/
 class Eq16
     (sigma : Fin 3 → Fin 4 → Fin 4 → ℂ)
     (sigmaBar : Fin 3 → Fin 4 → Fin 4 → ℂ)
     (gInv : Fin 4 → Fin 4 → ℂ)
     (tTilde : Fin 4 → Fin 4 → ℂ)
-    (tIj : Fin 3 → Fin 3 → ℂ)
-    where
+    (tIj : Fin 3 → Fin 3 → ℂ) : Prop where
   tIjDef : ∀ (i j : Fin 3),
     tIj i j =
       ∑ mu : Fin 4, ∑ nu : Fin 4, ∑ rho : Fin 4, ∑ alpha : Fin 4, ∑ beta : Fin 4,
@@ -323,11 +352,10 @@ Litlib.equation "krasnov2011plebanski"
   page "6"
   kind "definition"
 /--
-Physical Interpretation: The full non-vacuum Einstein equations coupled to macroscopic matter
-in the Plebański formulation. The trace of the self-dual curvature is determined by the
-cosmological constant and the trace of the stress-energy tensor.
-Mathematical Boundaries: By coupling the curvature to the stress-energy components `T` and `tIj`,
-these equations are strictly bound to domains where macroscopic matter fields are well-defined.
+Physical Interpretation: Non-vacuum Einstein equations coupled to matter in the Plebański
+formulation: `Tr(F) = -Λ - 2πGT` and `F̄ⁱʲ = -2πGTⁱʲ`.
+Mathematical Boundaries: Explicitly couples the curvature trace and anti-self-dual parts to the
+matter stress-energy trace and projection matrix `Tⁱʲ`.
 -/
 class Eq17
     (lambda : ℂ)
@@ -336,8 +364,7 @@ class Eq17
     (fBarIj : Fin 3 → Fin 3 → ℂ)
     (tTrace : ℂ)
     (tIj : Fin 3 → Fin 3 → ℂ)
-    (plebanskiMatterEqs : Prop)
-    where
+    (plebanskiMatterEqs : Prop) : Prop where
   einsteinEqsIff : plebanskiMatterEqs ↔
     ((∑ i : Fin 3, fIj i i) = -lambda - 2 * (Real.pi : ℂ) * gNewton * tTrace ∧
      (∀ i j, fBarIj i j = -2 * (Real.pi : ℂ) * gNewton * tIj i j))
@@ -347,8 +374,12 @@ Litlib.equation "krasnov2011plebanski"
   page "6"
   kind "theorem"
 /--
-Physical Interpretation: Establishes the bridge between the Plebański formulation and the
-standard metric formulation of general relativity for vacuum.
+Physical Interpretation: Establishes the equivalence between the Plebański vacuum equations
+and the standard metric Einstein vacuum equations with cosmological constant:
+`Tr(F) = -Λ ∧ F̄ⁱʲ = 0 ↔ R_μν = Λ g_μν`.
+Mathematical Boundaries: Metric invertibility (`gInv`) prevents topological collapse. The
+predicate `isPlebanskiCurvature` binds `(fIj, fBarIj)` directly to `g`, preventing the
+decoupling exploit where arbitrary curvature matrices could falsify the equivalence.
 -/
 class PlebanskiToEinsteinEquivalence
     (g : Fin 4 → Fin 4 → ℝ)
@@ -356,12 +387,13 @@ class PlebanskiToEinsteinEquivalence
     (ricci : Fin 4 → Fin 4 → ℝ)
     (lambda : ℝ)
     (fIj fBarIj : Fin 3 → Fin 3 → ℂ)
+    (isPlebanskiCurvature : (Fin 4 → Fin 4 → ℝ) → (Fin 3 → Fin 3 → ℂ) → (Fin 3 → Fin 3 → ℂ) → Prop)
     (plebanskiVacuum : ℂ → (Fin 3 → Fin 3 → ℂ) → (Fin 3 → Fin 3 → ℂ) → Prop)
-    (isLeviCivitaRicci : (Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → ℝ) → Prop)
-    where
+    (isLeviCivitaRicci : (Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → ℝ) → Prop) : Prop where
   equivalenceIff :
     (∀ mu nu, (∑ alpha : Fin 4, g mu alpha * gInv alpha nu) = if mu = nu then 1 else 0) →
     isLeviCivitaRicci g ricci →
+    isPlebanskiCurvature g fIj fBarIj →
     (plebanskiVacuum (lambda : ℂ) fIj fBarIj ↔ (∀ a b, ricci a b = lambda * g a b))
 
 Litlib.equation "krasnov2011plebanski"
@@ -369,11 +401,13 @@ Litlib.equation "krasnov2011plebanski"
   page "6"
   kind "theorem"
 /--
-Physical Interpretation: The full horizon bridge theorem equating the macroscopic non-vacuum
-Plebański equations (Eq 17) to the tensorial Einstein Field Equations.
+Physical Interpretation: Equivalence between the non-vacuum Plebański equations (Eq 17) and
+the standard tensorial Einstein Field Equations with matter:
+`G_μν + Λ g_μν = 8πG T_μν`.
 Mathematical Boundaries: Extends the vacuum bridge to incorporate arbitrary stress-energy fields
-`tMuNu`, strictly preventing the "Can-Kicking" exploit by ensuring the non-vacuum topological
-constraints directly map to Einstein's $G_{\mu\nu}$.
+`tMuNu`. The predicates `isPlebanskiCurvature` and `isPlebanskiMatter` algebraically couple
+the Plebański variables `(fIj, fBarIj)` and `(tTrace, tIj)` to `g` and `tMuNu`, closing
+the decoupling exploit.
 -/
 class PlebanskiMatterToEinsteinEquivalence
     (g : Fin 4 → Fin 4 → ℝ)
@@ -382,12 +416,18 @@ class PlebanskiMatterToEinsteinEquivalence
     (tMuNu : Fin 4 → Fin 4 → ℝ)
     (lambda : ℝ)
     (gNewton : ℝ)
+    (fIj fBarIj : Fin 3 → Fin 3 → ℂ)
+    (tTrace : ℂ)
+    (tIj : Fin 3 → Fin 3 → ℂ)
+    (isPlebanskiCurvature : (Fin 4 → Fin 4 → ℝ) → (Fin 3 → Fin 3 → ℂ) → (Fin 3 → Fin 3 → ℂ) → Prop)
+    (isPlebanskiMatter : (Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → ℝ) → ℂ → (Fin 3 → Fin 3 → ℂ) → Prop)
     (plebanskiMatterEqs : Prop)
-    (isLeviCivitaRicci : (Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → ℝ) → Prop)
-    where
+    (isEinsteinTensor : (Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → ℝ) → Prop) : Prop where
   equivalenceIff :
     (∀ mu nu, (∑ alpha : Fin 4, g mu alpha * gInv alpha nu) = if mu = nu then 1 else 0) →
-    isLeviCivitaRicci g einsteinTensor →
+    isEinsteinTensor g einsteinTensor →
+    isPlebanskiCurvature g fIj fBarIj →
+    isPlebanskiMatter g tMuNu tTrace tIj →
     (plebanskiMatterEqs ↔
       (∀ mu nu, einsteinTensor mu nu + lambda * g mu nu = 8 * Real.pi * gNewton * tMuNu mu nu))
 
@@ -398,15 +438,13 @@ Litlib.equation "krasnov2011plebanski"
 /--
 Physical Interpretation: The explicit tetrad and self-dual basis 2-forms for the exact
 Schwarzschild solution.
-Mathematical Boundaries: Variables and forms are explicitly mapped to their spacetime
-coordinates (r, theta) over `Fin 4` indices (t=0, r=1, theta=2, phi=3) to categorically prevent
-dimensional collapse or arbitrary unphysical embeddings.
+Mathematical Boundaries: Spacetime coordinates (r, theta) are mapped to `Fin 4` indices
+(t=0, r=1, theta=2, phi=3) to prevent dimensional collapse.
 -/
 class Eq31_33
     (f gFunc : ℝ → ℝ)
     (eT eR eTheta ePhi : ℝ → ℝ → Fin 4 → ℝ)
-    (sigma : ℝ → ℝ → Fin 3 → Fin 4 → Fin 4 → ℂ)
-    where
+    (sigma : ℝ → ℝ → Fin 3 → Fin 4 → Fin 4 → ℂ) : Prop where
   eT_def : ∀ r theta, eT r theta 0 = f r ∧ ∀ i, i ≠ 0 → eT r theta i = 0
   eR_def : ∀ r theta, eR r theta 1 = gFunc r ∧ ∀ i, i ≠ 1 → eR r theta i = 0
   eTheta_def : ∀ r theta, eTheta r theta 2 = r ∧ ∀ i, i ≠ 2 → eTheta r theta i = 0
@@ -431,29 +469,27 @@ Litlib.equation "krasnov2011plebanski"
 /--
 Physical Interpretation: The explicit construction of the self-dual basis forms for the
 homogeneous isotropic Universe (FLRW metric) parameterized by conformal time `eta`.
-Mathematical Boundaries: Strictly defines the spatial differentials using Kronecker deltas
-over `Fin 4` to explicitly prohibit mathematical can-kicking and enforce rigid 4-dimensional
-symmetry.
+Mathematical Boundaries: Strictly defines spatial differentials using Kronecker deltas
+over `Fin 4` indices to enforce 4-dimensional symmetry.
 -/
 class Eq55_56
     (a : ℝ → ℝ)
     (dEta : Fin 4 → ℝ)
     (dx : Fin 3 → Fin 4 → ℝ)
     (epsilonIjk : Fin 3 → Fin 3 → Fin 3 → ℝ)
-    (sigma sigmaBar : ℝ → Fin 3 → Fin 4 → Fin 4 → ℂ)
-    where
+    (sigma sigmaBar : ℝ → Fin 3 → Fin 4 → Fin 4 → ℂ) : Prop where
   dEta_def : ∀ mu, dEta mu = if mu = 0 then 1 else 0
   dx_def : ∀ i mu, dx i mu = if mu.val = i.val + 1 then 1 else 0
   sigmaDef : ∀ eta i mu nu,
     sigma eta i mu nu = (a eta)^2 * (
       Complex.I * (dEta mu * dx i nu - dEta nu * dx i mu) -
-      (1/2 : ℂ) * ∑ j : Fin 3, ∑ k : Fin 3, (epsilonIjk i j k : ℂ) *
+      (1 / 2 : ℂ) * ∑ j : Fin 3, ∑ k : Fin 3, (epsilonIjk i j k : ℂ) *
         (dx j mu * dx k nu - dx j nu * dx k mu)
     )
   sigmaBarDef : ∀ eta i mu nu,
     sigmaBar eta i mu nu = (a eta)^2 * (
       Complex.I * (dEta mu * dx i nu - dEta nu * dx i mu) +
-      (1/2 : ℂ) * ∑ j : Fin 3, ∑ k : Fin 3, (epsilonIjk i j k : ℂ) *
+      (1 / 2 : ℂ) * ∑ j : Fin 3, ∑ k : Fin 3, (epsilonIjk i j k : ℂ) *
         (dx j mu * dx k nu - dx j nu * dx k mu)
     )
 
@@ -463,78 +499,18 @@ Litlib.equation "krasnov2011plebanski"
   kind "theorem"
 /--
 Physical Interpretation: The Bianchi identity in the Plebański formulation, mapping the covariant
-exterior derivative of the Weyl curvature components wedged with the self-dual 2-forms to zero.
-Mathematical Boundaries: Expressed rigorously as a vanishing 3-form by fully contracting it
-with the 4D Levi-Civita symbol. This explicitly shuts down trivial solutions that might arise
-if the wedge product were abstracted away.
+exterior derivative of the Weyl curvature components wedged with the self-dual 2-forms to zero:
+`D_A Ψⁱʲ ∧ Σʲ = 0`.
+Mathematical Boundaries: Expressed rigorously as a vanishing 3-form by fully contracting with
+the 4D Levi-Civita symbol.
 -/
 class Eq62
     (psi : (Fin 4 → ℝ) → Fin 3 → Fin 3 → ℂ)
     (covDerivPsi : (Fin 4 → ℝ) → Fin 3 → Fin 3 → Fin 4 → ℂ)
     (sigma : (Fin 4 → ℝ) → Fin 3 → Fin 4 → Fin 4 → ℂ)
-    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ)
-    where
+    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ) : Prop where
   bianchiIdentity : ∀ (x : Fin 4 → ℝ) (i : Fin 3) (mu : Fin 4),
     ∑ j : Fin 3, ∑ nu : Fin 4, ∑ rho : Fin 4, ∑ sigma_ : Fin 4,
       (epsilon4 mu nu rho sigma_ : ℂ) * covDerivPsi x i j nu * sigma x j rho sigma_ = 0
-
-Litlib.equation "krasnov2011plebanski"
-  eq "8_11_converse"
-  page "5"
-  kind "theorem"
-/--
-Physical Interpretation: The Ashtekar-Plebański Reality Theorem (Krasnov 2011, Sec 1.3 & 2;
-Krasnov 2020, Theorem 5.6). If a triple of complex 2-forms `sigma` satisfies the metricity and
-reality conditions (Eq 9-10), then there exists a real tetrad `(theta0, thetaSpat)` such that
-`sigma` decomposes into an electric (purely imaginary) part and a magnetic (purely real) part
-as in Eq (8).
--/
-class RealityTheorem
-    (epsilon4 : Fin 4 → Fin 4 → Fin 4 → Fin 4 → ℝ)
-    (epsilonIjk : Fin 3 → Fin 3 → Fin 3 → ℝ)
-    (sigma : Fin 3 → Fin 4 → Fin 4 → ℂ)
-    (sigmaBar : Fin 3 → Fin 4 → Fin 4 → ℂ)
-    (gDetSqrt : ℝ)
-    where
-  realityToTetrad :
-    (∀ (i j : Fin 3),
-      (Complex.I / 2) * ∑ mu : Fin 4, ∑ nu : Fin 4, ∑ rho : Fin 4, ∑ s : Fin 4,
-        (epsilon4 mu nu rho s : ℂ) * sigma i mu nu * sigma j rho s =
-        if i = j then (gDetSqrt : ℂ) else 0) →
-    (∀ (i j : Fin 3),
-      ∑ mu : Fin 4, ∑ nu : Fin 4, ∑ rho : Fin 4, ∑ s : Fin 4,
-        (epsilon4 mu nu rho s : ℂ) * sigma i mu nu * sigmaBar j rho s = 0) →
-    gDetSqrt > 0 →
-    ∃ (theta0 : Fin 4 → ℝ) (thetaSpat : Fin 3 → Fin 4 → ℝ),
-      ∀ (i : Fin 3) (mu nu : Fin 4),
-        sigma i mu nu =
-          Complex.I * (theta0 mu * thetaSpat i nu - theta0 nu * thetaSpat i mu) -
-          (1/2 : ℂ) * ∑ j : Fin 3, ∑ k : Fin 3, (epsilonIjk i j k : ℂ) *
-            (thetaSpat j mu * thetaSpat k nu - thetaSpat j nu * thetaSpat k mu)
-
-Litlib.equation "krasnov2011plebanski"
-  eq "reality_conditions"
-  page "5"
-  kind "theorem"
-/--
-Physical Interpretation: The Ashtekar-Plebański Reality Theorem in matrix representation.
-If the emergent Urbantke metric generated by self-dual curvature is strictly real and Lorentzian,
-there algebraically exists an SL(2,C) gauge frame rotating the electric curvature components
-to real Pauli coefficients and the magnetic components to imaginary coefficients.
--/
-class RealityConditions
-    (F : Fin 4 → Fin 4 → Matrix (Fin 2) (Fin 2) ℂ)
-    (urbantkeMetric : (Fin 4 → Fin 4 → Matrix (Fin 2) (Fin 2) ℂ) → Matrix (Fin 4) (Fin 4) ℂ)
-    (isLorentzian : Matrix (Fin 4) (Fin 4) ℂ → Prop)
-    (pauliProject : Matrix (Fin 2) (Fin 2) ℂ → Fin 3 → ℂ)
-    where
-  realityForcesFrame :
-    isLorentzian (urbantkeMetric F) →
-    ∃ (h : Matrix (Fin 2) (Fin 2) ℂ),
-      Matrix.det h = 1 ∧
-      (∀ (a : Fin 3) (i : Fin 4), i ≠ 0 →
-        (pauliProject (h * F 0 i * h⁻¹) a).im = 0) ∧
-      (∀ (a : Fin 3) (i j : Fin 4), i ≠ 0 → j ≠ 0 →
-        (pauliProject (h * F i j * h⁻¹) a).re = 0)
 
 end Litlib.Y2011.krasnov2011plebanski
