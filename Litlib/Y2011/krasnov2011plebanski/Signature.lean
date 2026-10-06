@@ -370,68 +370,6 @@ class Eq17
      (∀ i j, fBarIj i j = -2 * (Real.pi : ℂ) * gNewton * tIj i j))
 
 Litlib.equation "krasnov2011plebanski"
-  eq "bridge_theorem_vacuum"
-  page "6"
-  kind "theorem"
-/--
-Physical Interpretation: Establishes the equivalence between the Plebański vacuum equations
-and the standard metric Einstein vacuum equations with cosmological constant:
-`Tr(F) = -Λ ∧ F̄ⁱʲ = 0 ↔ R_μν = Λ g_μν`.
-Mathematical Boundaries: Metric invertibility (`gInv`) prevents topological collapse. The
-predicate `isPlebanskiCurvature` binds `(fIj, fBarIj)` directly to `g`, preventing the
-decoupling exploit where arbitrary curvature matrices could falsify the equivalence.
--/
-class PlebanskiToEinsteinEquivalence
-    (g : Fin 4 → Fin 4 → ℝ)
-    (gInv : Fin 4 → Fin 4 → ℝ)
-    (ricci : Fin 4 → Fin 4 → ℝ)
-    (lambda : ℝ)
-    (fIj fBarIj : Fin 3 → Fin 3 → ℂ)
-    (isPlebanskiCurvature : (Fin 4 → Fin 4 → ℝ) → (Fin 3 → Fin 3 → ℂ) → (Fin 3 → Fin 3 → ℂ) → Prop)
-    (plebanskiVacuum : ℂ → (Fin 3 → Fin 3 → ℂ) → (Fin 3 → Fin 3 → ℂ) → Prop)
-    (isLeviCivitaRicci : (Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → ℝ) → Prop) : Prop where
-  equivalenceIff :
-    (∀ mu nu, (∑ alpha : Fin 4, g mu alpha * gInv alpha nu) = if mu = nu then 1 else 0) →
-    isLeviCivitaRicci g ricci →
-    isPlebanskiCurvature g fIj fBarIj →
-    (plebanskiVacuum (lambda : ℂ) fIj fBarIj ↔ (∀ a b, ricci a b = lambda * g a b))
-
-Litlib.equation "krasnov2011plebanski"
-  eq "bridge_theorem_matter"
-  page "6"
-  kind "theorem"
-/--
-Physical Interpretation: Equivalence between the non-vacuum Plebański equations (Eq 17) and
-the standard tensorial Einstein Field Equations with matter:
-`G_μν + Λ g_μν = 8πG T_μν`.
-Mathematical Boundaries: Extends the vacuum bridge to incorporate arbitrary stress-energy fields
-`tMuNu`. The predicates `isPlebanskiCurvature` and `isPlebanskiMatter` algebraically couple
-the Plebański variables `(fIj, fBarIj)` and `(tTrace, tIj)` to `g` and `tMuNu`, closing
-the decoupling exploit.
--/
-class PlebanskiMatterToEinsteinEquivalence
-    (g : Fin 4 → Fin 4 → ℝ)
-    (gInv : Fin 4 → Fin 4 → ℝ)
-    (einsteinTensor : Fin 4 → Fin 4 → ℝ)
-    (tMuNu : Fin 4 → Fin 4 → ℝ)
-    (lambda : ℝ)
-    (gNewton : ℝ)
-    (fIj fBarIj : Fin 3 → Fin 3 → ℂ)
-    (tTrace : ℂ)
-    (tIj : Fin 3 → Fin 3 → ℂ)
-    (isPlebanskiCurvature : (Fin 4 → Fin 4 → ℝ) → (Fin 3 → Fin 3 → ℂ) → (Fin 3 → Fin 3 → ℂ) → Prop)
-    (isPlebanskiMatter : (Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → ℝ) → ℂ → (Fin 3 → Fin 3 → ℂ) → Prop)
-    (plebanskiMatterEqs : Prop)
-    (isEinsteinTensor : (Fin 4 → Fin 4 → ℝ) → (Fin 4 → Fin 4 → ℝ) → Prop) : Prop where
-  equivalenceIff :
-    (∀ mu nu, (∑ alpha : Fin 4, g mu alpha * gInv alpha nu) = if mu = nu then 1 else 0) →
-    isEinsteinTensor g einsteinTensor →
-    isPlebanskiCurvature g fIj fBarIj →
-    isPlebanskiMatter g tMuNu tTrace tIj →
-    (plebanskiMatterEqs ↔
-      (∀ mu nu, einsteinTensor mu nu + lambda * g mu nu = 8 * Real.pi * gNewton * tMuNu mu nu))
-
-Litlib.equation "krasnov2011plebanski"
   eq "31_33"
   page "9"
   kind "theorem"
