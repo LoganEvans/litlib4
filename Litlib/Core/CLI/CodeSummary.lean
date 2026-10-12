@@ -26,9 +26,15 @@ def isAuto (n : Name) : Bool :=
   | .str _ s =>
     s == "mk" || s == "rec" || s == "casesOn" || s == "recOn" ||
     s == "noConfusion" || s == "noConfusionType" || s == "injEq" ||
+    s == "ctorElim" || s == "ctorElimType" || s == "ctorIdx" || s == "toCtorIdx" ||
+    s == "enumList" || s == "ofNat" || s == "decEq" || s == "beq" ||
+    s == "below" || s == "brecOn" || s == "elim" || s == "repr" || s == "reprPrec" ||
     s.startsWith "match_" || s.startsWith "proof_" || s.startsWith "eq_" ||
     s.startsWith "sizeOf" || s.startsWith "inst" || s.startsWith "_aux" ||
-    s.endsWith "inj" || s.endsWith "ext" || s.endsWith "ext_iff"
+    s.startsWith "enumList_" || s.startsWith "ofNat_" || s.startsWith "decEq_" ||
+    s.startsWith "beq_" ||
+    s.endsWith "inj" || s.endsWith "ext" || s.endsWith "ext_iff" ||
+    s.endsWith "_paper_meta"
   | _ => false
 
 /-- Attempts to locate the .lean source file for a given module. -/
@@ -380,6 +386,7 @@ partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet
           | none => true
 
         let projInfoOpt ← Lean.getProjectionFnInfo? c
+        let ctorInfoOpt := match env.find? c with | some (.ctorInfo ci) => some ci | _ => none
 
         let isTracked := (litlibTrackExt.find? env c).isSome || (litlibEqExt.find? env c).isSome
         let isThm := match env.find? c with | some (.thmInfo _) => true | _ => false
@@ -396,9 +403,16 @@ partial def collectLocalDepsRec (rootModule : Name) (q : List Name) (v : NameSet
 
         let allowedByLitlib := if isThm || isInst then isTracked else true
 
-        if isLocalMod && !isAuto c && c != curr then
+        let parentOpt : Option Name :=
           if let some projInfo := projInfoOpt then
-            let parent := projInfo.ctorName.getPrefix
+            some projInfo.ctorName.getPrefix
+          else if let some ci := ctorInfoOpt then
+            some ci.induct
+          else
+            none
+
+        if isLocalMod && !isAuto c && c != curr then
+          if let some parent := parentOpt then
             if !newV.contains parent then
               let parentModStr := match env.getModuleIdxFor? parent with
                 | some idx => env.header.moduleNames[idx.toNat]!.toString
@@ -504,7 +518,8 @@ def gatherRoots (rootModule : Name) (globalData : GlobalData) (ctx : CliContext)
         roots := roots.insert thm.declName
 
   if !ctx.litlibTheoremsOnly then
-    for (declName, _) in env.constants.toList do
+    for (declName, info) in env.constants.toList do
+      let ctorParent := match info with | .ctorInfo ci => some ci.induct | _ => none
       if !isAuto declName && !(← Lean.getProjectionFnInfo? declName).isSome then
         if isLocal declName then
           let modNameStr := match env.getModuleIdxFor? declName with
@@ -515,7 +530,9 @@ def gatherRoots (rootModule : Name) (globalData : GlobalData) (ctx : CliContext)
                          matchesAnyGlob ctx.theoremGlobs modNameStr ||
                          matchesAnyGlob ctx.referenceGlobs modNameStr
           if isMatch then
-            roots := roots.insert declName
+            match ctorParent with
+            | some parent => roots := roots.insert parent
+            | none => roots := roots.insert declName
 
   return roots
 

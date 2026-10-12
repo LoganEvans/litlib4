@@ -1,5 +1,3 @@
-<!-- FILENAME: @litlib4/Tests/Artifacts/LatexTest/litlib-README.md -->
-
 # Litlib LaTeX Artifacts
 
 This directory contains automatically generated files to seamlessly integrate your formal Lean 4 verification into your LaTeX paper.
