@@ -7,6 +7,8 @@ import Litlib.Core.CLI.CodeSummary
 import Litlib.Core.CLI.Dashboard
 import Litlib.Core.CLI.Help
 import Litlib.Core.CLI.Dependencies
+import Litlib.Core.CLI.Outline
+import Litlib.Core.CLI.Lint
 
 open Lean
 
@@ -18,45 +20,99 @@ def sanitizePathToModule (val : String) : String :=
   let cleanVal := if cleanVal.endsWith ".lean" then (cleanVal.dropEnd 5).toString else cleanVal
   cleanVal.replace "/" "."
 
+private def applyFilterTokens (ctx : CliContext) (rawVal : String) : CliContext := Id.run do
+  let tokens := rawVal.splitOn "," |>.map (fun s => sanitizePathToModule s.trimAscii.toString) |>.filter (· != "")
+  let mut c := { ctx with filterTokens := ctx.filterTokens ++ tokens }
+  if tokens.isEmpty || tokens == ["all"] || tokens == ["*"] then
+    c := { c with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
+  else if tokens == ["litlib_track"] then
+    c := { c with litlibTheoremsOnly := true, targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
+  else if tokens == ["leaf"] || tokens == ["leaves"] then
+    c := { c with leafOnly := true, targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
+  else if tokens == ["theorem"] || tokens == ["theorems"] then
+    c := { c with targetTheorems := true, theoremGlobs := ["all"], targetReferences := false, explicitFilters := true }
+  else if tokens == ["reference"] || tokens == ["references"] then
+    c := { c with targetTheorems := false, targetReferences := true, referenceGlobs := ["all"], explicitFilters := true }
+  else
+    let hasLeaf := tokens.any (fun t => t == "leaf" || t == "leaves")
+    let nonMagic := tokens.filter (fun t => !isMagicFilterToken t)
+    let effGlobs := if nonMagic.isEmpty then ["all"] else tokens
+    c := {
+      c with
+      leafOnly := c.leafOnly || hasLeaf
+      targetTheorems := true
+      theoremGlobs := c.theoremGlobs ++ effGlobs
+      targetReferences := true
+      referenceGlobs := c.referenceGlobs ++ effGlobs
+      explicitFilters := !nonMagic.isEmpty
+    }
+  return c
+
 def parseArgs (args : List String) : CliContext := Id.run do
   let mut ctx : CliContext := {}
+  let mut explicitAction : Option String := none
+
+  let setPrimaryAction (cur : Option String) (act : String) : Option String :=
+    match cur with
+    | none => some act
+    | some prev => if prev == act then some act else some "error"
+
   for arg in args do
     if arg == "--help" || arg == "-h" then
+      explicitAction := some "help"
       ctx := { ctx with action := "help" }
     else if arg == "--dashboard" then
-      ctx := { ctx with action := "dashboard" }
+      explicitAction := setPrimaryAction explicitAction "dashboard"
+      ctx := { ctx with action := explicitAction.getD "dashboard" }
     else if arg.startsWith "--dashboard=" then
+      explicitAction := setPrimaryAction explicitAction "dashboard"
       let globs := (arg.drop 12).toString.splitOn "," |>.map (fun s => sanitizePathToModule s.trimAscii.toString)
-      ctx := { ctx with action := "dashboard", targetTheorems := true, theoremGlobs := ctx.theoremGlobs ++ globs, targetReferences := true, referenceGlobs := ctx.referenceGlobs ++ globs, explicitFilters := true }
+      ctx := { ctx with action := explicitAction.getD "dashboard", targetTheorems := true, theoremGlobs := ctx.theoremGlobs ++ globs, targetReferences := true, referenceGlobs := ctx.referenceGlobs ++ globs, filterTokens := ctx.filterTokens ++ globs, explicitFilters := true }
     else if arg.startsWith "--latex=" then
+      explicitAction := setPrimaryAction explicitAction "code-summary"
       let dir := (arg.drop 8).toString
-      ctx := { ctx with action := "code-summary", latexDir := some dir }
+      ctx := { ctx with action := explicitAction.getD "code-summary", latexDir := some dir }
     else if arg == "--latex" then
-      ctx := { ctx with action := "code-summary", latexDir := some "latex-artifacts" }
+      explicitAction := setPrimaryAction explicitAction "code-summary"
+      ctx := { ctx with action := explicitAction.getD "code-summary", latexDir := some "latex-artifacts" }
     else if arg.startsWith "--code-summary=" then
-      ctx := { ctx with action := "code-summary" }
-      let val := sanitizePathToModule (arg.drop 15).toString
-      if val == "all" || val == "" then
-        ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
-      else if val == "litlib_track" then
-        ctx := { ctx with litlibTheoremsOnly := true, targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
-      else if val == "theorem" || val == "theorems" then
-        ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := false, explicitFilters := true }
-      else if val == "reference" || val == "references" then
-        ctx := { ctx with targetTheorems := false, targetReferences := true, referenceGlobs := ["all"], explicitFilters := true }
-      else
-        let globs := val.splitOn "," |>.map (fun s => s.trimAscii.toString)
-        ctx := { ctx with targetTheorems := true, theoremGlobs := ctx.theoremGlobs ++ globs, targetReferences := true, referenceGlobs := ctx.referenceGlobs ++ globs, explicitFilters := true }
+      explicitAction := setPrimaryAction explicitAction "code-summary"
+      ctx := { ctx with action := explicitAction.getD "code-summary" }
+      ctx := applyFilterTokens ctx (arg.drop 15).toString
     else if arg == "--code-summary" then
-      ctx := { ctx with action := "code-summary" }
+      explicitAction := setPrimaryAction explicitAction "code-summary"
+      ctx := { ctx with action := explicitAction.getD "code-summary" }
+    else if arg.startsWith "--outline=" then
+      explicitAction := setPrimaryAction explicitAction "outline"
+      ctx := { ctx with action := explicitAction.getD "outline" }
+      ctx := applyFilterTokens ctx (arg.drop 10).toString
+    else if arg == "--outline" then
+      explicitAction := setPrimaryAction explicitAction "outline"
+      ctx := { ctx with action := explicitAction.getD "outline", targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"], filterTokens := ["all"] }
+    else if arg.startsWith "--lint=" then
+      explicitAction := setPrimaryAction explicitAction "lint"
+      let lintNames := (arg.drop 7).toString.splitOn "," |>.map (fun s => s.trimAscii.toString) |>.filter (· != "")
+      ctx := { ctx with action := explicitAction.getD "lint", linters := ctx.linters ++ lintNames }
+    else if arg == "--lint" then
+      explicitAction := setPrimaryAction explicitAction "lint"
+      ctx := { ctx with action := explicitAction.getD "lint", linters := ["all"] }
+    else if arg.startsWith "--glob-mode=" then
+      let mode := (arg.drop 12).trimAscii.toString
+      if mode == "any" || mode == "all" then
+        ctx := { ctx with globMode := mode }
+      else
+        explicitAction := some "error"
+        ctx := { ctx with action := "error" }
     else if arg == "--bibtex" then
-      ctx := { ctx with action := "bibtex" }
+      explicitAction := setPrimaryAction explicitAction "bibtex"
+      ctx := { ctx with action := explicitAction.getD "bibtex" }
     else if arg.startsWith "--bibtex=" then
+      explicitAction := setPrimaryAction explicitAction "bibtex"
       let globs := (arg.drop 9).toString.splitOn "," |>.map (fun s => sanitizePathToModule s.trimAscii.toString)
-      ctx := { ctx with action := "bibtex", targetReferences := true, referenceGlobs := ctx.referenceGlobs ++ globs, explicitFilters := true }
+      ctx := { ctx with action := explicitAction.getD "bibtex", targetReferences := true, referenceGlobs := ctx.referenceGlobs ++ globs, explicitFilters := true }
     else if arg.startsWith "--theorem=" then
       let globs := (arg.drop 10).toString.splitOn "," |>.map (fun s => sanitizePathToModule s.trimAscii.toString)
-      ctx := { ctx with targetTheorems := true, theoremGlobs := ctx.theoremGlobs ++ globs, explicitFilters := true }
+      ctx := { ctx with targetTheorems := true, theoremGlobs := ctx.theoremGlobs ++ globs, filterTokens := ctx.filterTokens ++ globs, explicitFilters := true }
     else if arg == "--theorem" then
       ctx := { ctx with targetTheorems := true, theoremGlobs := ctx.theoremGlobs ++ ["all"], explicitFilters := true }
     else if arg.startsWith "--reference=" then
@@ -67,15 +123,21 @@ def parseArgs (args : List String) : CliContext := Id.run do
     else if arg == "--all" then
       ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"], explicitFilters := true }
     else if arg == "--dependencies" then
-      ctx := { ctx with action := "dependencies", dependenciesOut := some "dependencies.dot", dependenciesFormat := "dot" }
+      explicitAction := setPrimaryAction explicitAction "dependencies"
+      ctx := { ctx with action := explicitAction.getD "dependencies", dependenciesOut := some "dependencies.dot", dependenciesFormat := "dot" }
     else if arg.startsWith "--dependencies=" then
+      explicitAction := setPrimaryAction explicitAction "dependencies"
       let path := (arg.drop 15).toString
       if path.endsWith ".dot" then
-        ctx := { ctx with action := "dependencies", dependenciesOut := some path, dependenciesFormat := "dot" }
+        ctx := { ctx with action := explicitAction.getD "dependencies", dependenciesOut := some path, dependenciesFormat := "dot" }
       else if path.endsWith ".json" then
-        ctx := { ctx with action := "dependencies", dependenciesOut := some path, dependenciesFormat := "json" }
+        ctx := { ctx with action := explicitAction.getD "dependencies", dependenciesOut := some path, dependenciesFormat := "json" }
       else
+        explicitAction := some "error"
         ctx := { ctx with action := "error" }
+
+  if explicitAction == some "error" then
+    return { ctx with action := "error" }
 
   if ctx.action == "code-summary" && !ctx.targetTheorems && !ctx.targetReferences then
     if ctx.latexDir.isSome || ctx.litlibTheoremsOnly then
@@ -86,7 +148,7 @@ def parseArgs (args : List String) : CliContext := Id.run do
   if !ctx.targetTheorems && !ctx.targetReferences then
     if ctx.action == "bibtex" then
       ctx := { ctx with targetReferences := true, referenceGlobs := ["all"] }
-    else if ctx.action == "dashboard" || ctx.action == "dependencies" then
+    else if ctx.action == "dashboard" || ctx.action == "dependencies" || ctx.action == "outline" || ctx.action == "lint" then
       ctx := { ctx with targetTheorems := true, theoremGlobs := ["all"], targetReferences := true, referenceGlobs := ["all"] }
 
   return ctx
@@ -219,6 +281,10 @@ def runCli (rootModule : Name) (args : List String) : IO UInt32 := do
     return ← runDashboard rootModule globalData ctx
   else if ctx.action == "code-summary" then
     return ← runCodeSummary rootModule env globalData ctx
+  else if ctx.action == "outline" then
+    return ← runOutline rootModule env globalData ctx
+  else if ctx.action == "lint" then
+    return ← runLint rootModule env globalData ctx
   else if ctx.action == "bibtex" then
     return ← runBibtex globalData
   else if ctx.action == "dependencies" then

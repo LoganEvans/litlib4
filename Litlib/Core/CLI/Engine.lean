@@ -56,6 +56,10 @@ structure CliContext where
   explicitFilters : Bool := false
   dependenciesOut : Option String := none
   dependenciesFormat : String := "dot"
+  globMode : String := "any"
+  filterTokens : List String := []
+  leafOnly : Bool := false
+  linters : List String := []
 
 def myDropRight (s : String) (n : Nat) : String :=
   let chars := s.toList

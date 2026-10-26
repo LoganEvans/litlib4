@@ -9,11 +9,11 @@ open Lean Meta
 
 namespace Litlib.Core.CLI
 
-private def nameToFilePath : Name → System.FilePath
+def modNameToFilePath : Name → System.FilePath
   | .anonymous => System.FilePath.mk "."
   | .str .anonymous s => System.FilePath.mk s
-  | .str p s => nameToFilePath p / s
-  | .num p _ => nameToFilePath p
+  | .str p s => modNameToFilePath p / s
+  | .num p _ => modNameToFilePath p
 
 /-- Substring check helper -/
 private def stringContains (s sub : String) : Bool :=
@@ -38,9 +38,9 @@ def isAuto (n : Name) : Bool :=
   | _ => false
 
 /-- Attempts to locate the .lean source file for a given module. -/
-private def findSourceFile (modName : Name) : IO (Option System.FilePath) := do
+def findSourceFile (modName : Name) : IO (Option System.FilePath) := do
   let sp ← Lean.searchPathRef.get
-  let relPath := (nameToFilePath modName).withExtension "lean"
+  let relPath := (modNameToFilePath modName).withExtension "lean"
 
   if let some oleanPath ← Lean.SearchPath.findWithExt sp "olean" modName then
     let mut curr := oleanPath
@@ -486,16 +486,157 @@ def ppDecl (env : Environment) (name : Name) : IO String := do
 
   return res.replace "𝓝" "nhds"
 
+/-- Checks if a declaration belongs to a module under `rootModule`. -/
+def isLocalToRoot (rootModule : Name) (env : Environment) (declName : Name) : Bool :=
+  match env.getModuleIdxFor? declName with
+  | some idx =>
+    let modName := env.header.moduleNames[idx.toNat]!
+    modName.toString.startsWith rootModule.toString
+  | none => true
+
+/-- Collapses a projection function or constructor to its parent inductive/structure name. -/
+def collapseParentDecl (env : Environment) (c : Name) : CoreM Name := do
+  if let some projInfo ← Lean.getProjectionFnInfo? c then
+    return projInfo.ctorName.getPrefix
+  else if let some (.ctorInfo ci) := env.find? c then
+    return ci.induct
+  else
+    return c
+
+/-- Collects the set of local equation proof declaration names in the environment. -/
+def collectEqProofDecls (env : Environment) : NameSet := Id.run do
+  let mut eqDecls : NameSet := {}
+  for (declName, _) in env.constants.toList do
+    if (litlibEqExt.find? env declName).isSome then
+      eqDecls := eqDecls.insert declName
+  let mut proofDecls : NameSet := {}
+  for (declName, info) in env.constants.toList do
+    if let some tn := info.type.getAppFn.constName? then
+      if eqDecls.contains tn && !isAuto declName && declName != tn then
+        proofDecls := proofDecls.insert declName
+  return proofDecls
+
+/-- Checks whether a declaration is tracked via `@[litlib_track]` or `Litlib.equation`. -/
+def isTrackedDecl (env : Environment) (eqProofDecls : NameSet) (declName : Name) : Bool :=
+  (litlibTrackExt.find? env declName).isSome ||
+  (litlibEqExt.find? env declName).isSome ||
+  eqProofDecls.contains declName
+
+/--
+Computes the project-local dependency map (`decl -> sets of local decls it uses`)
+and the in-degree reference count map (`decl -> number of distinct local decls that use it`).
+-/
+def computeUsesAndDeps (rootModule : Name) (env : Environment) :
+    CoreM (NameMap Nat × NameMap NameSet) := do
+  let mut usesMap : NameMap Nat := {}
+  let mut depsMap : NameMap NameSet := {}
+  let mut localNodes : Array Name := #[]
+
+  for (declName, info) in env.constants.toList do
+    if isLocalToRoot rootModule env declName && !isAuto declName then
+      if (litlibPaperExt.find? env declName).isNone then
+        if !(← Lean.getProjectionFnInfo? declName).isSome then
+          match info with
+          | .ctorInfo _ => pure ()
+          | _ =>
+            localNodes := localNodes.push declName
+            usesMap := usesMap.insert declName 0
+
+  for declName in localNodes do
+    if let some info := env.find? declName then
+      let mut rawConsts : NameSet := {}
+      rawConsts := info.type.foldConsts rawConsts (fun c acc => acc.insert c)
+
+      if let some val := info.value? then
+        let mut valConsts : NameSet := {}
+        valConsts := val.foldConsts valConsts (fun c acc => acc.insert c)
+        for c in valConsts.toList do
+          if c != declName then
+            if (isAuto c || c.isInternal) && c.getPrefix == declName then
+              if let some auxInfo := env.find? c then
+                rawConsts := auxInfo.type.foldConsts rawConsts (fun ac acc => acc.insert ac)
+                if let some auxVal := auxInfo.value? then
+                  rawConsts := auxVal.foldConsts rawConsts (fun ac acc => acc.insert ac)
+            else
+              rawConsts := rawConsts.insert c
+
+      if let .inductInfo i := info then
+        for ctor in i.ctors do
+          if let some ctorInfo := env.find? ctor then
+            rawConsts := ctorInfo.type.foldConsts rawConsts (fun c acc => acc.insert c)
+
+      let mut declDeps : NameSet := {}
+      for c in rawConsts.toList do
+        let target ← collapseParentDecl env c
+        if target != declName && isLocalToRoot rootModule env target && !isAuto target then
+          if (litlibPaperExt.find? env target).isNone then
+            declDeps := declDeps.insert target
+
+      depsMap := depsMap.insert declName declDeps
+      for target in declDeps.toList do
+        let cur := usesMap.find? target |>.getD 0
+        usesMap := usesMap.insert target (cur + 1)
+
+  return (usesMap, depsMap)
+
+/-- Evaluates a single filter token predicate on a declaration. -/
+def matchesFilterToken (env : Environment) (usesMap : NameMap Nat) (eqProofDecls : NameSet)
+    (tok : String) (declName : Name) (modNameStr : String) : Bool :=
+  if tok == "all" || tok == "*" || tok == "" then
+    true
+  else if tok == "litlib_track" then
+    isTrackedDecl env eqProofDecls declName
+  else if tok == "leaf" || tok == "leaves" then
+    (usesMap.find? declName |>.getD 0) == 0
+  else if tok == "theorem" || tok == "theorems" then
+    (litlibTrackExt.find? env declName).isSome
+  else if tok == "reference" || tok == "references" then
+    (litlibEqExt.find? env declName).isSome || eqProofDecls.contains declName
+  else
+    globMatch tok declName.toString || globMatch tok modNameStr
+
+/-- Evaluates all active filter tokens on a declaration according to `ctx.globMode` (`any` vs `all`). -/
+def matchesAllFilterTokens (env : Environment) (usesMap : NameMap Nat) (eqProofDecls : NameSet)
+    (ctx : CliContext) (declName : Name) (modNameStr : String) : Bool :=
+  let tokens := if ctx.filterTokens.isEmpty then ["all"] else ctx.filterTokens
+  if ctx.globMode == "all" then
+    tokens.all (fun tok => matchesFilterToken env usesMap eqProofDecls tok declName modNameStr)
+  else
+    tokens.any (fun tok => matchesFilterToken env usesMap eqProofDecls tok declName modNameStr)
+
+def isMagicFilterToken (s : String) : Bool :=
+  s == "all" || s == "*" || s == "" || s == "litlib_track" ||
+  s == "leaf" || s == "leaves" || s == "theorem" || s == "theorems" ||
+  s == "reference" || s == "references"
+
 def gatherRoots (rootModule : Name) (globalData : GlobalData) (ctx : CliContext) : CoreM NameSet := do
   let env ← getEnv
   let mut roots : NameSet := {}
 
-  let isLocal (declName : Name) : Bool :=
-    match env.getModuleIdxFor? declName with
-    | some idx =>
-      let modName := env.header.moduleNames[idx.toNat]!
-      modName.toString.startsWith rootModule.toString
-    | none => true
+  let isLocal (declName : Name) : Bool := isLocalToRoot rootModule env declName
+
+  let useTokenPredicates :=
+    !ctx.filterTokens.isEmpty &&
+    (ctx.globMode == "all" ||
+     ctx.leafOnly ||
+     ctx.filterTokens.any (fun t => t == "leaf" || t == "leaves") ||
+     (ctx.filterTokens.contains "litlib_track" && ctx.filterTokens.length > 1))
+
+  if useTokenPredicates then
+    let (usesMap, _) ← computeUsesAndDeps rootModule env
+    let eqProofDecls := collectEqProofDecls env
+    for (declName, info) in env.constants.toList do
+      if isLocal declName && !isAuto declName && (litlibPaperExt.find? env declName).isNone then
+        if !(← Lean.getProjectionFnInfo? declName).isSome then
+          match info with
+          | .ctorInfo _ => pure ()
+          | _ =>
+            let modNameStr := match env.getModuleIdxFor? declName with
+              | some idx => env.header.moduleNames[idx.toNat]!.toString
+              | none => rootModule.toString
+            if matchesAllFilterTokens env usesMap eqProofDecls ctx declName modNameStr then
+              roots := roots.insert declName
+    return roots
 
   for paper in globalData.papers do
     for eq in paper.equations do
@@ -536,15 +677,13 @@ def gatherRoots (rootModule : Name) (globalData : GlobalData) (ctx : CliContext)
 
   return roots
 
-def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalData) (ctx : CliContext) : IO UInt32 := do
+def formatCodeSummaryInternal (rootModule : Name) (env : Environment) (globalData : GlobalData)
+    (ctx : CliContext) (emitWarnings : Bool) : IO String := do
   let isLatex := ctx.latexDir.isSome
   let outStrRef ← IO.mkRef (if isLatex then "\\printleanrefs\n\\vspace{2em}\n\\begin{minted}{lean}\n" else "")
 
   let appendLine (s : String) : IO Unit := do
-    if isLatex then
-      outStrRef.modify (fun out => out ++ s ++ "\n")
-    else
-      IO.println s
+    outStrRef.modify (fun out => out ++ s ++ "\n")
 
   if !isLatex then
     appendLine "\n===================================================================="
@@ -555,9 +694,11 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
   let state : Core.State := { env := env }
 
   let (roots, _) ← (gatherRoots rootModule globalData ctx).toIO ctxCore state
+  let ((usesMap, _), _) ← (computeUsesAndDeps rootModule env).toIO ctxCore state
+  let eqProofDecls := collectEqProofDecls env
 
-  if ctx.explicitFilters then
-    let allGlobs := (ctx.theoremGlobs ++ ctx.referenceGlobs).filter (fun g => g != "all" && g != "")
+  if emitWarnings && ctx.explicitFilters then
+    let allGlobs := (ctx.theoremGlobs ++ ctx.referenceGlobs).filter (fun g => !isMagicFilterToken g)
     let mut uniqueGlobs : List String := []
     for g in allGlobs do if !uniqueGlobs.contains g then uniqueGlobs := uniqueGlobs ++ [g]
 
@@ -578,7 +719,7 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
 
   if roots.isEmpty then
     if !isLatex then appendLine "\n  [No items found matching the filter.]\n"
-    return 0
+    return ← outStrRef.get
 
   let (allLocalConsts, _) ← (collectLocalDepsRec rootModule roots.toList roots).toIO ctxCore state
 
@@ -621,6 +762,10 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
     let names := (byModule.find? modName).getD #[]
     let sortedNames := names.qsort fun a b => a.toString < b.toString
     for n in sortedNames do
+      let uses := usesMap.find? n |>.getD 0
+      let isUntrackedLeaf := uses == 0 && !isTrackedDecl env eqProofDecls n
+      if !isLatex && isUntrackedLeaf then
+        appendLine "-- [UNTRACKED LEAF]"
       let codeStr ← ppDecl env n
       let formattedCode := injectLabelsAndLinks codeStr n nameMap isLatex
       appendLine formattedCode
@@ -631,7 +776,20 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
 
   if isLatex then
     outStrRef.modify (fun out => out ++ "\\end{minted}\n")
-    let finalOutStr ← outStrRef.get
+  else
+    appendLine "====================================================================\n"
+
+  return ← outStrRef.get
+
+def formatCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalData)
+    (ctx : CliContext) : IO String :=
+  formatCodeSummaryInternal rootModule env globalData ctx false
+
+def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalData) (ctx : CliContext) : IO UInt32 := do
+  let isLatex := ctx.latexDir.isSome
+  let finalOutStr ← formatCodeSummaryInternal rootModule env globalData ctx true
+
+  if isLatex then
     if let some dirStr := ctx.latexDir then
       let dir := System.FilePath.mk dirStr
       IO.FS.createDirAll dir
@@ -645,7 +803,7 @@ def runCodeSummary (rootModule : Name) (env : Environment) (globalData : GlobalD
 
       IO.println s!"LaTeX artifacts generated in {dir}"
   else
-    appendLine "====================================================================\n"
+    IO.print finalOutStr
 
   return 0
 
