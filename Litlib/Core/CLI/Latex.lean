@@ -1,4 +1,4 @@
--- FILENAME: @litlib4/Litlib/Core/CLI/Latex.lean
+-- FILENAME: Litlib/Core/CLI/Latex.lean
 
 import Lean
 
@@ -20,7 +20,9 @@ def injectLabelsAndLinks (code : String) (declName : Name) (nameMap : Array (Str
   let mut blockCommentDepth := 0
 
   let mut firstIdentReplaced := false
-  let shortName := declName.getString!
+  let shortName := match declName with
+    | .str _ s => s
+    | _ => declName.toString
 
   let mut citeStr := ""
   let nameParts := declName.toString.splitOn "."
@@ -97,7 +99,7 @@ def injectLabelsAndLinks (code : String) (declName : Name) (nameMap : Array (Str
           out := out ++ identChars
         else
           -- Provide the explicit hyperlink, detokenizing the visual text to protect against underscores
-          out := out ++ "§\\hyperref[lean:" ++ linkedName.toString ++ "]{\\detokenize{" ++ identChars ++ "}}§"
+          out := out ++ "§\\leanlink{" ++ linkedName.toString ++ "}{" ++ identChars ++ "}§"
       else
         out := out ++ identChars
 
@@ -139,37 +141,63 @@ def generateLitlibSty (dir : System.FilePath) : IO Unit := do
     \\immediate\\write\\leanfile{\\string\\relax}
 }
 
+\\AtEndDocument{%
+    \\immediate\\closeout\\leanfile
+}
+
 \\makeatletter
-\\newcommand{\\leanref}[1]{%
+\\@ifundefined{ifmeasuring@}{\\newif\\ifmeasuring@}{}
+
+\\newcommand{\\leaniflabel}[3]{%
+    \\@ifundefined{r@lean:#1}{#3}{#2}%
+}
+
+\\newcommand{\\leanlink}[2]{%
+    \\leaniflabel{#1}{\\hyperref[lean:#1]{\\detokenize{#2}}}{\\detokenize{#2}}%
+}
+
+\\newcommand{\\leanindexentry}[1]{%
+    \\leaniflabel{#1}{%
+        \\hyperref[lean:#1]{\\texttt{\\detokenize{#1}}}%
+        \\dotfill\\space Line \\ref{lean:#1}%
+    }{%
+        \\texttt{\\detokenize{#1}}%
+        \\dotfill\\space Formalized in Lean 4%
+    }%
+    \\par\\vspace{0.5em}%
+}
+
+\\DeclareRobustCommand{\\leanref}[1]{%
     \\ifmeasuring@
         \\ifmmode {}^{\\textnormal{[L?]}} \\else \\textsuperscript{[L?]} \\fi
     \\else
         \\expandafter\\ifx\\csname lean@ref@id@\\detokenize{#1}\\endcsname\\relax
-            \\stepcounter{leancnt}%
+            \\global\\advance\\c@leancnt\\@ne
             \\expandafter\\xdef\\csname lean@ref@id@\\detokenize{#1}\\endcsname{\\theleancnt}%
             \\immediate\\write\\leanfile{%
                 \\string\\noindent\\string\\textbf{[L\\theleancnt]}\\string\\quad%
-                \\string\\hyperref[lean:#1]{\\string\\texttt{\\string\\detokenize{#1}}}%
-                \\string\\dotfill\\space Line \\string\\ref{lean:#1}\\string\\par\\string\\vspace{0.5em}%
+                \\string\\leanindexentry{#1}%
             }%
         \\fi
         \\ifmmode
-            {}^{\\textnormal{\\hyperref[lean:#1]{[L\\csname lean@ref@id@\\detokenize{#1}\\endcsname]}}}%
+            {}^{\\textnormal{\\leaniflabel{#1}{\\hyperref[lean:#1]{[L\\csname lean@ref@id@\\detokenize{#1}\\endcsname]}}{[L\\csname lean@ref@id@\\detokenize{#1}\\endcsname]}}}%
         \\else
-            \\textsuperscript{\\hyperref[lean:#1]{\\pdftooltip{[L\\csname lean@ref@id@\\detokenize{#1}\\endcsname]}{\\detokenize{#1}}}}%
+            \\textsuperscript{\\leaniflabel{#1}{\\hyperref[lean:#1]{\\pdftooltip{[L\\csname lean@ref@id@\\detokenize{#1}\\endcsname]}{\\detokenize{#1}}}}{\\pdftooltip{[L\\csname lean@ref@id@\\detokenize{#1}\\endcsname]}{\\detokenize{#1}}}}%
         \\fi
     \\fi
 }
 \\makeatother
 
-\\newcommand{\\aleanref}[1]{\\rlap{\\quad \\leanref{#1}}}
+\\DeclareRobustCommand{\\aleanref}[1]{\\rlap{\\quad \\leanref{#1}}}
 
 \\newcommand{\\printleanrefs}{%
     \\section*{Formal Verification Index}%
     \\noindent The equations annotated with \\textbf{[L$n$]} in the main text have been formally verified in Lean 4. Click the theorem name to jump to the code signature, or reference the line number in the Appendix.
     \\par\\vspace{1em}
     \\immediate\\closeout\\leanfile
-    \\input{\\jobname.leanrefs}
+    \\makeatletter
+    \\input{\\jobname.leanrefs}%
+    \\makeatother
 }
 "
   IO.FS.writeFile (dir / "litlib.sty") content
