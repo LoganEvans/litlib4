@@ -55,11 +55,11 @@ def main : IO UInt32 := do
 
   -- 3. namespace-folder-match linter
   let nsIssues := issues.filter (fun i => i.linterName == "namespace-folder-match")
-  if !nsIssues.any (fun i => i.declName == some `Tests.Fixtures.LeafAndLintFixture.badFilenameNsDecl) then
-    IO.println "[FAIL] namespace-folder-match linter missed badFilenameNsDecl (filename included in namespace)"
-    return 1
   if !nsIssues.any (fun i => i.declName == some `WrongFolder.Sub.badFolderNsDecl) then
     IO.println "[FAIL] namespace-folder-match linter missed badFolderNsDecl (wrong folder namespace)"
+    return 1
+  if nsIssues.any (fun i => i.declName == some `Tests.Fixtures.LeafAndLintFixture.badFilenameNsDecl) then
+    IO.println "[FAIL] namespace-folder-match linter falsely flagged module-exact namespace declaration"
     return 1
   if nsIssues.any (fun i => i.declName == some `Tests.Fixtures.FixtureStruct.double) then
     IO.println "[FAIL] namespace-folder-match linter falsely flagged valid structure method FixtureStruct.double"
@@ -68,8 +68,9 @@ def main : IO UInt32 := do
     IO.println "[FAIL] namespace-folder-match linter falsely flagged valid folder namespace declaration"
     return 1
 
-  -- 4. line-length linter (> 100 chars)
-  let lineLenIssues := issues.filter (fun i => i.linterName == "line-length")
+  -- 4. line-length linter (> 100 chars, opt-in via --lint=line-length)
+  let ctxLineLen := parseArgs ["--lint=line-length", "--theorem=LeafAndLintFixture"]
+  let lineLenIssues ← runLinters `Tests env globalData ctxLineLen
   if lineLenIssues.isEmpty then
     IO.println "[FAIL] line-length linter missed >100 character line in LeafAndLintFixture.lean"
     return 1
