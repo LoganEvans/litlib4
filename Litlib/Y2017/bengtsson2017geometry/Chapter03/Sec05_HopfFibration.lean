@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y2017/bengtsson2017geometry/Chapter03/Sec05_HopfFibration.lean
 
 import Litlib.Core
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic

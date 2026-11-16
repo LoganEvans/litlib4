@@ -2,7 +2,7 @@
 
 import Litlib.Core
 import Litlib.Y1989.arnold1989mathematical.Paper
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Data.Fintype.Basic

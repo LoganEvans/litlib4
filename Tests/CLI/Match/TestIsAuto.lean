@@ -13,3 +13,4 @@ open Litlib.Core.CLI
 #guard isAuto `CGK.Axioms.Ontology._aux_1 == true
 #guard isAuto `CGK.Axioms.Ontology.eq_1 == true
 #guard isAuto `CGK.Axioms.Ontology.mk == true
+#guard isAuto `PiLp.normedAddCommGroup.congr_simp == true

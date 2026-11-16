@@ -67,6 +67,12 @@ set_option maxHeartbeats 300000
 @[litlib_track "Long line test declaration"]
 def longLineDeclaration (n : Nat) : Nat := n + n + n + n + n + n + n + n + n + n + n + n + n + n + n + 1
 
+/-- Theorem with an unused underscore-silenced hypothesis and a dummy `have _ :=` binding. -/
+@[litlib_track "Unused hypothesis fixture"]
+theorem theoremWithDeadHyp (n : Nat) (_h_dead : n > 0) (h_dummy : n ≠ 999) : n + 0 = n := by
+  have _ := h_dummy
+  exact Nat.add_zero n
+
 end Tests.Fixtures
 
 namespace Tests.Fixtures.LeafAndLintFixture

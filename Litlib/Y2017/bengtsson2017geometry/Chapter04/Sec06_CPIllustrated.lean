@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y2017/bengtsson2017geometry/Chapter04/Sec06_CPIllustrated.lean
 
 import Litlib.Core
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Fintype.Basic
 import Litlib.Y2017.bengtsson2017geometry.Paper

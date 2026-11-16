@@ -3,7 +3,7 @@
 import Litlib.Core
 import Mathlib.Algebra.Module.Basic
 import Mathlib.Algebra.Algebra.Basic
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Data.Fin.Basic
 import Mathlib.Data.Fintype.Basic
 

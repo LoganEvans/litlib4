@@ -25,7 +25,7 @@ def isAuto (n : Name) : Bool :=
   match n with
   | .str _ s =>
     s == "mk" || s == "rec" || s == "casesOn" || s == "recOn" ||
-    s == "noConfusion" || s == "noConfusionType" || s == "injEq" ||
+    s == "noConfusion" || s == "noConfusionType" || s == "injEq" || s == "congr_simp" ||
     s == "ctorElim" || s == "ctorElimType" || s == "ctorIdx" || s == "toCtorIdx" ||
     s == "enumList" || s == "ofNat" || s == "decEq" || s == "beq" ||
     s == "below" || s == "brecOn" || s == "elim" || s == "repr" || s == "reprPrec" ||

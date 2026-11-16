@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Math/LeviCivita/ContractOne.lean
 
 import Litlib.Math.LeviCivita.Basic
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 
 namespace Litlib.Math.LeviCivita
 

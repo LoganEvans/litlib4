@@ -1,9 +1,9 @@
 -- FILENAME: @litlib4/Litlib/Y1987/manton1987geometry/Signature.lean
 
 import Litlib.Core
-import Mathlib.Data.Real.Sqrt
+import Mathlib.Analysis.Real.Sqrt
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Fintype.Basic
 

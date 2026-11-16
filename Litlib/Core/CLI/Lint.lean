@@ -3,6 +3,7 @@
 import Lean
 import Litlib.Core.CLI.Lint.Types
 import Litlib.Core.CLI.Lint.UntrackedLeaf
+import Litlib.Core.CLI.Lint.UnusedHypothesis
 import Litlib.Core.CLI.Lint.DuplicateType
 import Litlib.Core.CLI.Lint.NamespaceFolderMatch
 import Litlib.Core.CLI.Lint.FileLength
@@ -16,6 +17,7 @@ namespace Litlib.Core.CLI
 /-- Registry of all modular linters. Add new linter files here to register them automatically. -/
 def allLinters : Array Linter := #[
   untrackedLeafLinter,
+  unusedHypothesisLinter,
   duplicateTypeLinter,
   namespaceFolderMatchLinter,
   fileLengthLinter,
@@ -70,7 +72,7 @@ def runLinters (rootModule : Name) (env : Environment) (globalData : GlobalData)
 
   let mut allIssues : Array LintIssue := #[]
   for linter in allLinters do
-    if runAll || enabledNames.contains linter.name then
+    if (runAll && linter.name != "line-length") || enabledNames.contains linter.name then
       let (issues, _) ← (linter.run lctx).toIO ctxCore state
       allIssues := allIssues ++ issues
 

@@ -250,7 +250,8 @@ def runCli (rootModule : Name) (args : List String) : IO UInt32 := do
     System.FilePath.mk ".lake" / "build" / "lib" / "lean",
     System.FilePath.mk ".lake" / "build" / "lib",
     System.FilePath.mk "build" / "lib" / "lean",
-    System.FilePath.mk "build" / "lib"
+    System.FilePath.mk "build" / "lib",
+    System.FilePath.mk ".." / "litlib4" / ".lake" / "build" / "lib" / "lean"
   ]
   for c in candidates do
     if ← c.isDir then

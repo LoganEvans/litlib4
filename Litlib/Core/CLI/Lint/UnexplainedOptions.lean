@@ -15,9 +15,14 @@ private def isCommentLine (line : String) : Bool :=
   let t := line.trimAscii.toString
   t.startsWith "--" || t.startsWith "/-" || t.endsWith "-/"
 
+/-- Standard project-wide option overrides that do not require per-file explanation comments. -/
+private def isStandardPermittedOption (trimmed : String) : Bool :=
+  trimmed == "set_option autoImplicit false" ||
+    trimmed == "set_option linter.unusedSimpArgs false"
+
 def unexplainedOptionsLinter : Linter where
   name := "unexplained-options"
-  description := "Flags `set_option` overrides that lack an inline or immediately preceding explanation comment."
+  description := "Flags non-standard `set_option` overrides that lack an inline or immediately preceding explanation comment."
   run := fun lctx => do
     let mut issues : Array LintIssue := #[]
     let sortedMods := lctx.moduleLines.toList.toArray.qsort fun a b => a.1.toString < b.1.toString
@@ -25,7 +30,7 @@ def unexplainedOptionsLinter : Linter where
       for idx in [0:lines.size] do
         let line := lines[idx]!
         let trimmed := line.trimAscii.toString
-        if trimmed.startsWith "set_option " then
+        if trimmed.startsWith "set_option " && !isStandardPermittedOption trimmed then
           let hasInlineComment := stringContains trimmed "--" || stringContains trimmed "/-"
           let hasPrecedingComment :=
             if idx > 0 then

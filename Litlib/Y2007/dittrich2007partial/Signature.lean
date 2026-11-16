@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y2007/dittrich2007partial/Signature.lean
 
 import Litlib.Core
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Data.Nat.Factorial.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic

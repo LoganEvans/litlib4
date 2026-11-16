@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y1981/goldstone1981fractional/Signature.lean
 
 import Litlib.Core
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
 import Mathlib.Data.Fintype.Basic
 

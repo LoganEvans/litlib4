@@ -2,7 +2,7 @@
 
 import Litlib.Core
 import Litlib.Y2010.wald2010general.Paper
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Data.Matrix.Basic
 
 namespace Litlib.Y2010.wald2010general

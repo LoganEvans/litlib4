@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y2018/baer2018spin/Chapter01/Sec03_LaplaceAndDirac.lean
 
 import Litlib.Core
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Algebra.Module.Pi
 
 namespace Litlib.Y2018.baer2018spin
