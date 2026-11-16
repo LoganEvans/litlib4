@@ -3,6 +3,7 @@
 import Lean
 import Litlib.Core.CLI.Lint.Types
 import Litlib.Core.CLI.Lint.UntrackedLeaf
+import Litlib.Core.CLI.Lint.UnusedHypothesis
 import Litlib.Core.CLI.Lint.DuplicateType
 import Litlib.Core.CLI.Lint.NamespaceFolderMatch
 import Litlib.Core.CLI.Lint.FileLength
@@ -16,6 +17,7 @@ namespace Litlib.Core.CLI
 /-- Registry of all modular linters. Add new linter files here to register them automatically. -/
 def allLinters : Array Linter := #[
   untrackedLeafLinter,
+  unusedHypothesisLinter,
   duplicateTypeLinter,
   namespaceFolderMatchLinter,
   fileLengthLinter,

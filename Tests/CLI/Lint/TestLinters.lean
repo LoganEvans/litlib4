@@ -42,6 +42,19 @@ def main : IO UInt32 := do
     IO.println "[FAIL] untracked-leaf linter did not report transitive dead helper deadHelperOnlyUsedByDeadLeaf"
     return 1
 
+  -- 1b. unused-hypothesis linter
+  let hypIssues := issues.filter (fun i => i.linterName == "unused-hypothesis")
+  let deadHypIssue := hypIssues.find? (fun i => i.declName == some `Tests.Fixtures.theoremWithDeadHyp)
+  if deadHypIssue.isNone then
+    IO.println "[FAIL] unused-hypothesis linter missed theoremWithDeadHyp"
+    return 1
+  if !stringContains deadHypIssue.get!.message "_h_dead" || !stringContains deadHypIssue.get!.message "h_dummy" then
+    IO.println s!"[FAIL] unused-hypothesis linter did not catch both _h_dead and h_dummy: {deadHypIssue.get!.message}"
+    return 1
+  if hypIssues.any (fun i => i.declName == some `Tests.Fixtures.trackedCulminationLeaf) then
+    IO.println "[FAIL] unused-hypothesis linter falsely flagged trackedCulminationLeaf"
+    return 1
+
   -- 2. duplicate-type linter
   let dupIssues := issues.filter (fun i => i.linterName == "duplicate-type")
   if !dupIssues.any (fun i =>
