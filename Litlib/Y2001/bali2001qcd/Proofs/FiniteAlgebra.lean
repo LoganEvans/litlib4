@@ -12,18 +12,16 @@ instance verified_StringMassAndAngMom : StringMassAndAngMom where
     have hSigmaNeq : σ ≠ 0 := ne_of_gt hSigma
     have hPiNeq : Real.pi ≠ 0 := Real.pi_ne_zero
     field_simp
-    try ring
 
 instance verified_SingletOctetPotentials : SingletOctetPotentials where
   singletOctetPotentials N nA g q hN hNa hQ := by
     have hNNeq : N ≠ 0 := by linarith
-    have hNaNeq : nA ≠ 0 := by 
+    have hNaNeq : nA ≠ 0 := by
       rw [hNa]
       nlinarith
     -- vO = - (1 / nA) * vS
     dsimp only
     field_simp
-    try ring
 
 instance verified_AdjointSelfEnergy : AdjointSelfEnergy where
   adjointSelfEnergy N cA cF vSelf hN hCa hCf := by
@@ -38,7 +36,6 @@ instance verified_AdjointSelfEnergy : AdjointSelfEnergy where
       · nlinarith
     rw [hCa, hCf]
     field_simp
-    try ring
 
 instance verified_GromesAndBbpRelations : GromesAndBbpRelations where
   gromesAndBbpRelations e h σ vSelf cB cD := by
@@ -47,18 +44,18 @@ instance verified_GromesAndBbpRelations : GromesAndBbpRelations where
       intro r hR
       dsimp only
       field_simp
-      try ring
+      ring
     · constructor
       · -- vB + 2 * vD = (r / 6) * v0Prime - (1 / 2) * v0
         intro hV r hR
         dsimp only
         rw [hV]
         field_simp
-        try ring
+        ring
       · -- vC + 2 * vE = - (r / 2) * v0Prime
         intro r hR
         dsimp only
         field_simp
-        try ring
+        ring
 
 end Litlib.Y2001.bali2001qcd.Proofs
