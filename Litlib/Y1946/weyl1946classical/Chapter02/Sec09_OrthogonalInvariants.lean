@@ -1,6 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y1946/weyl1946classical/Chapter02/Sec09_OrthogonalInvariants.lean
 
-import Mathlib
+import Mathlib.Basic.Complex.Basic
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Litlib.Core
 
 open Matrix BigOperators

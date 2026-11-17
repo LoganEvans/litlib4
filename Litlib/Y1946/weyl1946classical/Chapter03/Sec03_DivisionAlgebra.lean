@@ -1,6 +1,6 @@
 -- FILENAME: @litlib4/Litlib/Y1946/weyl1946classical/Chapter03/Sec03_DivisionAlgebra.lean
 
-import Mathlib
+import Mathlib.RingTheory.SimpleRing.Basic
 import Litlib.Core
 
 namespace Litlib.Y1946.weyl1946classical
