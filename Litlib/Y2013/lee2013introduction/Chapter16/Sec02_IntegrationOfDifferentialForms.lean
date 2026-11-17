@@ -1,6 +1,8 @@
 -- FILENAME: @litlib4/Litlib/Y2013/lee2013introduction/Chapter16/Sec02_IntegrationOfDifferentialForms.lean
 
-import Mathlib
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
+import Mathlib.Data.Fin.VecNotation
+import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 import Litlib.Core
 
 set_option linter.unusedVariables false

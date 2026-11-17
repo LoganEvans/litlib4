@@ -1,6 +1,9 @@
 -- FILENAME: @litlib4/Litlib/Y2013/lee2013introduction/Chapter15/Sec03_RiemannianVolumeForm.lean
 
-import Mathlib
+import Mathlib.Analysis.Real.Sqrt
+import Mathlib.Data.Fin.Tuple.Basic
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+import Mathlib.LinearAlgebra.Matrix.PosDef
 import Litlib.Core
 
 namespace Litlib.Y2012.lee2013introduction
@@ -45,7 +48,7 @@ class Proposition_15_32
   (omega_g_tilde : (Fin n → (Fin (n + 1) → ℝ)) → ℝ)
   where
   -- ω_g_tilde = i_S^* (N ⌟ ω_g)
-  -- Evaluated on n tangent vectors v_1 ... v_n on the hypersurface, 
+  -- Evaluated on n tangent vectors v_1 ... v_n on the hypersurface,
   -- this corresponds exactly to ω_g evaluated on (N, v_1, ..., v_n).
   -- Lean 4's `Fin.cons` prepends N to the frame perfectly.
   inducedVol : ∀ (v : Fin n → (Fin (n + 1) → ℝ)),
