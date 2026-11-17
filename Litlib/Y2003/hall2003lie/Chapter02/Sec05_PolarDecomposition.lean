@@ -12,7 +12,7 @@ import Mathlib.Topology.MetricSpace.Basic
 
 namespace Litlib.Y2003.hall2003lie
 
-abbrev Sphere3 := Metric.sphere (0 : EuclideanSpace ℝ (Fin 4)) (1 : ℝ)
+noncomputable abbrev Sphere3 := Metric.sphere (0 : EuclideanSpace ℝ (Fin 4)) (1 : ℝ)
 
 def is_SU {n : Type*} [Fintype n] [DecidableEq n] (A : Matrix.SpecialLinearGroup n ℂ) : Prop :=
   star (A : Matrix n n ℂ) * (A : Matrix n n ℂ) = 1
