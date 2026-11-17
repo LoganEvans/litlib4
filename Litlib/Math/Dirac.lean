@@ -245,13 +245,11 @@ theorem gamma_clifford (eta : Fin 4 → Fin 4 → ℂ)
     (2 * eta a b) • (1 : Matrix (Fin 4) (Fin 4) ℂ) := by
   ext i j
   fin_cases a <;> fin_cases b <;> fin_cases i <;> fin_cases j
-  all_goals {
-    rw [h_eta]
-    simp [gammaVec, gammaSpatial, gamma0, sigmaToMatrix, s1, s2, s3,
-          Matrix.fromBlocks, Matrix.reindex, chiralIso, chiralIsoTo, chiralIsoInv,
-          Matrix.submatrix, Sum.elim, eval_mul_4x4, Matrix.one_apply,
-          Matrix.smul_apply, Matrix.add_apply]
-    try norm_num
-  }
+  all_goals rw [h_eta]
+  all_goals simp [gammaVec, gammaSpatial, gamma0, sigmaToMatrix, s1, s2, s3,
+        Matrix.fromBlocks, Matrix.reindex, chiralIso, chiralIsoTo, chiralIsoInv,
+        Matrix.submatrix, Sum.elim, eval_mul_4x4, Matrix.one_apply,
+        Matrix.smul_apply, Matrix.add_apply]
+  all_goals ring
 
 end Litlib.Math.Dirac

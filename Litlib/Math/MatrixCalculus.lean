@@ -113,7 +113,7 @@ lemma partialDeriv_sum {ι : Type} (s : Finset ι) (f : ι → SpacetimePoint �
   (x : SpacetimePoint) (hf : ∀ k ∈ s, DifferentiableAt ℝ (f k) x) (mu : Fin 4) :
   partialDeriv mu (fun p => ∑ k ∈ s, f k p) x = ∑ k ∈ s, partialDeriv mu (f k) x := by
   unfold partialDeriv
-  have heq : (fun p => ∑ k ∈ s, f k p) = ∑ k ∈ s, f k := by 
+  have heq : (fun p => ∑ k ∈ s, f k p) = ∑ k ∈ s, f k := by
     ext p
     exact (map_sum (eval_pt p) (fun k => f k) s).symm
   rw [heq]
@@ -122,7 +122,7 @@ lemma partialDeriv_sum {ι : Type} (s : Finset ι) (f : ι → SpacetimePoint �
   exact map_sum ev (fun k => fderiv ℝ (f k) x) s
 
 /-- Matrix multilinear sum mappings. -/
-lemma partialDerivMat_sum {ι : Type} (s : Finset ι) 
+lemma partialDerivMat_sum {ι : Type} (s : Finset ι)
   (f : ι → SpacetimePoint → Matrix (Fin 2) (Fin 2) ℂ) (x : SpacetimePoint)
   (hf : ∀ k ∈ s, ∀ i j, DifferentiableAt ℝ (fun p => (f k p) i j) x) (mu : Fin 4) :
   partialDerivMat mu (fun p => ∑ k ∈ s, f k p) x = ∑ k ∈ s, partialDerivMat mu (f k) x := by
@@ -198,9 +198,9 @@ lemma partialDerivMat_sub (M N : SpacetimePoint → Matrix (Fin 2) (Fin 2) ℂ)
   rw [h]
   exact partialDeriv_sub _ _ x (hM i j) (hN i j) mu
 
-/-- 
+/--
 Physical Interpretation:
-The exact analytical continuous field evaluation representing the Product Rule (Leibniz Rule) mapping strictly onto arbitrary gauge-field matrix contractions dynamically. 
+The exact analytical continuous field evaluation representing the Product Rule (Leibniz Rule) mapping strictly onto arbitrary gauge-field matrix contractions dynamically.
 
 Mathematical Boundaries:
 Applicable to all topological continuous vector spaces.
@@ -212,8 +212,9 @@ lemma partialDerivMat_mul (M N : SpacetimePoint → Matrix (Fin 2) (Fin 2) ℂ)
   (mu : Fin 4) :
   partialDerivMat mu (fun p => M p * N p) x = partialDerivMat mu M x * N x + M x * partialDerivMat mu N x := by
   ext i j
-  unfold partialDerivMat
-  have h0 : (fun p => (M p * N p) i j) = fun p => (M p i 0 * N p 0 j) + (M p i 1 * N p 1 j) := by 
+  simp only [Matrix.add_apply, Matrix.mul_apply, Fin.sum_univ_two]
+  dsimp only [partialDerivMat]
+  have h0 : (fun p => (M p * N p) i j) = fun p => (M p i 0 * N p 0 j) + (M p i 1 * N p 1 j) := by
     ext p; simp only [Matrix.mul_apply, Fin.sum_univ_two]
   rw [h0]
   have h1 : partialDeriv mu (fun p => (M p i 0 * N p 0 j) + (M p i 1 * N p 1 j)) x =
@@ -222,9 +223,8 @@ lemma partialDerivMat_mul (M N : SpacetimePoint → Matrix (Fin 2) (Fin 2) ℂ)
     · exact DifferentiableAt.mul (hM i 0) (hN 0 j)
     · exact DifferentiableAt.mul (hM i 1) (hN 1 j)
   rw [h1]
-  rw [partialDeriv_mul _ _ x (hM i 0) (hN 0 j)]
-  rw [partialDeriv_mul _ _ x (hM i 1) (hN 1 j)]
-  simp only [Matrix.add_apply, Matrix.mul_apply, Fin.sum_univ_two]
+  rw [partialDeriv_mul _ _ x (hM i 0) (hN 0 j) mu]
+  rw [partialDeriv_mul _ _ x (hM i 1) (hN 1 j) mu]
   ring
 
 -- ============================================================================
@@ -236,7 +236,7 @@ Physical Interpretation:
 The Schwarz Integrability Theorem (Clairaut's Theorem) evaluating directly over coordinate matrix fields. Ensuring that mixed partial coordinate derivatives mathematically commute physically maps to the absence of induced manifold torsion within the respective base geometric coordinates.
 
 Mathematical Boundaries:
-Requires the continuous gauge field functions to be smooth (infinitely differentiable) and is strictly confined to an inherent flat 4D spacetime base topological manifold. 
+Requires the continuous gauge field functions to be smooth (infinitely differentiable) and is strictly confined to an inherent flat 4D spacetime base topological manifold.
 
 Literature:
 Schwarz's integrability limits in gauge bundle formulations (e.g., Nakahara, Geometry, Topology and Physics).

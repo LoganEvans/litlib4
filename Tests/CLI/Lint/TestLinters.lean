@@ -16,6 +16,34 @@ def main : IO UInt32 := do
   if !(sp.contains buildLib) then
     Lean.searchPathRef.set (buildLib :: sp)
 
+  let fixtures := #[
+    "Tests/Fixtures/DependencyGraph/BaseDefs",
+    "Tests/Fixtures/DependencyGraph/MidDefs",
+    "Tests/Fixtures/DependencyGraph/TopTheorems",
+    "Tests/Fixtures/BinderHygiene",
+    "Tests/Fixtures/DefProofStripping",
+    "Tests/Fixtures/DocstringWhere",
+    "Tests/Fixtures/IndentedWhereTactics",
+    "Tests/Fixtures/InductiveDeriving",
+    "Tests/Fixtures/LeafAndLintFixture",
+    "Tests/Fixtures/LetBindingStatement",
+    "Tests/Fixtures/LiteratureMock",
+    "Tests/Fixtures/PreColonSuppression",
+    "Tests/Fixtures/PreColonVsPostColon",
+    "Tests/Fixtures/ProofStripping",
+    "Tests/Fixtures/SignatureOnlyCrawl",
+    "Tests/Fixtures/SoundnessAudit",
+    "Tests/Fixtures/StructureSafety",
+    "Tests/Fixtures/TypeclassDependencyOrder"
+  ]
+  for rel in fixtures do
+    let oleanPath := buildLib / (rel ++ ".olean")
+    if let some parent := oleanPath.parent then
+      IO.FS.createDirAll parent
+    let _ ← IO.Process.output {
+      cmd := "lean"
+      args := #[rel ++ ".lean", "-o", oleanPath.toString]
+    }
   let env ← importModules #[{ module := `Tests.Fixtures.LeafAndLintFixture }] {}
 
   let ctx := parseArgs ["--lint", "--theorem=LeafAndLintFixture"]

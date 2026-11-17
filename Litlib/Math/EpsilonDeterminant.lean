@@ -3,7 +3,8 @@
 import Litlib.Math.Matrix4
 import Litlib.Math.LeviCivita
 import Mathlib.Basic.Complex.Basic
-import Mathlib.Tactic
+import Mathlib.Tactic.NormNum
+import Mathlib.Tactic.Ring
 
 set_option maxHeartbeats 4000000
 set_option linter.unusedVariables false
@@ -28,13 +29,13 @@ lemma fin4_cases (x : Fin 4) : x = 0 ∨ x = 1 ∨ x = 2 ∨ x = 3 := by
 -- THE LOOKUP TABLE
 -- ============================================================================
 
-lemma eps_val_0 (i j k l : Fin 4) (h : epsilon4 i j k l = 0) : 
+lemma eps_val_0 (i j k l : Fin 4) (h : epsilon4 i j k l = 0) :
   (epsilon4 i j k l : Complex) = 0 := by exact_mod_cast h
 
-lemma eps_val_1 (i j k l : Fin 4) (h : epsilon4 i j k l = 1) : 
+lemma eps_val_1 (i j k l : Fin 4) (h : epsilon4 i j k l = 1) :
   (epsilon4 i j k l : Complex) = 1 := by exact_mod_cast h
 
-lemma eps_val_m1 (i j k l : Fin 4) (h : epsilon4 i j k l = -1) : 
+lemma eps_val_m1 (i j k l : Fin 4) (h : epsilon4 i j k l = -1) :
   (epsilon4 i j k l : Complex) = -1 := by exact_mod_cast h
 
 lemma e0000 : (epsilon4 0 0 0 0 : Complex) = 0 := eps_val_0 0 0 0 0 (by decide)
@@ -337,13 +338,13 @@ lemma epsilon_det_inner (M : Matrix (Fin 4) (Fin 4) Complex) (μ ν ρ σ : Fin 
   rw [h_group]
   rw [expand_epsilon_complex (fun α β γ δ => M μ α * M ν β * M ρ γ * M σ δ)]
   rw [Litlib.Math.Matrix4.expand_det_4]
-  
+
   rcases fin4_cases μ with rfl | rfl | rfl | rfl <;>
   rcases fin4_cases ν with rfl | rfl | rfl | rfl <;>
   rcases fin4_cases ρ with rfl | rfl | rfl | rfl <;>
   rcases fin4_cases σ with rfl | rfl | rfl | rfl
   all_goals {
-    try simp only [
+    simp only [
       e0000, e0001, e0002, e0003, e0010, e0011, e0012, e0013, e0020, e0021, e0022, e0023, e0030, e0031, e0032, e0033,
       e0100, e0101, e0102, e0103, e0110, e0111, e0112, e0113, e0120, e0121, e0122, e0123, e0130, e0131, e0132, e0133,
       e0200, e0201, e0202, e0203, e0210, e0211, e0212, e0213, e0220, e0221, e0222, e0223, e0230, e0231, e0232, e0233,
@@ -361,7 +362,8 @@ lemma epsilon_det_inner (M : Matrix (Fin 4) (Fin 4) Complex) (μ ν ρ σ : Fin 
       e3200, e3201, e3202, e3203, e3210, e3211, e3212, e3213, e3220, e3221, e3222, e3223, e3230, e3231, e3232, e3233,
       e3300, e3301, e3302, e3303, e3310, e3311, e3312, e3313, e3320, e3321, e3322, e3323, e3330, e3331, e3332, e3333,
       zero_mul, mul_zero, zero_add, add_zero, sub_zero, zero_sub, neg_zero
-    ] <;> try ring
+    ]
+    ring
   }
 
 /--
@@ -369,7 +371,7 @@ Physical Interpretation:
 The Levi-Civita Epsilon Determinant Formula. Relates the fully antisymmetric contraction of two Levi-Civita volume forms with a matrix to its macroscopic determinant. Represents the volume-form equivalence in general relativity and principal bundle metrics.
 
 Mathematical Boundaries:
-Evaluated strictly over 4x4 complex matrices. 
+Evaluated strictly over 4x4 complex matrices.
 
 Literature:
 Standard multi-linear algebra result used heavily in Capovilla-Dell-Jacobson (CDJ) formalisms of General Relativity and tetrad representations.
