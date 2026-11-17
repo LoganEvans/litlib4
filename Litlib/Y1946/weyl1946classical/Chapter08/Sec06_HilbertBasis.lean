@@ -1,6 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y1946/weyl1946classical/Chapter08/Sec06_HilbertBasis.lean
 
-import Mathlib
+import Mathlib.Algebra.Polynomial.Basic
+import Mathlib.RingTheory.Noetherian.Defs
 import Litlib.Core
 
 namespace Litlib.Y1946.weyl1946classical

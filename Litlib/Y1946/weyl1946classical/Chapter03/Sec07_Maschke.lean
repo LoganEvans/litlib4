@@ -1,6 +1,9 @@
 -- FILENAME: @litlib4/Litlib/Y1946/weyl1946classical/Chapter03/Sec07_Maschke.lean
 
-import Mathlib
+import Mathlib.Algebra.Field.Defs
+import Mathlib.Algebra.MonoidAlgebra.Defs
+import Mathlib.Data.Fintype.Card
+import Mathlib.RingTheory.SimpleModule.Basic
 import Litlib.Core
 
 namespace Litlib.Y1946.weyl1946classical

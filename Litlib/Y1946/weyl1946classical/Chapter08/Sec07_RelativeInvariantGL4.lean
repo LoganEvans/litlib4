@@ -1,6 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y1946/weyl1946classical/Chapter08/Sec07_RelativeInvariantGL4.lean
 
-import Mathlib
+import Mathlib.Basic.Complex.Basic
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 import Litlib.Core
 
 open Matrix BigOperators
