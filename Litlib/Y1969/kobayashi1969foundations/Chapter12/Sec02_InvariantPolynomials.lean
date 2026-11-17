@@ -1,7 +1,9 @@
 -- FILENAME: @litlib4/Litlib/Y1969/kobayashi1969foundations/Chapter12/Sec02_InvariantPolynomials.lean
 
-import Mathlib
 import Litlib.Core
+import Mathlib.Algebra.MvPolynomial.Eval
+import Mathlib.Basic.Real.Basic
+import Mathlib.LinearAlgebra.Matrix.Trace
 
 namespace Litlib.Y1969.kobayashi1969foundations
 

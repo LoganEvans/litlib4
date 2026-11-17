@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y1987/besse1987einstein/Chapter09/SecH_HopfFibrations.lean
 
 import Litlib.Core
-import Mathlib
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 namespace Litlib.Y1987.besse1987einstein
 
@@ -15,17 +15,17 @@ class Example_9_81 (m : ℕ) [Fact (m ≥ 1)]
   (canonicalVariation : Metric → ℝ → Metric)
   (scalarCurvature : Metric → ℝ)
   where
-  
+
   -- Besse p. 257: "Notice that the standard SU(m+1)-invariant metric on S^{2m+1} is not Einstein."
   -- We strictly enforce this negative condition.
   g_not_einstein : ¬ isEinstein g
-  
+
   -- The explicit scalar curvature polynomial for the canonical variation g_t.
   -- φ(t) = 2mt^{-1/(2m+1)}(2m + 2 - t)
-  -- ANTI-BS PROTOCOL: The exponent MUST be negative. We explicitly write the 
+  -- ANTI-BS PROTOCOL: The exponent MUST be negative. We explicitly write the
   -- right-hand-side algebra so downstream users are forced to match it.
   canonicalVariationScalarCurvature : ∀ (t : ℝ), t > 0 →
-    scalarCurvature (canonicalVariation g t) = 
+    scalarCurvature (canonicalVariation g t) =
       2 * (m : ℝ) * (t ^ (-(1 : ℝ) / (2 * (m : ℝ) + 1))) * (2 * (m : ℝ) + 2 - t)
 
 end Litlib.Y1987.besse1987einstein

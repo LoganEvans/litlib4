@@ -1,7 +1,11 @@
 -- FILENAME: @litlib4/Litlib/Y1960/smale1960morse/Signature.lean
 
 import Litlib.Core
-import Mathlib
+import Mathlib.Algebra.BigOperators.Group.Finset.Defs
+import Mathlib.Basic.Real.Basic
+import Mathlib.Data.Finset.Range
+import Mathlib.Order.Filter.AtTopBot.Defs
+import Mathlib.Topology.Defs.Filter
 
 open Finset
 
@@ -28,15 +32,15 @@ class Condition3 (M : Type*) [TopologicalSpace M]
   -- Anti-BS Protocol: The flow must actually be a valid dynamical flow.
   flow_zero : ∀ x, phi 0 x = x
   flow_add : ∀ s t x, phi (s + t) x = phi s (phi t x)
-  
+
   -- Condition 3: "The limit points of all the orbits of X as t -> ±∞ lie on the β_i."
-  -- We explicitly define the ω-limit and α-limit sets using rigorous topological 
+  -- We explicitly define the ω-limit and α-limit sets using rigorous topological
   -- sequences to prevent "Opaque Function" boundary exploits.
   omega_limit_in_beta : ∀ (y x : M),
     (∃ (seq : ℕ → ℝ), Filter.Tendsto seq Filter.atTop Filter.atTop ∧
       Filter.Tendsto (fun n => phi (seq n) y) Filter.atTop (nhds x)) →
     x ∈ beta
-    
+
   alpha_limit_in_beta : ∀ (y x : M),
     (∃ (seq : ℕ → ℝ), Filter.Tendsto seq Filter.atTop Filter.atBot ∧
       Filter.Tendsto (fun n => phi (seq n) y) Filter.atTop (nhds x)) →
