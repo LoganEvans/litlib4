@@ -53,8 +53,8 @@ class Theorem_SkyrmeBogomolnyEnergyBound
   where
   bogomolny_bound : E ≥ 12 * Real.pi ^ 2 * |B|
 
-def Theorem_SkyrmeBogomolnyEnergyBound.fadeev_bound
-  {E B : ℝ} (h : Theorem_SkyrmeBogomolnyEnergyBound E B) : E ≥ 12 * Real.pi ^ 2 * |B| :=
+theorem Theorem_SkyrmeBogomolnyEnergyBound.fadeev_bound
+    {E B : ℝ} (h : Theorem_SkyrmeBogomolnyEnergyBound E B) : E ≥ 12 * Real.pi ^ 2 * |B| :=
   h.bogomolny_bound
 
 Litlib.equation "manton1987geometry" eq "4.1" page "474" kind "ansatz"
