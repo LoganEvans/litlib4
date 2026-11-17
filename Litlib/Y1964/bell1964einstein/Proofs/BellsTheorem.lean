@@ -118,7 +118,7 @@ lemma chsh_integral_bound (Λ : Type*) [MeasurableSpace Λ] (μ : Measure Λ)
     rw [integral_add int_sub_3 i4, integral_sub int_sub_2 i3,
       integral_sub int_neg_1 i2, integral_neg]
   rw [← H_split]
-  haveI : IsProbabilityMeasure μ := ⟨h_mu⟩
+  have : IsProbabilityMeasure μ := ⟨h_mu⟩
   have h_int_const : Integrable (fun _ : Λ ↦ (2 : ℝ)) μ := integrable_const (2 : ℝ)
   have h_int_f :
       Integrable (fun lam ↦ -(A a lam * B b lam) - (A a lam * B c lam) -
