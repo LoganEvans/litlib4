@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Math/SU2.lean
 
 import Mathlib.Data.Matrix.Basic
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.FinCases
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic

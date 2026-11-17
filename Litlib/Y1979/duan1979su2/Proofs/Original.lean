@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y1979/duan1979su2/Proofs/Original.lean
 
 import Mathlib.Data.Matrix.Basic
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.FinCases
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic

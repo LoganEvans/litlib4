@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y2017/bengtsson2017geometry/Chapter15/Sec02_ProductMeasures.lean
 
 import Litlib.Core
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Data.Nat.Factorial.Basic
 import Mathlib.Analysis.SpecialFunctions.Gamma.Basic
 import Litlib.Y2017.bengtsson2017geometry.Paper

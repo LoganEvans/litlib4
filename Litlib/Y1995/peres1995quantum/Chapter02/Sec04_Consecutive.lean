@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y1995/peres1995quantum/Chapter02/Sec04_Consecutive.lean
 
 import Litlib.Core
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Algebra.BigOperators.Ring.Finset
 

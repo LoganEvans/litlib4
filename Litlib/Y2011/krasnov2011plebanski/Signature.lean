@@ -1,8 +1,8 @@
 -- FILENAME: Litlib/Y2011/krasnov2011plebanski/Signature.lean
 
 import Litlib.Core
-import Mathlib.Data.Complex.Basic
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Complex.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 
 namespace Litlib.Y2011.krasnov2011plebanski

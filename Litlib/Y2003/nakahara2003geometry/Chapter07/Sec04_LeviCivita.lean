@@ -1,8 +1,8 @@
 -- FILENAME: @litlib4/Litlib/Y2003/nakahara2003geometry/Chapter07/Sec04_LeviCivita.lean
 
 import Litlib.Core
-import Mathlib.Data.Real.Basic
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Real.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Data.Fintype.Basic
 

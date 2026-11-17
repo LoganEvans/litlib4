@@ -2,8 +2,8 @@
 
 import Litlib.Core
 import Mathlib.Data.Matrix.Basic
-import Mathlib.Data.Complex.Basic
-import Mathlib.MeasureTheory.Measure.MeasureSpace
+import Mathlib.Basic.Complex.Basic
+import Mathlib.MeasureTheory.Measure.Basic
 import Mathlib.MeasureTheory.Integral.Bochner.Basic
 import Mathlib.MeasureTheory.Function.L1Space.Integrable
 

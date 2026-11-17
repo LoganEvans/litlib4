@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y2003/nakahara2003geometry/Chapter07/Sec11_StringTheory.lean
 
 import Litlib.Core
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 

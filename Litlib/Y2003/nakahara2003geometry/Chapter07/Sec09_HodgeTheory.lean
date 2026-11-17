@@ -3,7 +3,7 @@
 import Litlib.Core
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Algebra.Module.Basic
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 
 namespace Litlib.Y2003.nakahara2003geometry
 

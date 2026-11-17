@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y1974/guillemin1974differential/Chapter03/Sec06_HopfDegreeTheorem.lean
 
 import Mathlib.Data.Fintype.Card
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Topology.Connected.Basic
 import Litlib.Core
 

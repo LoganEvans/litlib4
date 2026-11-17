@@ -1,12 +1,12 @@
 -- FILENAME: @litlib4/Litlib/Y2003/nakahara2003geometry/Chapter10/Sec05_GaugeTheories.lean
 
 import Litlib.Core
-import Mathlib.Data.Real.Basic
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Real.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Topology.Basic
 import Mathlib.Topology.ContinuousMap.Basic
 import Mathlib.Topology.UnitInterval
-import Mathlib.MeasureTheory.Measure.MeasureSpace
+import Mathlib.MeasureTheory.Measure.Basic
 import Mathlib.MeasureTheory.Function.L1Space.Integrable
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 

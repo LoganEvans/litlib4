@@ -3,7 +3,7 @@
 import Mathlib.LinearAlgebra.Determinant
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fintype.BigOperators
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Topology.Connected.Basic
 import Litlib.Core
 

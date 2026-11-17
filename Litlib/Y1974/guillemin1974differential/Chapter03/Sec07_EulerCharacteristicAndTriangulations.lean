@@ -2,7 +2,7 @@
 
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fintype.BigOperators
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 import Litlib.Core
 
 namespace Litlib.Y1974.guillemin1974differential

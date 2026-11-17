@@ -4,10 +4,10 @@ import Litlib.Core
 import Mathlib.Topology.Basic
 import Mathlib.Topology.ContinuousMap.Basic
 import Litlib.Y2003.nakahara2003geometry.Chapter10.Sec05_GaugeTheories
-import Mathlib.Data.Real.Basic
-import Mathlib.Data.Real.Sqrt
+import Mathlib.Basic.Real.Basic
+import Mathlib.Analysis.Real.Sqrt
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic

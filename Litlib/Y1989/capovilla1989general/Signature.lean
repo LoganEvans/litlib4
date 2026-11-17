@@ -1,8 +1,8 @@
 -- FILENAME: @litlib4/Litlib/Y1989/capovilla1989general/Signature.lean
 
 import Litlib.Core
-import Mathlib.Data.Complex.Basic
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Complex.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
 

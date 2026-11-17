@@ -4,7 +4,7 @@ import Litlib.Core
 import Litlib.Math.SU2
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Matrix.Block
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.Tactic.Ring
 import Mathlib.Tactic.FinCases

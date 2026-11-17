@@ -1,9 +1,9 @@
 -- FILENAME: @litlib4/Litlib/Y1995/peres1995quantum/Chapter07/Sec02_Gleason.lean
 
 import Litlib.Core
-import Mathlib.Data.Real.Basic
-import Mathlib.Data.Real.Sqrt
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Real.Basic
+import Mathlib.Analysis.Real.Sqrt
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Int.Interval
 import Mathlib.LinearAlgebra.Matrix.Trace

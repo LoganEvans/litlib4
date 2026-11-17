@@ -2,8 +2,8 @@
 
 import Mathlib.Data.Fintype.Card
 import Mathlib.Data.Fintype.BigOperators
-import Mathlib.Data.Complex.Basic
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Complex.Basic
+import Mathlib.Basic.Real.Basic
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Topology.Basic

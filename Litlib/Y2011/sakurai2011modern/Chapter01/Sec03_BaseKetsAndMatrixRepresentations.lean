@@ -1,7 +1,7 @@
 -- FILENAME: @litlib4/Litlib/Y2011/sakurai2011modern/Chapter01/Sec03_BaseKetsAndMatrixRepresentations.lean
 
 import Litlib.Core
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 import Litlib.Y2011.sakurai2011modern.Paper
 

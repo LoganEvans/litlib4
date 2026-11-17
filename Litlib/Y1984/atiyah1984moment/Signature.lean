@@ -5,7 +5,7 @@ import Mathlib.Algebra.Module.Basic
 import Mathlib.Algebra.Algebra.Basic
 import Mathlib.RingTheory.Localization.Basic
 import Mathlib.Topology.Basic
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Data.Fintype.Basic
 
 open Finset

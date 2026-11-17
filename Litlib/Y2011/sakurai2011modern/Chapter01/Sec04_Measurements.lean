@@ -1,9 +1,9 @@
 -- FILENAME: @litlib4/Litlib/Y2011/sakurai2011modern/Chapter01/Sec04_Measurements.lean
 
 import Litlib.Core
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Data.Matrix.Basic
-import Mathlib.Data.Real.Sqrt
+import Mathlib.Analysis.Real.Sqrt
 import Litlib.Y2011.sakurai2011modern.Paper
 
 namespace Litlib.Y2011.sakurai2011modern

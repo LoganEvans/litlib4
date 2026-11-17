@@ -1,8 +1,8 @@
 -- FILENAME: @litlib4/Litlib/Y1994/stuart1994geodesic/Signature.lean
 
 import Litlib.Core
-import Mathlib.Data.Real.Basic
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Real.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
